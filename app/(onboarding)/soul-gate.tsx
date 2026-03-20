@@ -11,6 +11,7 @@ import { fonts, fontSizes } from '@/src/constants/typography';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import { useAuthStore } from '@/src/stores/authStore';
 import { signInWithApple, signInWithGoogle } from '@/src/services/auth';
+import { features } from '@/src/config/features';
 
 export default function SoulGate() {
   const router = useRouter();
@@ -142,7 +143,7 @@ export default function SoulGate() {
                   variant="filled"
                   fullWidth
                 />
-                {Platform.OS === 'ios' && (
+                {features.appleSignIn && Platform.OS === 'ios' && (
                   <GoldButton
                     title="CONTINUE WITH APPLE"
                     onPress={handleAppleAuth}
@@ -150,12 +151,14 @@ export default function SoulGate() {
                     fullWidth
                   />
                 )}
-                <GoldButton
-                  title="CONTINUE WITH GOOGLE"
-                  onPress={handleGoogleAuth}
-                  variant="outlined"
-                  fullWidth
-                />
+                {features.googleSignIn && (
+                  <GoldButton
+                    title="CONTINUE WITH GOOGLE"
+                    onPress={handleGoogleAuth}
+                    variant="outlined"
+                    fullWidth
+                  />
+                )}
                 <GoldButton
                   title="Continue as Guest"
                   onPress={handleGuestContinue}
