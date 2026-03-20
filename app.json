@@ -30,8 +30,7 @@
       "expo-secure-store",
       "expo-font",
       "expo-localization",
-      "expo-web-browser",
-      "react-native-reanimated"
+      "expo-web-browser"
     ]
   }
 }
