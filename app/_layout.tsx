@@ -9,6 +9,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from '@/src/i18n';
 import { colors } from '@/src/constants/colors';
 import { useHydration } from '@/src/hooks/useHydration';
+import { useAuthListener } from '@/src/hooks/useAuthListener';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,6 +25,7 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const hydrated = useHydration();
+  useAuthListener();
   const [fontsLoaded, fontError] = useFonts({
     'CinzelDecorative-Regular': require('@/assets/fonts/CinzelDecorative-Regular.ttf'),
     'CinzelDecorative-Bold': require('@/assets/fonts/CinzelDecorative-Bold.ttf'),

@@ -1,0 +1,33 @@
+{
+  "title": "ออราเคิล",
+  "chat": {
+    "placeholder": "ถามออราเคิล...",
+    "send": "ส่ง",
+    "dailyLimit": "คุณใช้คำถามฟรีวันนี้หมดแล้ว",
+    "upgradePrompt": "ปลดล็อกการดูดวงไม่จำกัดกับแพ็คมาตรฐาน — ฿149/เดือน"
+  },
+  "tarot": {
+    "title": "ไพ่ทาโรต์",
+    "singleCard": "ไพ่ใบเดียว",
+    "threeCard": "ไพ่สามใบ",
+    "celticCross": "เซลติกครอส",
+    "selectSpread": "เลือกรูปแบบไพ่",
+    "drawCards": "จั่วไพ่",
+    "autoDraw": "จั่วอัตโนมัติ",
+    "interpretation": "การตีความ",
+    "past": "อดีต",
+    "present": "ปัจจุบัน",
+    "future": "อนาคต"
+  },
+  "siamSi": {
+    "title": "เซียมซี",
+    "instruction": "ตั้งสมาธิกับคำถาม แล้วเขย่าโทรศัพท์",
+    "shakePrompt": "เขย่าเพื่อจั่ว",
+    "remaining": "เหลือ {{count}} ครั้งในเดือนนี้",
+    "unlimited": "ไม่จำกัดจำนวนครั้ง"
+  },
+  "modes": {
+    "mordoo": "หมอดู",
+    "strategist": "นักกลยุทธ์"
+  }
+}

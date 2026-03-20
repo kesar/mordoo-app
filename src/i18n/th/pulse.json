@@ -1,0 +1,30 @@
+{
+  "title": "พลังงาน",
+  "energyScore": "คะแนนพลังงาน",
+  "summary": "สรุปจักรวาลวันนี้",
+  "subScores": {
+    "business": "ธุรกิจ",
+    "heart": "ความรัก",
+    "body": "สุขภาพ"
+  },
+  "luckyElements": {
+    "title": "ธาตุมงคล",
+    "color": "สีมงคล",
+    "number": "เลขนำโชค",
+    "direction": "ทิศมงคล"
+  },
+  "cosmicNews": {
+    "title": "ข่าวจักรวาล",
+    "seeAll": "ดูทั้งหมด",
+    "tags": {
+      "transit": "การโคจร",
+      "market": "ตลาด",
+      "personal": "ส่วนตัว"
+    }
+  },
+  "powerWindows": {
+    "title": "ช่วงเวลาทอง",
+    "seeFullDay": "ดูทั้งวัน",
+    "locked": "อัปเกรดเพื่อปลดล็อกข้อมูลรายชั่วโมง"
+  }
+}

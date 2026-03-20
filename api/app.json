@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.anonymous.mordooapi"
+  },
+  "ios": {
+    "bundleIdentifier": "com.anonymous.mordooapi"
+  }
+}

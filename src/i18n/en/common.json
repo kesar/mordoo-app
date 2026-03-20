@@ -1,0 +1,29 @@
+{
+  "appName": "Mor Doo",
+  "tabs": {
+    "pulse": "The Pulse",
+    "oracle": "The Oracle"
+  },
+  "actions": {
+    "continue": "Continue",
+    "skip": "Skip for now",
+    "share": "Share",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "retry": "Try Again"
+  },
+  "subscription": {
+    "free": "Freemium",
+    "standard": "Standard",
+    "upgrade": "Upgrade to Standard",
+    "price": "฿149/month"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "No internet connection.",
+    "timeout": "Request timed out."
+  }
+}

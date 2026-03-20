@@ -1,0 +1,85 @@
+{
+  "soulGate": {
+    "title": "Welcome, Seeker",
+    "subtitle": "Choose your language to begin",
+    "guestMode": "Continue as Guest",
+    "createAccount": "Create Account"
+  },
+  "birthData": {
+    "title": "Your Celestial Foundation",
+    "subtitle": "This data is sacred — it defines your cosmic blueprint",
+    "dateLabel": "Date of Birth",
+    "timeLabel": "Time of Birth",
+    "timeHint": "Even an approximate hour significantly changes your reading",
+    "timeUnknown": "I don't know my birth time",
+    "placeLabel": "Place of Birth",
+    "genderLabel": "Gender (optional)",
+    "genderOptions": {
+      "male": "Male",
+      "female": "Female",
+      "nonBinary": "Non-binary",
+      "preferNot": "Prefer not to say"
+    }
+  },
+  "nameNumbers": {
+    "title": "Name & Numbers",
+    "subtitle": "Your name carries vibrations that shape your destiny",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number (optional)",
+    "carPlate": "Car Plate (optional)",
+    "lifePathNumber": "Life Path Number",
+    "nameVibration": "Name Vibration"
+  },
+  "lifeContext": {
+    "title": "What brings you here today?",
+    "concerns": {
+      "love": "Love & Relationships",
+      "career": "Career & Business",
+      "money": "Money & Investment",
+      "health": "Health & Wellness",
+      "family": "Family",
+      "spiritual": "Spiritual Growth"
+    },
+    "urgency": {
+      "exploring": "Just exploring",
+      "specific": "I need guidance on a specific decision"
+    },
+    "situationPlaceholder": "Briefly describe your situation"
+  },
+  "powerUps": {
+    "title": "Unlock Deeper Readings",
+    "health": {
+      "title": "Health Data",
+      "description": "Correlate HRV and sleep with planetary transits"
+    },
+    "location": {
+      "title": "Location",
+      "description": "GPS Temple Finder and location-based rituals"
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Export auspicious dates to your calendar"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Daily Energy Score alerts and cosmic updates"
+    },
+    "comingSoon": "Coming soon"
+  },
+  "soulSnapshot": {
+    "title": "Your Soul Snapshot",
+    "loading": {
+      "stars": "Reading the stars...",
+      "blueprint": "Calculating your celestial blueprint...",
+      "cosmos": "The cosmos speaks..."
+    },
+    "energyScore": "Energy Score",
+    "business": "Business",
+    "heart": "Heart",
+    "body": "Body",
+    "luckyColor": "Lucky Color",
+    "luckyNumber": "Lucky Number",
+    "luckyDirection": "Lucky Direction",
+    "enterRealms": "Enter the Realms"
+  }
+}

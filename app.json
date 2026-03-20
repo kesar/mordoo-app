@@ -30,7 +30,19 @@
       "expo-secure-store",
       "expo-font",
       "expo-localization",
-      "expo-web-browser"
-    ]
+      "expo-web-browser",
+      "expo-apple-authentication",
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Allow $(PRODUCT_NAME) to detect shake gestures for Siam Si fortune drawing"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": ""
+      }
+    }
   }
 }

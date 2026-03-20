@@ -1,0 +1,30 @@
+{
+  "title": "The Pulse",
+  "energyScore": "Energy Score",
+  "summary": "Today's Cosmic Summary",
+  "subScores": {
+    "business": "Business",
+    "heart": "Heart",
+    "body": "Body"
+  },
+  "luckyElements": {
+    "title": "Lucky Elements",
+    "color": "Lucky Color",
+    "number": "Lucky Number",
+    "direction": "Lucky Direction"
+  },
+  "cosmicNews": {
+    "title": "Cosmic News",
+    "seeAll": "See all",
+    "tags": {
+      "transit": "Transit",
+      "market": "Market",
+      "personal": "Personal"
+    }
+  },
+  "powerWindows": {
+    "title": "Power Windows",
+    "seeFullDay": "See full day",
+    "locked": "Upgrade to unlock hourly insights"
+  }
+}

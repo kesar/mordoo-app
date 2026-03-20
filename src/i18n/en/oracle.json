@@ -1,0 +1,33 @@
+{
+  "title": "The Oracle",
+  "chat": {
+    "placeholder": "Ask the Oracle...",
+    "send": "Send",
+    "dailyLimit": "You've used your free question today",
+    "upgradePrompt": "Unlock unlimited readings with Standard — ฿149/month"
+  },
+  "tarot": {
+    "title": "Tarot Reading",
+    "singleCard": "Single Card",
+    "threeCard": "Three-Card Spread",
+    "celticCross": "Celtic Cross",
+    "selectSpread": "Choose your spread",
+    "drawCards": "Draw Cards",
+    "autoDraw": "Auto-draw",
+    "interpretation": "Interpretation",
+    "past": "Past",
+    "present": "Present",
+    "future": "Future"
+  },
+  "siamSi": {
+    "title": "Siam Si",
+    "instruction": "Focus on your question, then shake your phone",
+    "shakePrompt": "Shake to draw",
+    "remaining": "{{count}} draws remaining this month",
+    "unlimited": "Unlimited draws"
+  },
+  "modes": {
+    "mordoo": "Mor Doo",
+    "strategist": "Strategist"
+  }
+}
