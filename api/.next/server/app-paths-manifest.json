@@ -1,3 +1,6 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/oracle/chat/route": "app/api/oracle/chat/route.js",
+  "/api/pulse/daily/route": "app/api/pulse/daily/route.js",
   "/page": "app/page.js"
 }

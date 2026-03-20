@@ -1,14 +1,39 @@
 {
   "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-078f6dfb37dff419.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-38b49df12a94ee57.js",
+      "static/chunks/main-app-7ce0842a2d0f18eb.js",
+      "static/chunks/app/_not-found/page-8b5dbb511c88e47f.js"
+    ],
     "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/layout.js"
+      "static/chunks/webpack-078f6dfb37dff419.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-38b49df12a94ee57.js",
+      "static/chunks/main-app-7ce0842a2d0f18eb.js",
+      "static/chunks/app/layout-15cedeb33cdb6b72.js"
+    ],
+    "/api/oracle/chat/route": [
+      "static/chunks/webpack-078f6dfb37dff419.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-38b49df12a94ee57.js",
+      "static/chunks/main-app-7ce0842a2d0f18eb.js",
+      "static/chunks/app/api/oracle/chat/route-15cedeb33cdb6b72.js"
+    ],
+    "/api/pulse/daily/route": [
+      "static/chunks/webpack-078f6dfb37dff419.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-38b49df12a94ee57.js",
+      "static/chunks/main-app-7ce0842a2d0f18eb.js",
+      "static/chunks/app/api/pulse/daily/route-15cedeb33cdb6b72.js"
     ],
     "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/webpack-078f6dfb37dff419.js",
+      "static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "static/chunks/255-38b49df12a94ee57.js",
+      "static/chunks/main-app-7ce0842a2d0f18eb.js",
+      "static/chunks/app/page-15cedeb33cdb6b72.js"
     ]
   }
 }
