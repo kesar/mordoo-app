@@ -10,7 +10,7 @@ function buildSystemPrompt(birthData?: {
   dateOfBirth: string;
   fullName?: string;
   concerns: string[];
-}) {
+}, lang?: string) {
   let context = '';
   if (birthData) {
     const date = new Date(birthData.dateOfBirth);
@@ -44,7 +44,9 @@ Your personality:
 - When appropriate, give specific actionable advice tied to astrological timing
 - Today's date: ${new Date().toISOString().split('T')[0]}
 ${context}
-Respond in the same language the seeker uses. If they write in Thai, respond in Thai. If English, respond in English.`;
+${lang === 'th'
+  ? 'ตอบเป็นภาษาไทยเสมอ ใช้ภาษาที่สุภาพและเข้าใจง่าย'
+  : 'Always respond in English. Use clear, accessible language.'}`;
 }
 
 function getZodiacSign(month: number, day: number): string {
@@ -105,9 +107,10 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const { message, birthData } = body as {
+  const { message, birthData, lang: rawLang } = body as {
     message: string;
     birthData?: { dateOfBirth: string; fullName?: string; concerns: string[] };
+    lang?: string;
   };
 
   if (!message || typeof message !== 'string') {
@@ -190,7 +193,7 @@ export async function POST(request: NextRequest) {
   }
 
   // 4. Call Claude API with streaming
-  const systemPrompt = buildSystemPrompt(birthData ?? undefined);
+  const systemPrompt = buildSystemPrompt(birthData ?? undefined, rawLang ?? undefined);
 
   const stream = await anthropic.messages.stream({
     model: 'claude-sonnet-4-6',
