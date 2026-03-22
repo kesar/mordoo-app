@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Markdown from 'react-native-markdown-display';
 import { router } from 'expo-router';
 import { Text } from '@/src/components/ui/Text';
 import { StarIcon, LockIcon, BambooIcon, SendArrowIcon } from '@/src/components/icons/TarotIcons';
@@ -79,6 +80,61 @@ function ModeToggle({
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mordooAvatar = require('@/assets/images/mordoo-avatar.png');
 
+const markdownStyles = {
+  body: {
+    fontFamily: fonts.body.regular,
+    fontSize: 15,
+    color: colors.onSurface,
+    lineHeight: 21,
+  },
+  paragraph: {
+    marginTop: 0,
+    marginBottom: 4,
+  },
+  strong: {
+    fontFamily: fonts.body.semibold,
+    color: colors.gold.light,
+  },
+  em: {
+    fontFamily: fonts.body.regular,
+    fontStyle: 'italic' as const,
+    color: colors.onSurface,
+  },
+  bullet_list: {
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  ordered_list: {
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  list_item: {
+    marginTop: 1,
+    marginBottom: 1,
+  },
+  heading1: {
+    fontFamily: fonts.display.bold,
+    fontSize: 18,
+    color: colors.gold.light,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  heading2: {
+    fontFamily: fonts.display.bold,
+    fontSize: 16,
+    color: colors.gold.light,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  heading3: {
+    fontFamily: fonts.body.semibold,
+    fontSize: 15,
+    color: colors.gold.light,
+    marginTop: 2,
+    marginBottom: 2,
+  },
+};
+
 function AiMessageBubble({ message }: { message: ChatMessage }) {
   const time = new Date(message.timestamp).toLocaleTimeString([], {
     hour: '2-digit',
@@ -88,7 +144,7 @@ function AiMessageBubble({ message }: { message: ChatMessage }) {
     <View style={styles.aiRow}>
       <Image source={mordooAvatar} style={styles.avatar} />
       <View style={styles.aiBubble}>
-        <Text style={styles.aiBubbleBody}>{message.content}</Text>
+        <Markdown style={markdownStyles}>{message.content}</Markdown>
         <Text style={styles.aiBubbleTime}>{time}</Text>
       </View>
     </View>

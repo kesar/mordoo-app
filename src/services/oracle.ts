@@ -24,70 +24,69 @@ export async function sendOracleMessage(params: SendMessageParams): Promise<void
     return;
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/oracle/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ message, birthData, lang }),
-    });
+  // Use XMLHttpRequest for streaming — React Native's fetch doesn't support ReadableStream
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', `${API_BASE_URL}/api/oracle/chat`);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.setRequestHeader('Authorization', `Bearer ${session.access_token}`);
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      if (response.status === 429) {
-        onError(new Error('QUOTA_EXCEEDED'));
+  let lastIndex = 0;
+  let settled = false;
+
+  const settle = (fn: () => void) => {
+    if (!settled) {
+      settled = true;
+      fn();
+    }
+  };
+
+  xhr.onprogress = () => {
+    const newText = xhr.responseText.slice(lastIndex);
+    lastIndex = xhr.responseText.length;
+
+    const chunks = newText.split('\n\n');
+    for (const chunk of chunks) {
+      if (!chunk.startsWith('data: ')) continue;
+      const data = chunk.slice(6);
+      if (data === '[DONE]') {
+        settle(onDone);
         return;
       }
-      onError(new Error(errorData.error || `API error: ${response.status}`));
-      return;
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) {
-      onError(new Error('No response stream'));
-      return;
-    }
-
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          if (data === '[DONE]') {
-            onDone();
-            return;
-          }
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed.text) {
-              onChunk(parsed.text);
-            }
-            if (parsed.error) {
-              onError(new Error(parsed.error));
-              return;
-            }
-          } catch {
-            // Skip malformed JSON chunks
-          }
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed.text) onChunk(parsed.text);
+        if (parsed.error) {
+          settle(() => onError(new Error(parsed.error)));
+          return;
         }
+      } catch {
+        // Skip malformed JSON chunks
       }
     }
+  };
 
-    onDone();
-  } catch (error) {
-    onError(error instanceof Error ? error : new Error('Network error'));
-  }
+  xhr.onload = () => {
+    if (xhr.status === 429) {
+      settle(() => onError(new Error('QUOTA_EXCEEDED')));
+      return;
+    }
+    if (xhr.status !== 200) {
+      let errorMsg = `API error: ${xhr.status}`;
+      try {
+        const parsed = JSON.parse(xhr.responseText);
+        if (parsed.error) errorMsg = parsed.error;
+      } catch { /* use default */ }
+      settle(() => onError(new Error(errorMsg)));
+      return;
+    }
+    settle(onDone);
+  };
+
+  xhr.onerror = () => {
+    settle(() => onError(new Error('Network error')));
+  };
+
+  xhr.send(JSON.stringify({ message, birthData, lang }));
 }
 
 export interface SiamSiDrawResponse {
