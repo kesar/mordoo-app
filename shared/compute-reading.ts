@@ -129,6 +129,22 @@ export function momentum(today: number, day1: number, day2: number, day3: number
   return Math.max(-1, Math.min(1, weightedTrend / 15));
 }
 
+// Internal helper — computes one sub-score for a given date WITHOUT momentum
+function computeBaseSubScore(
+  input: BirthDataInput,
+  dateStr: string,
+  dimOffset: number,
+  weight: number,
+  lifePath: number,
+  namNum: number,
+): number {
+  const seed = hashCode(`${input.userId}:${dateStr}`);
+  const energy = computeEnergyScore(lifePath, namNum, seed);
+  const base = weight * energy;
+  const variation = seededRandom(seed, dimOffset, 31) - 15;
+  return Math.max(0, Math.min(100, Math.round(base + variation)));
+}
+
 export function computeReading(input: BirthDataInput): DailyPulseReading {
   const lifePath = lifePathNumber(input.dateOfBirth);
   const namNum = input.fullName ? nameNumber(input.fullName) : 5;
@@ -137,16 +153,30 @@ export function computeReading(input: BirthDataInput): DailyPulseReading {
   // Energy score: base from life path, modulated by daily seed and name number
   const energyScore = computeEnergyScore(lifePath, namNum, dailySeed);
 
-  // Sub-scores: vary ±15 around energy score
-  const business = Math.max(0, Math.min(100,
-    energyScore + seededRandom(dailySeed, 1, 31) - 15));
-  const heart = Math.max(0, Math.min(100,
-    energyScore + seededRandom(dailySeed, 2, 31) - 15));
-  const body = Math.max(0, Math.min(100,
-    energyScore + seededRandom(dailySeed, 3, 31) - 15));
+  // Extract birth day and month for sub-scores and lucky color/direction
+  const birthDay = parseInt(input.dateOfBirth.split('-')[2], 10);
+  const birthMonth = parseInt(input.dateOfBirth.split('-')[1], 10);
+  const weights = profileWeights(lifePath, namNum, birthDay, birthMonth);
+
+  const dims = [
+    { key: 'business' as const, offset: 1, weight: weights.business },
+    { key: 'heart' as const, offset: 2, weight: weights.heart },
+    { key: 'body' as const, offset: 3, weight: weights.body },
+  ];
+
+  const subScores = { business: 0, heart: 0, body: 0 };
+
+  for (const dim of dims) {
+    const todayBase = computeBaseSubScore(input, input.currentDate, dim.offset, dim.weight, lifePath, namNum);
+    const day1 = computeBaseSubScore(input, subtractDays(input.currentDate, 1), dim.offset, dim.weight, lifePath, namNum);
+    const day2 = computeBaseSubScore(input, subtractDays(input.currentDate, 2), dim.offset, dim.weight, lifePath, namNum);
+    const day3 = computeBaseSubScore(input, subtractDays(input.currentDate, 3), dim.offset, dim.weight, lifePath, namNum);
+
+    const trend = momentum(todayBase, day1, day2, day3);
+    subScores[dim.key] = Math.max(0, Math.min(100, Math.round(todayBase + trend * 5)));
+  }
 
   // Lucky color: based on birth month element + daily offset
-  const birthMonth = parseInt(input.dateOfBirth.split('-')[1], 10);
   const colorIndex = (birthMonth + seededRandom(dailySeed, 4, LUCKY_COLORS.length)) % LUCKY_COLORS.length;
   const luckyColor = {
     name: LUCKY_COLORS[colorIndex].name,
@@ -171,6 +201,6 @@ export function computeReading(input: BirthDataInput): DailyPulseReading {
     luckyNumber,
     luckyDirection: direction.en,
     luckyDirectionTh: direction.th,
-    subScores: { business, heart, body },
+    subScores,
   };
 }

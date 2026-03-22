@@ -116,3 +116,82 @@ describe('momentum', () => {
     expect(momentum(0, 100, 100, 100)).toBeGreaterThanOrEqual(-1);
   });
 });
+
+describe('computeReading sub-scores', () => {
+  it('sub-scores are between 0 and 100', () => {
+    const users = ['user-a', 'user-b', 'user-c'];
+    const dates = ['2026-01-01', '2026-06-15', '2026-12-31'];
+    for (const userId of users) {
+      for (const currentDate of dates) {
+        const result = computeReading({
+          userId,
+          dateOfBirth: '1990-06-15',
+          fullName: 'Test User',
+          currentDate,
+        });
+        expect(result.subScores.business).toBeGreaterThanOrEqual(0);
+        expect(result.subScores.business).toBeLessThanOrEqual(100);
+        expect(result.subScores.heart).toBeGreaterThanOrEqual(0);
+        expect(result.subScores.heart).toBeLessThanOrEqual(100);
+        expect(result.subScores.body).toBeGreaterThanOrEqual(0);
+        expect(result.subScores.body).toBeLessThanOrEqual(100);
+      }
+    }
+  });
+
+  it('different users get different profile shapes', () => {
+    const userA = computeReading({
+      userId: 'user-a',
+      dateOfBirth: '1990-03-23',
+      fullName: 'Alice Johnson',
+      currentDate: '2026-03-22',
+    });
+    const userB = computeReading({
+      userId: 'user-b',
+      dateOfBirth: '1985-11-07',
+      fullName: 'Bob Williams',
+      currentDate: '2026-03-22',
+    });
+    const ratioA = userA.subScores.business / (userA.subScores.heart || 1);
+    const ratioB = userB.subScores.business / (userB.subScores.heart || 1);
+    expect(ratioA).not.toBeCloseTo(ratioB, 1);
+  });
+
+  it('sub-scores vary across days for the same user', () => {
+    const days = ['2026-03-20', '2026-03-21', '2026-03-22', '2026-03-23', '2026-03-24'];
+    const scores = days.map(d => computeReading({
+      userId: 'test-user-1',
+      dateOfBirth: '1990-06-15',
+      fullName: 'John Smith',
+      currentDate: d,
+    }).subScores.business);
+    const unique = new Set(scores);
+    expect(unique.size).toBeGreaterThan(1);
+  });
+
+  it('user without fullName still gets varied sub-scores', () => {
+    const result = computeReading({
+      userId: 'test-user-no-name',
+      dateOfBirth: '1995-08-20',
+      currentDate: '2026-03-22',
+    });
+    expect(result.subScores.business).toBeGreaterThanOrEqual(0);
+    expect(result.subScores.heart).toBeGreaterThanOrEqual(0);
+    expect(result.subScores.body).toBeGreaterThanOrEqual(0);
+    const { business, heart, body } = result.subScores;
+    const allSame = business === heart && heart === body;
+    expect(allSame).toBe(false);
+  });
+
+  it('remains deterministic', () => {
+    const input = {
+      userId: 'test-user-1',
+      dateOfBirth: '1990-06-15',
+      fullName: 'John Smith',
+      currentDate: '2026-03-22',
+    };
+    const a = computeReading(input);
+    const b = computeReading(input);
+    expect(a.subScores).toEqual(b.subScores);
+  });
+});
