@@ -86,15 +86,19 @@ const DIRECTIONS = [
   { en: 'Northwest', th: 'ทิศตะวันตกเฉียงเหนือ' },
 ] as const;
 
+function computeEnergyScore(lifePath: number, namNum: number, dailySeed: number): number {
+  const baseScore = ((lifePath * 7 + dailySeed) % 41) + 40;
+  const nameModifier = ((namNum * 3 + dailySeed) % 21) - 10;
+  return Math.max(0, Math.min(100, baseScore + nameModifier));
+}
+
 export function computeReading(input: BirthDataInput): DailyPulseReading {
   const lifePath = lifePathNumber(input.dateOfBirth);
   const namNum = input.fullName ? nameNumber(input.fullName) : 5;
   const dailySeed = hashCode(`${input.userId}:${input.currentDate}`);
 
   // Energy score: base from life path, modulated by daily seed and name number
-  const baseScore = ((lifePath * 7 + dailySeed) % 41) + 40; // 40-80
-  const nameModifier = ((namNum * 3 + dailySeed) % 21) - 10; // -10 to +10
-  const energyScore = Math.max(0, Math.min(100, baseScore + nameModifier));
+  const energyScore = computeEnergyScore(lifePath, namNum, dailySeed);
 
   // Sub-scores: vary ±15 around energy score
   const business = Math.max(0, Math.min(100,
