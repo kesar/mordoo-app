@@ -1,54 +1,52 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Accelerometer } from 'expo-sensors';
-import { useAuthStore } from '@/src/stores/authStore';
-import { useOracleStore } from '@/src/stores/oracleStore';
-import { drawSiamSi, type SiamSiStick } from '@shared/siam-si';
+import { fetchSiamSiDraw, type SiamSiDrawResponse } from '@/src/services/oracle';
 
 const SHAKE_THRESHOLD = 1.8;
 const SHAKE_DURATION_MS = 300;
 const COOLDOWN_MS = 2000;
 
-export function useSiamSi(maxDrawsPerMonth: number) {
-  const userId = useAuthStore((s) => s.userId);
-  const siamSiThisMonth = useOracleStore((s) => s.siamSiThisMonth);
-  const incrementSiamSiQuota = useOracleStore((s) => s.incrementSiamSiQuota);
-  const checkAndResetQuotas = useOracleStore((s) => s.checkAndResetQuotas);
-
+export function useSiamSi() {
   const [isShaking, setIsShaking] = useState(false);
-  const [currentStick, setCurrentStick] = useState<SiamSiStick | null>(null);
+  const [currentStick, setCurrentStick] = useState<SiamSiDrawResponse | null>(null);
   const [isRevealing, setIsRevealing] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [drawsRemaining, setDrawsRemaining] = useState<number | null>(null);
+  const [drawsTotal, setDrawsTotal] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const shakeStartRef = useRef<number | null>(null);
   const cooldownRef = useRef(false);
 
-  const drawsRemaining = maxDrawsPerMonth === Infinity
-    ? Infinity
-    : Math.max(0, maxDrawsPerMonth - siamSiThisMonth);
+  const canDraw = drawsRemaining === null || drawsRemaining > 0;
 
-  const canDraw = drawsRemaining > 0;
-
-  useEffect(() => {
-    checkAndResetQuotas();
-  }, [checkAndResetQuotas]);
-
-  const performDraw = useCallback(() => {
-    if (!canDraw || !userId || cooldownRef.current) return;
+  const performDraw = useCallback(async () => {
+    if (!canDraw || cooldownRef.current || isDrawing) return;
 
     cooldownRef.current = true;
+    setIsDrawing(true);
     setIsRevealing(true);
+    setError(null);
 
-    const now = new Date();
-    const yearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    const stick = drawSiamSi(userId, yearMonth, siamSiThisMonth);
-
-    setCurrentStick(stick);
-    incrementSiamSiQuota();
-
-    setTimeout(() => {
-      cooldownRef.current = false;
-      setIsRevealing(false);
-    }, COOLDOWN_MS);
-  }, [canDraw, userId, siamSiThisMonth, incrementSiamSiQuota]);
+    try {
+      const result = await fetchSiamSiDraw();
+      setCurrentStick(result);
+      setDrawsRemaining(result.drawsRemaining);
+      setDrawsTotal(result.drawsTotal);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Draw failed';
+      setError(message);
+      if (message === 'QUOTA_EXCEEDED') {
+        setDrawsRemaining(0);
+      }
+    } finally {
+      setIsDrawing(false);
+      setTimeout(() => {
+        cooldownRef.current = false;
+        setIsRevealing(false);
+      }, COOLDOWN_MS);
+    }
+  }, [canDraw, isDrawing]);
 
   useEffect(() => {
     const subscription = Accelerometer.addListener((data) => {
@@ -78,8 +76,11 @@ export function useSiamSi(maxDrawsPerMonth: number) {
     isShaking,
     currentStick,
     isRevealing,
+    isDrawing,
     drawsRemaining,
+    drawsTotal,
     canDraw,
+    error,
     performDraw,
   };
 }
