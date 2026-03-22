@@ -39,8 +39,8 @@ export default function SoulSnapshot() {
     if (!authMode) {
       setGuestAuth();
     } else if (authMode === 'account' && birthData) {
-      syncBirthData({ birthData, nameData, concerns, urgencyContext }).catch(() => {
-        // Silent fail — will use local computation as fallback
+      syncBirthData({ birthData, nameData, concerns, urgencyContext }).catch((err) => {
+        console.warn('Failed to sync birth data, will use local computation:', err);
       });
     }
     router.replace('/(main)/pulse');
@@ -138,9 +138,6 @@ export default function SoulSnapshot() {
 
           {/* Footer Actions */}
           <View style={styles.footerActions}>
-            <Pressable style={styles.shareButton}>
-              <Text style={styles.shareIcon}>↗</Text>
-            </Pressable>
             <GoldButton
               title="Enter the Realms"
               onPress={handleEnterRealms}
@@ -399,27 +396,11 @@ const styles = StyleSheet.create({
     gap: 12,
     alignItems: 'center',
   },
-  shareButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shareIcon: {
-    fontSize: 22,
-    color: colors.gold.DEFAULT,
-    lineHeight: 26,
-  },
   enterButton: {
-    flex: 1,
+    width: '100%',
     height: 56,
     borderRadius: 16,
     paddingVertical: 0,
-    alignSelf: 'stretch',
     shadowColor: colors.gold.light,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.5,

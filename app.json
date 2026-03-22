@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "ai.mordoo.app"
+      "bundleIdentifier": "ai.mordoo.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "ai.mordoo.app",
@@ -41,8 +44,10 @@
     ],
     "extra": {
       "eas": {
-        "projectId": ""
-      }
-    }
+        "projectId": "969fe2eb-8da0-4af0-be98-df44a79690a8"
+      },
+      "router": {}
+    },
+    "owner": "kesarito"
   }
 }

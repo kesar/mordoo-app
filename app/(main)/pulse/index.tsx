@@ -94,7 +94,7 @@ export default function PulseScreen() {
           <View style={styles.starMapTextOverlay}>
             <Text style={styles.starMapLocation}>YOUR DAILY READING</Text>
             <Text style={styles.starMapDate}>{dateStr}</Text>
-            <Text style={styles.starMapMoon}>✦ PRANA INDEX</Text>
+            <Text style={styles.starMapMoon}><RNText>{'✦ '}</RNText>PRANA INDEX</Text>
           </View>
         </View>
 

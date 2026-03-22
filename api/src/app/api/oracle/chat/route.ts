@@ -56,6 +56,7 @@ function getZodiacSign(month: number, day: number): string {
     [23, 'Libra', 'Virgo'], [23, 'Scorpio', 'Libra'],
     [22, 'Sagittarius', 'Scorpio'], [22, 'Capricorn', 'Sagittarius'],
   ];
+  if (month < 1 || month > 12) return 'Unknown';
   const [cutoff, after, before] = signs[month - 1];
   return day >= (cutoff as number) ? (after as string) : (before as string);
 }
@@ -94,7 +95,16 @@ export async function POST(request: NextRequest) {
   }
 
   // 2. Parse request
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const { message, birthData } = body as {
     message: string;
     birthData?: { dateOfBirth: string; fullName?: string; concerns: string[] };
@@ -107,15 +117,40 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  // Validate birthData shape if provided
+  if (birthData !== undefined) {
+    if (
+      typeof birthData !== 'object' ||
+      birthData === null ||
+      typeof birthData.dateOfBirth !== 'string' ||
+      !Array.isArray(birthData.concerns)
+    ) {
+      return new Response(JSON.stringify({ error: 'Invalid birth data' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
   // 3. Check quota
   const serviceClient = createServiceClient();
-  const today = new Date().toISOString().split('T')[0];
+  // Use the client-provided date context or fall back to server date
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-  const { data: quota } = await serviceClient
+  const { data: quota, error: quotaError } = await serviceClient
     .from('user_quotas')
     .select('*')
     .eq('user_id', user.id)
     .single();
+
+  // If quota query failed for a reason other than "not found", bail
+  if (quotaError && quotaError.code !== 'PGRST116') {
+    return new Response(JSON.stringify({ error: 'Failed to check quota' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   // Get user tier
   const { data: profile } = await serviceClient
@@ -180,8 +215,10 @@ export async function POST(request: NextRequest) {
         controller.enqueue(encoder.encode('data: [DONE]\n\n'));
         controller.close();
       } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Stream error';
+        console.error('Oracle stream error:', err);
         controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify({ error: 'Stream error' })}\n\n`),
+          encoder.encode(`data: ${JSON.stringify({ error: errorMessage })}\n\n`),
         );
         controller.close();
       }

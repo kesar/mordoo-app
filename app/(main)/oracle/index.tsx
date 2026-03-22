@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -51,7 +51,7 @@ function ModeToggle({
           onPress={() => onSelect('mordoo')}
         >
           <Text style={[styles.modeBtnText, mode === 'mordoo' && styles.modeBtnTextActive]}>
-            {'✦ Mor Doo'}
+            <RNText>{'✦ '}</RNText>Mor Doo
           </Text>
         </Pressable>
         <Pressable
@@ -60,7 +60,7 @@ function ModeToggle({
             /* locked — no-op */
           }}
         >
-          <Text style={[styles.modeBtnText, styles.modeBtnTextLocked]}>{'🔒 Strategist'}</Text>
+          <Text style={[styles.modeBtnText, styles.modeBtnTextLocked]}><RNText>{'🔒 '}</RNText>Strategist</Text>
         </Pressable>
       </View>
     </View>
@@ -155,16 +155,19 @@ export default function OracleScreen() {
   const concerns = useOnboardingStore((s) => s.concerns);
 
   // Reset quotas on mount
-  useState(() => {
+  useEffect(() => {
     checkAndResetQuotas();
-  });
+  }, [checkAndResetQuotas]);
 
   const displayMessages =
     messages.length === 0 ? [WELCOME_MESSAGE] : messages;
 
+  const sendingRef = useRef(false);
+
   const sendMessage = useCallback(() => {
     const text = input.trim();
-    if (!text || isStreaming) return;
+    if (!text || isStreaming || sendingRef.current) return;
+    sendingRef.current = true;
 
     lightHaptic();
     setInput('');
@@ -189,6 +192,7 @@ export default function OracleScreen() {
         timestamp: new Date().toISOString(),
       };
       addMessage(guestReply);
+      sendingRef.current = false;
       return;
     }
 
@@ -218,10 +222,12 @@ export default function OracleScreen() {
       },
       onDone: () => {
         setStreaming(false);
+        sendingRef.current = false;
         incrementOracleQuota();
       },
       onError: (error) => {
         setStreaming(false);
+        sendingRef.current = false;
         if (error.message === 'QUOTA_EXCEEDED') {
           setQuotaExceeded(true);
         } else {
@@ -329,7 +335,7 @@ const styles = StyleSheet.create({
   // ---- Message list ----
   messageList: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 16,
     paddingBottom: 160,
     gap: 16,
   },
@@ -337,7 +343,8 @@ const styles = StyleSheet.create({
   // ---- Mode Toggle ----
   modeToggleContainer: {
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   modePill: {
     flexDirection: 'row',

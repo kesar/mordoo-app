@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Pressable, StyleSheet, Text as RNText, Platform, Alert, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Pressable, StyleSheet, Platform, Alert, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,7 +9,6 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
-import { useAuthStore } from '@/src/stores/authStore';
 import { signInWithApple, signInWithGoogle } from '@/src/services/auth';
 import { features } from '@/src/config/features';
 
@@ -17,7 +16,6 @@ export default function SoulGate() {
   const router = useRouter();
   const { i18n } = useTranslation();
   const setLanguage = useOnboardingStore((s) => s.setLanguage);
-  const setGuestAuth = useAuthStore((s) => s.setGuestAuth);
   const [loading, setLoading] = useState(false);
 
   const selectLanguage = (lang: 'en' | 'th') => {
@@ -57,11 +55,6 @@ export default function SoulGate() {
     }
   };
 
-  const handleGuestContinue = () => {
-    setGuestAuth();
-    router.push('/(onboarding)/birth-data');
-  };
-
   const selectedLang = i18n.language as 'en' | 'th';
 
   return (
@@ -96,9 +89,6 @@ export default function SoulGate() {
           {/* Title */}
           <Text style={styles.title}>MOR DOO</Text>
 
-          {/* Subtitle */}
-          <Text style={styles.subtitle}>Choose your language to begin.</Text>
-
           {/* Language Selection */}
           <View style={styles.languageRow}>
             <Pressable
@@ -108,7 +98,7 @@ export default function SoulGate() {
               ]}
               onPress={() => selectLanguage('th')}
             >
-              <View style={styles.flagBadge}><RNText style={styles.flagBadgeText}>TH</RNText></View>
+              <Image source={{ uri: 'https://flagcdn.com/w160/th.png' }} style={styles.flagImage} />
               <Text style={styles.langLabelThai}>ไทย</Text>
             </Pressable>
 
@@ -119,7 +109,7 @@ export default function SoulGate() {
               ]}
               onPress={() => selectLanguage('en')}
             >
-              <View style={styles.flagBadge}><RNText style={styles.flagBadgeText}>EN</RNText></View>
+              <Image source={{ uri: 'https://flagcdn.com/w160/gb.png' }} style={styles.flagImage} />
               <Text style={styles.langLabelEnglish}>ENGLISH</Text>
             </Pressable>
           </View>
@@ -159,11 +149,6 @@ export default function SoulGate() {
                     fullWidth
                   />
                 )}
-                <GoldButton
-                  title="Continue as Guest"
-                  onPress={handleGuestContinue}
-                  variant="ghost"
-                />
               </>
             )}
           </View>
@@ -272,15 +257,6 @@ const styles = StyleSheet.create({
   },
 
   // Subtitle
-  subtitle: {
-    fontFamily: fonts.body.regular,
-    fontSize: fontSizes.xl,
-    color: colors.parchment.DEFAULT,
-    fontStyle: 'italic',
-    opacity: 0.9,
-    textAlign: 'center',
-  },
-
   // Language row
   languageRow: {
     flexDirection: 'row',
@@ -304,25 +280,10 @@ const styles = StyleSheet.create({
     borderColor: colors.gold.DEFAULT,
     backgroundColor: colors.surface.containerHighest,
   },
-  langFlag: {
-    fontSize: 36,
-    lineHeight: 44,
-  },
-  flagBadge: {
-    width: 56,
-    height: 40,
+  flagImage: {
+    width: 64,
+    height: 43,
     borderRadius: 6,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(201, 168, 76, 0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flagBadgeText: {
-    fontFamily: fonts.display.bold,
-    fontSize: 16,
-    color: colors.gold.light,
-    letterSpacing: 2,
   },
   langLabelThai: {
     fontFamily: fonts.thai.regular,
