@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { createServiceClient } from '../../../../lib/supabase';
+import { anthropic } from '../../../../lib/anthropic';
 import { authenticateRequest } from '../../../../lib/auth';
-import { getTodayString } from '../../../../lib/date';
+import { getBangkokDateString } from '../../../../lib/date';
 import {
   ORACLE_MODEL,
   ORACLE_MAX_TOKENS,
@@ -10,23 +10,25 @@ import {
   FREE_ORACLE_QUESTIONS_PER_DAY,
   PGRST_NOT_FOUND,
 } from '../../../../lib/config';
+import {
+  findOrCreateConversation,
+  saveMessage,
+  getRecentMessages,
+  getPastSummaries,
+  summarizeConversation,
+} from '../../../../lib/conversation';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
-
-function buildSystemPrompt(birthData?: {
-  dateOfBirth: string;
-  fullName?: string;
-  concerns: string[];
-}, lang?: string) {
+function buildSystemPrompt(
+  birthData?: { dateOfBirth: string; fullName?: string; concerns: string[] },
+  lang?: string,
+  summaries?: Array<{ date: string; summary: string }>,
+) {
   let context = '';
   if (birthData) {
     const date = new Date(birthData.dateOfBirth);
     const month = date.getMonth() + 1;
     const day = date.getDate();
 
-    // Simple zodiac calculation
     const zodiac = getZodiacSign(month, day);
     const element = getElement(month);
     const chineseZodiac = getChineseZodiac(date.getFullYear());
@@ -42,6 +44,11 @@ The seeker's birth data:
 `;
   }
 
+  let summaryContext = '';
+  if (summaries && summaries.length > 0) {
+    summaryContext = `\nPrevious sessions with this seeker:\n${summaries.map((s) => `- ${s.date}: ${s.summary}`).join('\n')}\n`;
+  }
+
   return `You are Mor Doo (หมอดู), a mystical Thai astrologer who blends Thai, Chinese, and Western astrology into deeply personal readings. You speak with ancient wisdom but in accessible modern language.
 
 Your personality:
@@ -52,11 +59,11 @@ Your personality:
 - Use mystical but clear language — no generic fortune cookie responses
 - Never use emojis — use words and markdown formatting (bold, italic) instead
 - When appropriate, give specific actionable advice tied to astrological timing
-- Today's date: ${new Date().toISOString().split('T')[0]}
-${context}
+- Today's date: ${getBangkokDateString()}
+${context}${summaryContext}
 ${lang === 'th'
-  ? 'ตอบเป็นภาษาไทยเสมอ ใช้ภาษาที่สุภาพและเข้าใจง่าย'
-  : 'Always respond in English. Use clear, accessible language.'}`;
+    ? 'ตอบเป็นภาษาไทยเสมอ ใช้ภาษาที่สุภาพและเข้าใจง่าย'
+    : 'Always respond in English. Use clear, accessible language.'}`;
 }
 
 function getZodiacSign(month: number, day: number): string {
@@ -109,7 +116,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Message required' }, { status: 400 });
   }
 
-  // Validate birthData shape if provided
   if (birthData !== undefined) {
     if (
       typeof birthData !== 'object' ||
@@ -123,7 +129,7 @@ export async function POST(request: NextRequest) {
 
   // 3. Check quota
   const serviceClient = createServiceClient();
-  const today = getTodayString();
+  const today = getBangkokDateString();
 
   const { data: quota, error: quotaError } = await serviceClient
     .from('user_quotas')
@@ -135,7 +141,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to check quota' }, { status: 500 });
   }
 
-  // Get user tier
   const { data: profile } = await serviceClient
     .from('profiles')
     .select('tier')
@@ -156,7 +161,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Daily quota exceeded' }, { status: 429 });
     }
 
-    // Increment quota
     const { error: updateError } = await serviceClient.from('user_quotas').update({
       oracle_questions_today: questionsToday + 1,
       oracle_last_reset: today,
@@ -168,7 +172,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update quota' }, { status: 500 });
     }
   } else {
-    // Create quota record
     const { error: insertError } = await serviceClient.from('user_quotas').insert({
       user_id: user.id,
       oracle_questions_today: 1,
@@ -181,29 +184,66 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 4. Call Claude API with streaming
-  const systemPrompt = buildSystemPrompt(birthData ?? undefined, rawLang ?? undefined);
+  // 4. Conversation persistence
+  let conversation: { id: string; conversationDate: string };
+  try {
+    conversation = await findOrCreateConversation(serviceClient, user.id);
+  } catch {
+    return NextResponse.json({ error: 'Failed to create conversation' }, { status: 500 });
+  }
 
-  const stream = await anthropic.messages.stream({
+  // Save user message immediately (before Claude call)
+  await saveMessage(serviceClient, conversation.id, user.id, 'user', message);
+
+  // Fire async summarization (non-blocking)
+  summarizeConversation(serviceClient, user.id);
+
+  // 5. Build context with history
+  const [recentMessages, summaries] = await Promise.all([
+    getRecentMessages(serviceClient, conversation.id),
+    getPastSummaries(serviceClient, user.id, conversation.conversationDate),
+  ]);
+
+  const systemPrompt = buildSystemPrompt(
+    birthData ?? undefined,
+    rawLang ?? undefined,
+    summaries,
+  );
+
+  // Build messages array: recent history + new message (already saved, included in recentMessages)
+  const claudeMessages = recentMessages.map((m) => ({
+    role: m.role as 'user' | 'assistant',
+    content: m.content,
+  }));
+
+  // 6. Call Claude API with streaming
+  const stream = anthropic.messages.stream({
     model: ORACLE_MODEL,
     max_tokens: ORACLE_MAX_TOKENS,
     temperature: ORACLE_TEMPERATURE,
     system: systemPrompt,
-    messages: [{ role: 'user', content: message }],
+    messages: claudeMessages,
   });
 
-  // 5. Return SSE stream
+  // 7. Return SSE stream, saving assistant response on completion
   const encoder = new TextEncoder();
+  let fullResponse = '';
+
   const readable = new ReadableStream({
     async start(controller) {
       try {
         for await (const event of stream) {
           if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+            fullResponse += event.delta.text;
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`),
             );
           }
         }
+
+        // Save assistant response after successful stream
+        await saveMessage(serviceClient, conversation.id, user.id, 'assistant', fullResponse);
+
         controller.enqueue(encoder.encode('data: [DONE]\n\n'));
         controller.close();
       } catch (err) {
