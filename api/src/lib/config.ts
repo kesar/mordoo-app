@@ -15,3 +15,15 @@ export const FREE_SIAM_SI_DRAWS_PER_DAY = 2;
 
 /** Supabase PostgREST error code for "no rows found" (single row expected). */
 export const PGRST_NOT_FOUND = 'PGRST116';
+
+/** Max recent messages to include in Claude context. */
+export const MAX_CONTEXT_MESSAGES = 15;
+
+/** Max days of summaries to include in Claude context. */
+export const MAX_SUMMARY_DAYS = 30;
+
+/** Max tokens for summarization responses. */
+export const SUMMARY_MAX_TOKENS = 200;
+
+/** Temperature for summarization (low for consistency). */
+export const SUMMARY_TEMPERATURE = 0.3;
