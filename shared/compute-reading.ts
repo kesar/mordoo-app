@@ -112,6 +112,23 @@ export function profileWeights(
   };
 }
 
+export function subtractDays(isoDate: string, days: number): string {
+  const d = new Date(isoDate + 'T00:00:00');
+  d.setDate(d.getDate() - days);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+export function momentum(today: number, day1: number, day2: number, day3: number): number {
+  const diff1 = today - day1;
+  const diff2 = day1 - day2;
+  const diff3 = day2 - day3;
+  const weightedTrend = (diff1 * 3 + diff2 * 2 + diff3 * 1) / 6;
+  return Math.max(-1, Math.min(1, weightedTrend / 15));
+}
+
 export function computeReading(input: BirthDataInput): DailyPulseReading {
   const lifePath = lifePathNumber(input.dateOfBirth);
   const namNum = input.fullName ? nameNumber(input.fullName) : 5;
