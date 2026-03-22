@@ -1,7 +1,17 @@
 {
   "title": "The Pulse",
+  "header": "YOUR DAILY READING",
+  "pranaIndex": "PRANA INDEX",
   "energyScore": "Energy Score",
+  "pranaLabel": "Prana Index",
   "summary": "Today's Cosmic Summary",
+  "loading": {
+    "title": "Reading the stars...",
+    "subtitle": "Aligning your cosmic energies"
+  },
+  "error": {
+    "title": "Could not read your pulse today"
+  },
   "subScores": {
     "business": "Business",
     "heart": "Heart",
@@ -9,9 +19,10 @@
   },
   "luckyElements": {
     "title": "Lucky Elements",
-    "color": "Lucky Color",
-    "number": "Lucky Number",
-    "direction": "Lucky Direction"
+    "color": "LUCKY COLOR",
+    "number": "LUCKY NUMBER",
+    "numberLabel": "Number",
+    "direction": "LUCKY DIRECTION"
   },
   "cosmicNews": {
     "title": "Cosmic News",

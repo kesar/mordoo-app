@@ -7,6 +7,7 @@ import { fonts, fontSizes } from '@/src/constants/typography';
 import { Text } from '@/src/components/ui/Text';
 import { EnergyScoreRing } from '@/src/components/ui/EnergyScoreRing';
 import { GoldButton } from '@/src/components/ui/GoldButton';
+import { useTranslation } from 'react-i18next';
 import { useDailyPulse } from '@/src/hooks/useDailyPulse';
 import {
   SparkleIcon,
@@ -94,6 +95,7 @@ function TwinklingStar({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function PulseScreen() {
+  const { t } = useTranslation('pulse');
   const { data: pulse, isLoading, error, refetch } = useDailyPulse();
 
   // Slow vertical drift for constellation background
@@ -158,11 +160,11 @@ export default function PulseScreen() {
       >
         {/* Header text */}
         <View style={styles.headerSection}>
-          <Text style={styles.starMapLocation}>YOUR DAILY READING</Text>
+          <Text style={styles.starMapLocation}>{t('header')}</Text>
           <Text style={styles.starMapDate}>{dateStr}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
             <SparkleIcon size={12} color={colors.onSurfaceVariant} />
-            <Text style={styles.starMapMoon}>PRANA INDEX</Text>
+            <Text style={styles.starMapMoon}>{t('pranaIndex')}</Text>
           </View>
         </View>
 
@@ -172,20 +174,20 @@ export default function PulseScreen() {
             <View style={styles.loadingRingPlaceholder}>
               <ActivityIndicator color={colors.gold.DEFAULT} size="large" />
             </View>
-            <Text style={styles.loadingText}>Reading the stars...</Text>
-            <Text style={styles.loadingSubText}>Aligning your cosmic energies</Text>
+            <Text style={styles.loadingText}>{t('loading.title')}</Text>
+            <Text style={styles.loadingSubText}>{t('loading.subtitle')}</Text>
           </View>
         ) : error && !pulse ? (
           <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>Could not read your pulse today</Text>
-            <GoldButton title="Try Again" onPress={() => refetch()} variant="outlined" />
+            <Text style={styles.errorText}>{t('error.title')}</Text>
+            <GoldButton title={t('common:actions.retry')} onPress={() => refetch()} variant="outlined" />
           </View>
         ) : pulse ? (
           <>
             {/* Energy Score */}
             <View style={styles.energyScoreWrapper}>
               <View style={styles.energyScoreCard}>
-                <EnergyScoreRing score={pulse.energyScore} size={192} label="Prana Index" />
+                <EnergyScoreRing score={pulse.energyScore} size={192} label={t('pranaLabel')} />
                 <Text style={styles.insightText}>{pulse.insight}</Text>
               </View>
             </View>
@@ -194,7 +196,7 @@ export default function PulseScreen() {
             <View style={styles.luckyElementsSection}>
               <View style={styles.luckyGrid}>
                 <View style={styles.luckyCard}>
-                  <Text style={styles.luckyCardLabel}>LUCKY COLOR</Text>
+                  <Text style={styles.luckyCardLabel}>{t('luckyElements.color')}</Text>
                   <View style={styles.luckyCardContent}>
                     <View style={[styles.luckyColorCircle, { backgroundColor: pulse.luckyColor.hex }]} />
                   </View>
@@ -202,15 +204,15 @@ export default function PulseScreen() {
                 </View>
 
                 <View style={styles.luckyCard}>
-                  <Text style={styles.luckyCardLabel}>LUCKY NUMBER</Text>
+                  <Text style={styles.luckyCardLabel}>{t('luckyElements.number')}</Text>
                   <View style={styles.luckyCardContent}>
                     <Text style={styles.luckyNumber}>{pulse.luckyNumber}</Text>
                   </View>
-                  <Text style={styles.luckyCardValue}>Number</Text>
+                  <Text style={styles.luckyCardValue}>{t('luckyElements.numberLabel')}</Text>
                 </View>
 
                 <View style={styles.luckyCard}>
-                  <Text style={styles.luckyCardLabel}>LUCKY DIRECTION</Text>
+                  <Text style={styles.luckyCardLabel}>{t('luckyElements.direction')}</Text>
                   <View style={styles.luckyCardContent}>
                     <ArrowRightIcon size={28} color={colors.gold.DEFAULT} />
                   </View>
@@ -221,9 +223,9 @@ export default function PulseScreen() {
 
             {/* Sub-Scores */}
             <View style={styles.subScoresSection}>
-              <SubScoreBar Icon={BusinessStarIcon} label="Business" value={pulse.subScores.business} color={colors.elements.fire} />
-              <SubScoreBar Icon={HeartIcon} label="Heart" value={pulse.subScores.heart} color="#ec4899" />
-              <SubScoreBar Icon={BodyDiamondIcon} label="Body" value={pulse.subScores.body} color={colors.elements.wood} />
+              <SubScoreBar Icon={BusinessStarIcon} label={t('subScores.business')} value={pulse.subScores.business} color={colors.elements.fire} />
+              <SubScoreBar Icon={HeartIcon} label={t('subScores.heart')} value={pulse.subScores.heart} color="#ec4899" />
+              <SubScoreBar Icon={BodyDiamondIcon} label={t('subScores.body')} value={pulse.subScores.body} color={colors.elements.wood} />
             </View>
           </>
         ) : null}

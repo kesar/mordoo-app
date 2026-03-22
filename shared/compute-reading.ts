@@ -98,7 +98,7 @@ export function profileWeights(
   const lp = lifePath === 11 ? 2 : lifePath === 22 ? 4 : lifePath;
 
   const rawBusiness = namNum + (birthDay % 10);
-  const rawHeart    = birthMonth + (namNum * 2 % 7);
+  const rawHeart    = birthMonth + ((namNum * 2) % 7);
   const rawBody     = lp + (birthMonth % 5) + (birthDay % 4);
 
   const normalize = (raw: number) => 0.7 + ((raw - 1) / 17) * 0.6;
@@ -112,6 +112,7 @@ export function profileWeights(
   };
 }
 
+// Parses as local time (no Z suffix). Correct for server-side (UTC) usage.
 export function subtractDays(isoDate: string, days: number): string {
   const d = new Date(isoDate + 'T00:00:00');
   d.setDate(d.getDate() - days);

@@ -6,6 +6,7 @@ import {
   View,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -38,6 +39,7 @@ type NameDataForm = z.infer<typeof nameDataSchema>;
 // ---------------------------------------------------------------------------
 
 export default function NameNumbersScreen() {
+  const { t } = useTranslation('onboarding');
   const router = useRouter();
   const setNameData = useOnboardingStore((s) => s.setNameData);
   const setStep = useOnboardingStore((s) => s.setStep);
@@ -80,14 +82,14 @@ export default function NameNumbersScreen() {
         <ProgressIndicator
           currentStep={3}
           totalSteps={6}
-          label="Phase 3 of 6 — The Vibration"
+          label={t('nameNumbers.step')}
         />
 
         {/* Header */}
         <View style={styles.headerSection}>
-          <Text style={styles.title}>Your Cosmic Signature</Text>
+          <Text style={styles.title}>{t('nameNumbers.title')}</Text>
           <Text style={styles.subtitle}>
-            Names and numbers carry vibrational frequencies that shape your destiny.
+            {t('nameNumbers.subtitle')}
           </Text>
         </View>
 
@@ -100,7 +102,7 @@ export default function NameNumbersScreen() {
 
           {/* Card label */}
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Name Vibration (Full Name)</Text>
+            <Text style={styles.cardLabel}>{t('nameNumbers.fullNameLabel')}</Text>
           </View>
 
           <Controller
@@ -114,7 +116,7 @@ export default function NameNumbersScreen() {
                 ]}
                 value={value}
                 onChangeText={onChange}
-                placeholder="Enter your full name..."
+                placeholder={t('nameNumbers.fullNamePlaceholder')}
                 placeholderTextColor="rgba(208, 197, 178, 0.3)"
                 onFocus={() => setFullNameFocused(true)}
                 onBlur={() => setFullNameFocused(false)}
@@ -127,7 +129,7 @@ export default function NameNumbersScreen() {
         <SacredCard variant="high" style={styles.card}>
           {/* Card label */}
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Digital Signal (Phone — Optional)</Text>
+            <Text style={styles.cardLabel}>{t('nameNumbers.phoneLabel')}</Text>
           </View>
 
           <Controller
@@ -141,7 +143,7 @@ export default function NameNumbersScreen() {
                 ]}
                 value={value}
                 onChangeText={onChange}
-                placeholder="0XX-XXX-XXXX"
+                placeholder={t('nameNumbers.phonePlaceholder')}
                 placeholderTextColor="rgba(208, 197, 178, 0.3)"
                 keyboardType="phone-pad"
                 onFocus={() => setPhoneFocused(true)}
@@ -153,7 +155,7 @@ export default function NameNumbersScreen() {
           {/* Info note */}
           <View style={styles.infoNote}>
             <Text style={styles.infoNoteText}>
-              Your number carries numerological significance
+              {t('nameNumbers.phoneHint')}
             </Text>
           </View>
         </SacredCard>
@@ -162,7 +164,7 @@ export default function NameNumbersScreen() {
         <SacredCard variant="low" style={styles.card}>
           {/* Card label */}
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Vehicle Resonance (Car Plate — Optional)</Text>
+            <Text style={styles.cardLabel}>{t('nameNumbers.carPlateLabel')}</Text>
           </View>
 
           <Controller
@@ -176,7 +178,7 @@ export default function NameNumbersScreen() {
                 ]}
                 value={value}
                 onChangeText={onChange}
-                placeholder="e.g. กข 1234"
+                placeholder={t('nameNumbers.carPlatePlaceholder')}
                 placeholderTextColor="rgba(208, 197, 178, 0.3)"
                 autoCapitalize="characters"
                 onFocus={() => setCarPlateFocused(true)}
@@ -188,7 +190,7 @@ export default function NameNumbersScreen() {
 
         {/* CTA */}
         <GoldButton
-          title="SEAL THE VIBRATION"
+          title={t('nameNumbers.cta')}
           onPress={handleSubmit(onSubmit)}
           variant="filled"
           fullWidth
@@ -196,7 +198,7 @@ export default function NameNumbersScreen() {
         />
 
         {/* Footer */}
-        <Text style={styles.footerText}>Your name echoes in the cosmic ledger</Text>
+        <Text style={styles.footerText}>{t('nameNumbers.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

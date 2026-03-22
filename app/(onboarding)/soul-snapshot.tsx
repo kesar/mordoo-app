@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   StyleSheet,
@@ -24,12 +25,13 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 
 const SUB_SCORES = [
-  { Icon: BusinessStarIcon, label: 'Business', value: 78 },
-  { Icon: HeartIcon, label: 'Heart', value: 45 },
-  { Icon: BodyDiamondIcon, label: 'Body', value: 91 },
+  { Icon: BusinessStarIcon, key: 'business', value: 78 },
+  { Icon: HeartIcon, key: 'heart', value: 45 },
+  { Icon: BodyDiamondIcon, key: 'body', value: 91 },
 ] as const;
 
 export default function SoulSnapshot() {
+  const { t } = useTranslation('onboarding');
   const router = useRouter();
   const completeOnboarding = useOnboardingStore((s) => s.completeOnboarding);
   const { width } = useWindowDimensions();
@@ -54,28 +56,28 @@ export default function SoulSnapshot() {
           <Pressable onPress={() => router.back()} hitSlop={12}>
             <ArrowLeftIcon size={24} color={colors.gold.DEFAULT} />
           </Pressable>
-          <Text style={styles.navTitle}>MOR DOO</Text>
+          <Text style={styles.navTitle}>{t('soulSnapshot.navTitle')}</Text>
         </View>
 
         {/* Soul Snapshot Card */}
         <View style={[styles.card, { width: Math.min(width - 32, 400) }]}>
           {/* Header */}
           <View style={styles.cardHeader}>
-            <Text style={styles.ascensionLabel}>Ascension Complete</Text>
-            <Text style={styles.cardTitle}>Soul Snapshot</Text>
+            <Text style={styles.ascensionLabel}>{t('soulSnapshot.ascensionLabel')}</Text>
+            <Text style={styles.cardTitle}>{t('soulSnapshot.title')}</Text>
           </View>
 
           {/* Energy Score Ring */}
           <View style={styles.ringContainer}>
-            <EnergyScoreRing score={73} size={208} label="Energy Score" />
+            <EnergyScoreRing score={73} size={208} label={t('soulSnapshot.energyScore')} />
           </View>
 
           {/* Sub-Score Bars */}
           <View style={styles.subScoresRow}>
             {SUB_SCORES.map((item) => (
-              <View key={item.label} style={styles.subScoreCol}>
+              <View key={item.key} style={styles.subScoreCol}>
                 <item.Icon size={16} color={colors.gold.DEFAULT} />
-                <Text style={styles.subScoreLabel}>{item.label}</Text>
+                <Text style={styles.subScoreLabel}>{t(`soulSnapshot.${item.key}`)}</Text>
                 <View style={styles.barTrack}>
                   <View
                     style={[styles.barFill, { width: `${item.value}%` as `${number}%` }]}
@@ -92,9 +94,7 @@ export default function SoulSnapshot() {
               <QuoteIcon size={22} color={colors.gold.DEFAULT} />
             </View>
             <Text style={styles.insightText}>
-              Your Mercury in Scorpio combined with Life Path 8 means you think
-              three moves ahead in business, but Mars retrograde this month
-              creates friction with water-element partners.
+              {t('soulSnapshot.insightPlaceholder')}
             </Text>
           </View>
 
@@ -104,35 +104,34 @@ export default function SoulSnapshot() {
               <View style={styles.luckyCellTop}>
                 <View style={styles.luckyColorCircle} />
               </View>
-              <Text style={styles.luckyCellLabel}>Gold</Text>
+              <Text style={styles.luckyCellLabel}>{t('soulSnapshot.luckyColor')}</Text>
             </View>
             <View style={styles.luckyCell}>
               <View style={styles.luckyCellTop}>
                 <Text style={styles.luckyNumber}>8</Text>
               </View>
-              <Text style={styles.luckyCellLabel}>Number</Text>
+              <Text style={styles.luckyCellLabel}>{t('soulSnapshot.luckyNumber')}</Text>
             </View>
             <View style={styles.luckyCell}>
               <View style={styles.luckyCellTop}>
                 <ArrowRightIcon size={22} color={colors.gold.DEFAULT} />
               </View>
-              <Text style={styles.luckyCellLabel}>East</Text>
+              <Text style={styles.luckyCellLabel}>{t('soulSnapshot.luckyDirection')}</Text>
             </View>
           </View>
 
           {/* Daily Ritual */}
           <View style={styles.dailyRitualWrap}>
-            <Text style={styles.dailyRitualHeading}>Daily Ritual</Text>
+            <Text style={styles.dailyRitualHeading}>{t('soulSnapshot.dailyRitual')}</Text>
             <Text style={styles.dailyRitualText}>
-              Today: wear gold to amplify your Sun in Leo. Avoid signing
-              contracts after 3pm.
+              {t('soulSnapshot.dailyRitualText')}
             </Text>
           </View>
 
           {/* Footer Actions */}
           <View style={styles.footerActions}>
             <GoldButton
-              title="Enter the Realms"
+              title={t('soulSnapshot.enterRealms')}
               onPress={handleEnterRealms}
               style={styles.enterButton}
             />
@@ -141,7 +140,7 @@ export default function SoulSnapshot() {
 
         {/* Step Pagination */}
         <View style={styles.paginationWrap}>
-          <Text style={styles.stepLabel}>Step 6 of 6</Text>
+          <Text style={styles.stepLabel}>{t('soulSnapshot.stepLabel')}</Text>
           <View style={styles.dotsRow}>
             {[0, 1, 2, 3, 4].map((i) => (
               <View key={i} style={styles.dot} />

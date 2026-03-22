@@ -17,9 +17,11 @@ import { SacredCard } from '@/src/components/ui/SacredCard';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { CheckIcon } from '@/src/components/icons/TarotIcons';
+import { useTranslation } from 'react-i18next';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 
 export default function PowerUps() {
+  const { t } = useTranslation('onboarding');
   const setStep = useOnboardingStore((s) => s.setStep);
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -44,15 +46,15 @@ export default function PowerUps() {
           <ProgressIndicator
             currentStep={5}
             totalSteps={6}
-            label="Phase 5 of 6 — The Awakening"
+            label={t('powerUps.step')}
           />
         </View>
 
         {/* Header */}
         <View style={styles.headerWrapper}>
-          <Text style={styles.title}>UNLOCK DEEPER READINGS</Text>
+          <Text style={styles.title}>{t('powerUps.title')}</Text>
           <Text style={styles.subtitle}>
-            Grant the Oracle access to enhance your cosmic readings.
+            {t('powerUps.subtitle')}
           </Text>
         </View>
 
@@ -65,9 +67,9 @@ export default function PowerUps() {
               style={styles.cardImage}
               resizeMode="contain"
             />
-            <Text style={styles.cardTitle}>Sacred Coordinates</Text>
+            <Text style={styles.cardTitle}>{t('powerUps.location.title')}</Text>
             <Text style={styles.cardDescription}>
-              Your location helps calculate precise planetary positions for accurate readings.
+              {t('powerUps.location.description')}
             </Text>
             <View style={styles.toggleRow}>
               <TouchableOpacity
@@ -84,7 +86,7 @@ export default function PowerUps() {
                     locationEnabled ? styles.toggleTextActive : styles.toggleTextInactive,
                   ]}
                 >
-                  {locationEnabled ? 'Enabled' : 'Enable'}
+                  {locationEnabled ? t('powerUps.enabled') : t('powerUps.enable')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -97,9 +99,9 @@ export default function PowerUps() {
               style={styles.cardImage}
               resizeMode="contain"
             />
-            <Text style={styles.cardTitle}>Daily Oracle Whispers</Text>
+            <Text style={styles.cardTitle}>{t('powerUps.notifications.title')}</Text>
             <Text style={styles.cardDescription}>
-              Receive your daily energy score and cosmic alerts each morning.
+              {t('powerUps.notifications.description')}
             </Text>
             <View style={styles.toggleRow}>
               <TouchableOpacity
@@ -116,7 +118,7 @@ export default function PowerUps() {
                     notificationsEnabled ? styles.toggleTextActive : styles.toggleTextInactive,
                   ]}
                 >
-                  {notificationsEnabled ? 'Enabled' : 'Enable'}
+                  {notificationsEnabled ? t('powerUps.enabled') : t('powerUps.enable')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -125,20 +127,20 @@ export default function PowerUps() {
 
         {/* Info note */}
         <Text style={styles.infoNote}>
-          You can change these permissions at any time in Settings.
+          {t('powerUps.infoNote')}
         </Text>
 
         {/* CTA */}
         <View style={styles.ctaWrapper}>
           <GoldButton
-            title="COMPLETE AWAKENING"
+            title={t('powerUps.cta')}
             onPress={handleContinue}
             variant="filled"
             fullWidth
             rounded
           />
           <GoldButton
-            title="Skip for now"
+            title={t('powerUps.skip')}
             onPress={handleContinue}
             variant="ghost"
           />

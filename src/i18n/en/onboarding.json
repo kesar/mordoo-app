@@ -2,87 +2,123 @@
   "soulGate": {
     "title": "Welcome, Seeker",
     "subtitle": "Choose your language to begin",
-"continueWithPhone": "Continue with Phone",
+    "continueWithPhone": "Continue with Phone",
     "continueWithApple": "Continue with Apple",
     "continueWithGoogle": "Continue with Google",
     "step": "Step 1: Initiation",
     "footer": "The Soul Gate"
   },
+  "phoneAuth": {
+    "titlePhone": "ENTER YOUR NUMBER",
+    "titleOtp": "VERIFY CODE",
+    "subtitlePhone": "We will send a sacred code to your device.",
+    "subtitleOtp": "Enter the 6-digit code sent to {{phone}}",
+    "phonePlaceholder": "+66 xxx xxx xxxx",
+    "otpPlaceholder": "000000",
+    "sendCode": "SEND CODE",
+    "verify": "VERIFY",
+    "resendCode": "Resend Code",
+    "invalidNumberTitle": "Invalid Number",
+    "invalidNumberMessage": "Please enter a valid phone number.",
+    "invalidCodeTitle": "Invalid Code",
+    "invalidCodeMessage": "Please enter the 6-digit code.",
+    "errorTitle": "Error",
+    "errorSendCode": "Failed to send verification code.",
+    "errorVerifyCode": "Invalid verification code."
+  },
   "birthData": {
+    "step": "Phase 2 of 6 — The Blueprint",
     "title": "Your Celestial Foundation",
-    "subtitle": "This data is sacred — it defines your cosmic blueprint",
-    "dateLabel": "Date of Birth",
-    "timeLabel": "Time of Birth",
-    "timeHint": "Even an approximate hour significantly changes your reading",
+    "subtitle": "This data is sacred — it defines your cosmic blueprint.",
+    "dateLabel": "Solar Alignment (Date of Birth)",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "timeLabel": "Temporal Coordinates (Time)",
+    "timeHint": "Even an approximate hour significantly changes your reading.",
     "timeUnknown": "I don't know my birth time",
-    "placeLabel": "Place of Birth",
-    "genderLabel": "Gender (optional)",
+    "placeLabel": "Sacred Origin (Birth Place)",
+    "placePlaceholder": "Search your city of birth...",
+    "genderLabel": "Vessel Identity (Optional)",
     "genderOptions": {
       "male": "Male",
       "female": "Female",
-      "nonBinary": "Non-binary",
-      "preferNot": "Prefer not to say"
-    }
+      "nonBinary": "Other",
+      "preferNot": "Secret"
+    },
+    "cta": "CAST THE BLUEPRINT",
+    "footer": "Fate awaits your initiation"
   },
   "nameNumbers": {
-    "title": "Name & Numbers",
-    "subtitle": "Your name carries vibrations that shape your destiny",
-    "fullName": "Full Name",
-    "phoneNumber": "Phone Number (optional)",
-    "carPlate": "Car Plate (optional)",
-    "lifePathNumber": "Life Path Number",
-    "nameVibration": "Name Vibration"
+    "step": "Phase 3 of 6 — The Vibration",
+    "title": "Your Cosmic Signature",
+    "subtitle": "Names and numbers carry vibrational frequencies that shape your destiny.",
+    "fullNameLabel": "Name Vibration (Full Name)",
+    "fullNamePlaceholder": "Enter your full name...",
+    "phoneLabel": "Digital Signal (Phone — Optional)",
+    "phonePlaceholder": "0XX-XXX-XXXX",
+    "phoneHint": "Your number carries numerological significance",
+    "carPlateLabel": "Vehicle Resonance (Car Plate — Optional)",
+    "carPlatePlaceholder": "e.g. กข 1234",
+    "cta": "SEAL THE VIBRATION",
+    "footer": "Your name echoes in the cosmic ledger"
   },
   "lifeContext": {
-    "title": "What brings you here today?",
+    "step": "Phase 4 of 6 — The Intent",
+    "title": "What Brings You Here?",
+    "subtitle": "Select the forces stirring within your soul.",
+    "forcesLabel": "Life Forces",
     "concerns": {
-      "love": "Love & Relationships",
-      "career": "Career & Business",
-      "money": "Money & Investment",
-      "health": "Health & Wellness",
+      "love": "Love",
+      "career": "Career",
+      "money": "Money",
+      "health": "Health",
       "family": "Family",
-      "spiritual": "Spiritual Growth"
+      "spiritual": "Spiritual"
     },
-    "urgency": {
-      "exploring": "Just exploring",
-      "specific": "I need guidance on a specific decision"
-    },
-    "situationPlaceholder": "Briefly describe your situation"
+    "whisperLabel": "Whisper to the Oracle (Optional)",
+    "whisperPlaceholder": "Tell us more about what weighs on your spirit...",
+    "cta": "DECLARE YOUR INTENT",
+    "footer": "The stars listen to those who seek"
   },
   "powerUps": {
-    "title": "Unlock Deeper Readings",
-    "health": {
-      "title": "Health Data",
-      "description": "Correlate HRV and sleep with planetary transits"
-    },
+    "step": "Phase 5 of 6 — The Awakening",
+    "title": "UNLOCK DEEPER READINGS",
+    "subtitle": "Grant the Oracle access to enhance your cosmic readings.",
     "location": {
-      "title": "Location",
-      "description": "GPS Temple Finder and location-based rituals"
-    },
-    "calendar": {
-      "title": "Calendar",
-      "description": "Export auspicious dates to your calendar"
+      "title": "Sacred Coordinates",
+      "description": "Your location helps calculate precise planetary positions for accurate readings."
     },
     "notifications": {
-      "title": "Notifications",
-      "description": "Daily Energy Score alerts and cosmic updates"
+      "title": "Daily Oracle Whispers",
+      "description": "Receive your daily energy score and cosmic alerts each morning."
     },
-    "comingSoon": "Coming soon"
+    "enabled": "Enabled",
+    "enable": "Enable",
+    "infoNote": "You can change these permissions at any time in Settings.",
+    "cta": "COMPLETE AWAKENING",
+    "skip": "Skip for now"
   },
   "soulSnapshot": {
-    "title": "Your Soul Snapshot",
-    "loading": {
-      "stars": "Reading the stars...",
-      "blueprint": "Calculating your celestial blueprint...",
-      "cosmos": "The cosmos speaks..."
-    },
+    "navTitle": "MOR DOO",
+    "ascensionLabel": "Ascension Complete",
+    "title": "Soul Snapshot",
     "energyScore": "Energy Score",
     "business": "Business",
     "heart": "Heart",
     "body": "Body",
-    "luckyColor": "Lucky Color",
-    "luckyNumber": "Lucky Number",
-    "luckyDirection": "Lucky Direction",
-    "enterRealms": "Enter the Realms"
+    "insightPlaceholder": "Your Mercury in Scorpio combined with Life Path 8 means you think three moves ahead in business, but Mars retrograde this month creates friction with water-element partners.",
+    "luckyColor": "Gold",
+    "luckyNumber": "Number",
+    "luckyDirection": "East",
+    "dailyRitual": "Daily Ritual",
+    "dailyRitualText": "Today: wear gold to amplify your Sun in Leo. Avoid signing contracts after 3pm.",
+    "enterRealms": "Enter the Realms",
+    "stepLabel": "Step 6 of 6",
+    "loading": {
+      "stars": "Reading the stars...",
+      "blueprint": "Calculating your celestial blueprint...",
+      "cosmos": "The cosmos speaks..."
+    }
   }
 }

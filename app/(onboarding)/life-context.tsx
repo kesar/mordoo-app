@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
 import { Text } from '@/src/components/ui/Text';
@@ -18,16 +19,17 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, Concern } from '@/src/stores/onboardingStore';
 
-const CONCERNS: { concern: Concern; image: number; label: string }[] = [
-  { concern: 'love', image: require('@/assets/images/tarot/concern-love.webp'), label: 'Love' },
-  { concern: 'career', image: require('@/assets/images/tarot/concern-career.webp'), label: 'Career' },
-  { concern: 'money', image: require('@/assets/images/tarot/concern-money.webp'), label: 'Money' },
-  { concern: 'health', image: require('@/assets/images/tarot/concern-health.webp'), label: 'Health' },
-  { concern: 'family', image: require('@/assets/images/tarot/concern-family.webp'), label: 'Family' },
-  { concern: 'spiritual', image: require('@/assets/images/tarot/concern-spiritual.webp'), label: 'Spiritual' },
+const CONCERNS: { concern: Concern; image: number }[] = [
+  { concern: 'love', image: require('@/assets/images/tarot/concern-love.webp') },
+  { concern: 'career', image: require('@/assets/images/tarot/concern-career.webp') },
+  { concern: 'money', image: require('@/assets/images/tarot/concern-money.webp') },
+  { concern: 'health', image: require('@/assets/images/tarot/concern-health.webp') },
+  { concern: 'family', image: require('@/assets/images/tarot/concern-family.webp') },
+  { concern: 'spiritual', image: require('@/assets/images/tarot/concern-spiritual.webp') },
 ];
 
 export default function LifeContext() {
+  const { t } = useTranslation('onboarding');
   const setConcerns = useOnboardingStore((s) => s.setConcerns);
   const setUrgencyContext = useOnboardingStore((s) => s.setUrgencyContext);
   const setStep = useOnboardingStore((s) => s.setStep);
@@ -64,25 +66,25 @@ export default function LifeContext() {
           <ProgressIndicator
             currentStep={4}
             totalSteps={6}
-            label="Phase 4 of 6 — The Intent"
+            label={t('lifeContext.step')}
           />
         </View>
 
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>What Brings You Here?</Text>
+          <Text style={styles.title}>{t('lifeContext.title')}</Text>
           <Text style={styles.subtitle}>
-            Select the forces stirring within your soul.
+            {t('lifeContext.subtitle')}
           </Text>
         </View>
 
         {/* Concern Chips */}
         <SacredCard variant="low" style={styles.card}>
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Life Forces</Text>
+            <Text style={styles.cardLabel}>{t('lifeContext.forcesLabel')}</Text>
           </View>
           <View style={styles.chipsGrid}>
-            {CONCERNS.map(({ concern, image, label }) => {
+            {CONCERNS.map(({ concern, image }) => {
               const isActive = selectedConcerns.includes(concern);
               return (
                 <TouchableOpacity
@@ -92,11 +94,11 @@ export default function LifeContext() {
                   activeOpacity={0.75}
                   accessibilityRole="checkbox"
                   accessibilityState={{ checked: isActive }}
-                  accessibilityLabel={label}
+                  accessibilityLabel={t(`lifeContext.concerns.${concern}`)}
                 >
                   <Image source={image} style={styles.chipImage} resizeMode="contain" />
                   <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
-                    {label}
+                    {t(`lifeContext.concerns.${concern}`)}
                   </Text>
                 </TouchableOpacity>
               );
@@ -107,13 +109,13 @@ export default function LifeContext() {
         {/* Urgency Context */}
         <SacredCard variant="high" style={styles.card}>
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Whisper to the Oracle (Optional)</Text>
+            <Text style={styles.cardLabel}>{t('lifeContext.whisperLabel')}</Text>
           </View>
           <TextInput
             style={styles.textInput}
             multiline
             numberOfLines={4}
-            placeholder="Tell us more about what weighs on your spirit..."
+            placeholder={t('lifeContext.whisperPlaceholder')}
             placeholderTextColor={colors.outlineVariant}
             value={urgency}
             onChangeText={setUrgency}
@@ -124,7 +126,7 @@ export default function LifeContext() {
         {/* CTA */}
         <View style={styles.ctaWrapper}>
           <GoldButton
-            title="DECLARE YOUR INTENT"
+            title={t('lifeContext.cta')}
             onPress={handleContinue}
             variant="filled"
             fullWidth
@@ -133,7 +135,7 @@ export default function LifeContext() {
         </View>
 
         {/* Footer */}
-        <Text style={styles.footer}>The stars listen to those who seek</Text>
+        <Text style={styles.footer}>{t('lifeContext.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

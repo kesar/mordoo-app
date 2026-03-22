@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Text } from '@/src/components/ui/Text';
 import { BambooIcon, ChevronLeftIcon } from '@/src/components/icons/TarotIcons';
 import { colors } from '@/src/constants/colors';
@@ -21,14 +22,16 @@ const FORTUNE_COLORS: Record<string, string> = {
   caution: colors.energy.low,
 };
 
-const FORTUNE_LABELS: Record<string, string> = {
-  excellent: 'EXCELLENT FORTUNE',
-  good: 'GOOD FORTUNE',
-  fair: 'FAIR FORTUNE',
-  caution: 'CAUTION',
-};
-
 export default function SiamSiScreen() {
+  const { t } = useTranslation('oracle');
+
+  const fortuneLabels: Record<string, string> = {
+    excellent: t('siamSi.fortuneLabels.excellent'),
+    good: t('siamSi.fortuneLabels.good'),
+    fair: t('siamSi.fortuneLabels.fair'),
+    caution: t('siamSi.fortuneLabels.caution'),
+  };
+
   const {
     isShaking,
     currentStick,
@@ -96,10 +99,10 @@ export default function SiamSiScreen() {
         <Pressable onPress={() => router.back()} style={styles.backBtn}>
           <ChevronLeftIcon size={24} color={colors.gold.DEFAULT} />
         </Pressable>
-        <Text style={styles.headerTitle}>SIAM SI</Text>
+        <Text style={styles.headerTitle}>{t('siamSi.title').toUpperCase()}</Text>
         <View style={styles.quotaBadge}>
           <Text style={styles.quotaText}>
-            {drawsRemaining === null ? 'unlimited' : `${drawsRemaining} left`}
+            {drawsRemaining === null ? t('siamSi.unlimited') : t('siamSi.remaining', { count: drawsRemaining })}
           </Text>
         </View>
       </View>
@@ -126,7 +129,7 @@ export default function SiamSiScreen() {
               ]}
             >
               <Text style={styles.fortuneText}>
-                {FORTUNE_LABELS[currentStick.fortune] ?? currentStick.fortune}
+                {fortuneLabels[currentStick.fortune] ?? currentStick.fortune}
               </Text>
             </View>
             <Text style={styles.titleEn}>{currentStick.titleEn}</Text>
@@ -141,7 +144,7 @@ export default function SiamSiScreen() {
               disabled={!canDraw || isRevealing}
             >
               <Text style={styles.drawAgainText}>
-                {canDraw ? 'DRAW AGAIN' : 'NO DRAWS LEFT'}
+                {canDraw ? t('siamSi.drawAgain') : t('siamSi.noDrawsLeft')}
               </Text>
             </Pressable>
           </Animated.View>
@@ -173,9 +176,9 @@ export default function SiamSiScreen() {
             <Text style={styles.instruction}>
               {canDraw
                 ? isShaking
-                  ? 'SHAKING...'
-                  : 'SHAKE YOUR PHONE\nOR TAP BELOW'
-                : 'NO DRAWS REMAINING'}
+                  ? t('siamSi.shaking')
+                  : t('siamSi.shakePrompt')
+                : t('siamSi.noDrawsRemaining')}
             </Text>
 
             <Pressable
@@ -184,7 +187,7 @@ export default function SiamSiScreen() {
               disabled={!canDraw}
             >
               <Text style={styles.drawBtnText}>
-                {canDraw ? 'DRAW A STICK' : 'COME BACK TOMORROW'}
+                {canDraw ? t('siamSi.drawStick') : t('siamSi.comeBackTomorrow')}
               </Text>
             </Pressable>
           </View>

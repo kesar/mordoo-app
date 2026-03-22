@@ -21,6 +21,7 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, BirthData } from '@/src/stores/onboardingStore';
 import { CalendarIcon, LocationPinIcon, SearchIcon, InfoCircleIcon } from '@/src/components/icons/TarotIcons';
+import { useTranslation } from 'react-i18next';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -44,6 +45,7 @@ type BirthDataForm = z.infer<typeof birthDataSchema>;
 // ---------------------------------------------------------------------------
 
 export default function BirthDataScreen() {
+  const { t } = useTranslation('onboarding');
   const router = useRouter();
   const setBirthData = useOnboardingStore((s) => s.setBirthData);
   const setStep = useOnboardingStore((s) => s.setStep);
@@ -93,10 +95,10 @@ export default function BirthDataScreen() {
   };
 
   const genderOptions: { label: string; value: BirthDataForm['gender'] }[] = [
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
-    { label: 'Other', value: 'non-binary' },
-    { label: 'Secret', value: 'prefer-not' },
+    { label: t('birthData.genderOptions.male'), value: 'male' },
+    { label: t('birthData.genderOptions.female'), value: 'female' },
+    { label: t('birthData.genderOptions.nonBinary'), value: 'non-binary' },
+    { label: t('birthData.genderOptions.preferNot'), value: 'prefer-not' },
   ];
 
   return (
@@ -113,14 +115,14 @@ export default function BirthDataScreen() {
         <ProgressIndicator
           currentStep={2}
           totalSteps={6}
-          label="Phase 2 of 6 — The Blueprint"
+          label={t('birthData.step')}
         />
 
         {/* Header */}
         <View style={styles.headerSection}>
-          <Text style={styles.title}>Your Celestial Foundation</Text>
+          <Text style={styles.title}>{t('birthData.title')}</Text>
           <Text style={styles.subtitle}>
-            This data is sacred — it defines your cosmic blueprint.
+            {t('birthData.subtitle')}
           </Text>
         </View>
 
@@ -133,14 +135,14 @@ export default function BirthDataScreen() {
 
           {/* Card label */}
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Solar Alignment (Date of Birth)</Text>
+            <Text style={styles.cardLabel}>{t('birthData.dateLabel')}</Text>
           </View>
 
           {/* Day / Month / Year */}
           <View style={styles.dateRow}>
             {/* Day */}
             <View style={styles.dateField}>
-              <Text style={styles.inputLabel}>Day</Text>
+              <Text style={styles.inputLabel}>{t('birthData.day')}</Text>
               <Controller
                 control={control}
                 name="day"
@@ -165,7 +167,7 @@ export default function BirthDataScreen() {
 
             {/* Month */}
             <View style={styles.dateField}>
-              <Text style={styles.inputLabel}>Month</Text>
+              <Text style={styles.inputLabel}>{t('birthData.month')}</Text>
               <Controller
                 control={control}
                 name="month"
@@ -190,7 +192,7 @@ export default function BirthDataScreen() {
 
             {/* Year */}
             <View style={[styles.dateField, styles.dateFieldYear]}>
-              <Text style={styles.inputLabel}>Year</Text>
+              <Text style={styles.inputLabel}>{t('birthData.year')}</Text>
               <Controller
                 control={control}
                 name="year"
@@ -219,7 +221,7 @@ export default function BirthDataScreen() {
         <SacredCard variant="high" style={styles.card}>
           {/* Card label */}
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Temporal Coordinates (Time)</Text>
+            <Text style={styles.cardLabel}>{t('birthData.timeLabel')}</Text>
           </View>
 
           <View style={styles.timeRow}>
@@ -315,7 +317,7 @@ export default function BirthDataScreen() {
           <View style={styles.infoNote}>
             <InfoCircleIcon size={14} color={colors.gold.DEFAULT} />
             <Text style={styles.infoNoteText}>
-              Even an approximate hour significantly changes your reading.
+              {t('birthData.timeHint')}
             </Text>
           </View>
         </SacredCard>
@@ -324,7 +326,7 @@ export default function BirthDataScreen() {
         <SacredCard variant="low" style={styles.card}>
           {/* Card label */}
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Sacred Origin (Birth Place)</Text>
+            <Text style={styles.cardLabel}>{t('birthData.placeLabel')}</Text>
           </View>
 
           <View style={styles.placeRow}>
@@ -340,7 +342,7 @@ export default function BirthDataScreen() {
                   ]}
                   value={value}
                   onChangeText={onChange}
-                  placeholder="Search your city of birth..."
+                  placeholder={t('birthData.placePlaceholder')}
                   placeholderTextColor="rgba(208, 197, 178, 0.3)"
                   onFocus={() => setPlaceFocused(true)}
                   onBlur={() => setPlaceFocused(false)}
@@ -355,7 +357,7 @@ export default function BirthDataScreen() {
         <SacredCard variant="high" style={[styles.card, { overflow: 'visible' }]}>
           {/* Card label */}
           <View style={styles.cardLabelRow}>
-            <Text style={styles.cardLabel}>Vessel Identity (Optional)</Text>
+            <Text style={styles.cardLabel}>{t('birthData.genderLabel')}</Text>
           </View>
 
           <View style={styles.genderGrid}>
@@ -391,7 +393,7 @@ export default function BirthDataScreen() {
 
         {/* CTA */}
         <GoldButton
-          title="CAST THE BLUEPRINT"
+          title={t('birthData.cta')}
           onPress={handleSubmit(onSubmit)}
           variant="filled"
           fullWidth
@@ -399,7 +401,7 @@ export default function BirthDataScreen() {
         />
 
         {/* Footer */}
-        <Text style={styles.footerText}>Fate awaits your initiation</Text>
+        <Text style={styles.footerText}>{t('birthData.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   );

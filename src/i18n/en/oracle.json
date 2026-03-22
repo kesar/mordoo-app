@@ -1,10 +1,14 @@
 {
   "title": "The Oracle",
   "chat": {
-    "placeholder": "Ask the Oracle...",
+    "welcomeMessage": "The constellations shift in your favor, seeker. What shall we decode from the stars?",
+    "placeholder": "Ask the stars...",
     "send": "Send",
     "dailyLimit": "You've used your free question today",
-    "upgradePrompt": "Unlock unlimited readings with Standard — ฿149/month"
+    "upgradePrompt": "Unlock unlimited readings with Standard — ฿149/month",
+    "errorDisrupted": "\n\n_The astral connection was disrupted. Please try again._",
+    "quotaTitle": "DAILY LIMIT REACHED",
+    "quotaBody": "Your next reading will be available tomorrow."
   },
   "tarot": {
     "title": "Tarot Reading",
@@ -22,9 +26,21 @@
   "siamSi": {
     "title": "Siam Si",
     "instruction": "Focus on your question, then shake your phone",
-    "shakePrompt": "Shake to draw",
-    "remaining": "{{count}} draws remaining this month",
-    "unlimited": "Unlimited draws"
+    "shakePrompt": "SHAKE YOUR PHONE\nOR TAP BELOW",
+    "shaking": "SHAKING...",
+    "drawStick": "DRAW A STICK",
+    "drawAgain": "DRAW AGAIN",
+    "noDrawsLeft": "NO DRAWS LEFT",
+    "noDrawsRemaining": "NO DRAWS REMAINING",
+    "comeBackTomorrow": "COME BACK TOMORROW",
+    "remaining": "{{count}} left",
+    "unlimited": "unlimited",
+    "fortuneLabels": {
+      "excellent": "EXCELLENT FORTUNE",
+      "good": "GOOD FORTUNE",
+      "fair": "FAIR FORTUNE",
+      "caution": "CAUTION"
+    }
   },
   "modes": {
     "mordoo": "Mor Doo",

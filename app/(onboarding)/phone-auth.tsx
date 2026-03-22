@@ -15,6 +15,7 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
+import { useTranslation } from 'react-i18next';
 import { signInWithPhone, verifyOTP } from '@/src/services/auth';
 import { fetchExistingBirthData } from '@/src/services/birth-data';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
@@ -23,6 +24,7 @@ type Step = 'phone' | 'otp';
 
 export default function PhoneAuth() {
   const router = useRouter();
+  const { t } = useTranslation('onboarding');
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('+66');
   const [otpCode, setOtpCode] = useState('');
@@ -31,7 +33,7 @@ export default function PhoneAuth() {
 
   const handleSendOTP = async () => {
     if (phone !== '+66000000' && phone.length < 10) {
-      Alert.alert('Invalid Number', 'Please enter a valid phone number.');
+      Alert.alert(t('phoneAuth.invalidNumberTitle'), t('phoneAuth.invalidNumberMessage'));
       return;
     }
     setLoading(true);
@@ -44,7 +46,7 @@ export default function PhoneAuth() {
         setTimeout(() => otpInputRef.current?.focus(), 300);
       }
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to send verification code.');
+      Alert.alert(t('phoneAuth.errorTitle'), error.message || t('phoneAuth.errorSendCode'));
     } finally {
       setLoading(false);
     }
@@ -52,7 +54,7 @@ export default function PhoneAuth() {
 
   const handleVerifyOTP = async () => {
     if (otpCode.length !== 6) {
-      Alert.alert('Invalid Code', 'Please enter the 6-digit code.');
+      Alert.alert(t('phoneAuth.invalidCodeTitle'), t('phoneAuth.invalidCodeMessage'));
       return;
     }
     setLoading(true);
@@ -74,7 +76,7 @@ export default function PhoneAuth() {
         router.replace('/(onboarding)/birth-data');
       }
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Invalid verification code.');
+      Alert.alert(t('phoneAuth.errorTitle'), error.message || t('phoneAuth.errorVerifyCode'));
     } finally {
       setLoading(false);
     }
@@ -90,12 +92,12 @@ export default function PhoneAuth() {
       >
         <View style={styles.content}>
           <Text style={styles.title}>
-            {step === 'phone' ? 'ENTER YOUR NUMBER' : 'VERIFY CODE'}
+            {step === 'phone' ? t('phoneAuth.titlePhone') : t('phoneAuth.titleOtp')}
           </Text>
           <Text style={styles.subtitle}>
             {step === 'phone'
-              ? 'We will send a sacred code to your device.'
-              : `Enter the 6-digit code sent to ${phone}`}
+              ? t('phoneAuth.subtitlePhone')
+              : t('phoneAuth.subtitleOtp', { phone })}
           </Text>
 
           {step === 'phone' ? (
@@ -104,7 +106,7 @@ export default function PhoneAuth() {
                 style={styles.phoneInput}
                 value={phone}
                 onChangeText={setPhone}
-                placeholder="+66 xxx xxx xxxx"
+                placeholder={t('phoneAuth.phonePlaceholder')}
                 placeholderTextColor={colors.outlineVariant}
                 keyboardType="phone-pad"
                 autoFocus
@@ -118,7 +120,7 @@ export default function PhoneAuth() {
                 style={styles.otpInput}
                 value={otpCode}
                 onChangeText={(text) => setOtpCode(text.replace(/[^0-9]/g, '').slice(0, 6))}
-                placeholder="000000"
+                placeholder={t('phoneAuth.otpPlaceholder')}
                 placeholderTextColor={colors.outlineVariant}
                 keyboardType="number-pad"
                 maxLength={6}
@@ -132,7 +134,7 @@ export default function PhoneAuth() {
               <ActivityIndicator color={colors.gold.DEFAULT} size="large" />
             ) : (
               <GoldButton
-                title={step === 'phone' ? 'SEND CODE' : 'VERIFY'}
+                title={step === 'phone' ? t('phoneAuth.sendCode') : t('phoneAuth.verify')}
                 onPress={step === 'phone' ? handleSendOTP : handleVerifyOTP}
                 variant="filled"
                 fullWidth
@@ -143,7 +145,7 @@ export default function PhoneAuth() {
 
           {step === 'otp' && !loading && (
             <GoldButton
-              title="Resend Code"
+              title={t('phoneAuth.resendCode')}
               onPress={() => {
                 setOtpCode('');
                 handleSendOTP();
