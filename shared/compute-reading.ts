@@ -1,4 +1,4 @@
-import type { BirthDataInput, DailyPulseResponse } from './types';
+import type { BirthDataInput, DailyPulseReading } from './types';
 import { selectInsight } from './insight-templates';
 import { hashCode } from './hash';
 
@@ -49,26 +49,32 @@ function nameNumber(fullName: string): number {
 }
 
 const LUCKY_COLORS = [
-  { name: 'Gold', hex: '#c9a84c' },
-  { name: 'Crimson', hex: '#dc2626' },
-  { name: 'Sapphire', hex: '#2563eb' },
-  { name: 'Emerald', hex: '#16a34a' },
-  { name: 'Amethyst', hex: '#9333ea' },
-  { name: 'Ivory', hex: '#fefce8' },
-  { name: 'Coral', hex: '#fb7185' },
-  { name: 'Jade', hex: '#059669' },
-  { name: 'Silver', hex: '#94a3b8' },
-  { name: 'Amber', hex: '#d97706' },
-  { name: 'Rose', hex: '#e11d48' },
-  { name: 'Indigo', hex: '#4f46e5' },
+  { name: 'Gold', nameTh: 'ทอง', hex: '#c9a84c' },
+  { name: 'Crimson', nameTh: 'แดงเข้ม', hex: '#dc2626' },
+  { name: 'Sapphire', nameTh: 'ไพลิน', hex: '#2563eb' },
+  { name: 'Emerald', nameTh: 'มรกต', hex: '#16a34a' },
+  { name: 'Amethyst', nameTh: 'อเมทิสต์', hex: '#9333ea' },
+  { name: 'Ivory', nameTh: 'งาช้าง', hex: '#fefce8' },
+  { name: 'Coral', nameTh: 'ปะการัง', hex: '#fb7185' },
+  { name: 'Jade', nameTh: 'หยก', hex: '#059669' },
+  { name: 'Silver', nameTh: 'เงิน', hex: '#94a3b8' },
+  { name: 'Amber', nameTh: 'อำพัน', hex: '#d97706' },
+  { name: 'Rose', nameTh: 'กุหลาบ', hex: '#e11d48' },
+  { name: 'Indigo', nameTh: 'คราม', hex: '#4f46e5' },
 ] as const;
 
 const DIRECTIONS = [
-  'North', 'Northeast', 'East', 'Southeast',
-  'South', 'Southwest', 'West', 'Northwest',
+  { en: 'North', th: 'ทิศเหนือ' },
+  { en: 'Northeast', th: 'ทิศตะวันออกเฉียงเหนือ' },
+  { en: 'East', th: 'ทิศตะวันออก' },
+  { en: 'Southeast', th: 'ทิศตะวันออกเฉียงใต้' },
+  { en: 'South', th: 'ทิศใต้' },
+  { en: 'Southwest', th: 'ทิศตะวันตกเฉียงใต้' },
+  { en: 'West', th: 'ทิศตะวันตก' },
+  { en: 'Northwest', th: 'ทิศตะวันตกเฉียงเหนือ' },
 ] as const;
 
-export function computeReading(input: BirthDataInput): DailyPulseResponse {
+export function computeReading(input: BirthDataInput): DailyPulseReading {
   const lifePath = lifePathNumber(input.dateOfBirth);
   const namNum = input.fullName ? nameNumber(input.fullName) : 5;
   const dailySeed = hashCode(`${input.userId}:${input.currentDate}`);
@@ -89,25 +95,29 @@ export function computeReading(input: BirthDataInput): DailyPulseResponse {
   // Lucky color: based on birth month element + daily offset
   const birthMonth = parseInt(input.dateOfBirth.split('-')[1], 10);
   const colorIndex = (birthMonth + seededRandom(dailySeed, 4, 12)) % LUCKY_COLORS.length;
-  const luckyColor = { name: LUCKY_COLORS[colorIndex].name, hex: LUCKY_COLORS[colorIndex].hex };
+  const luckyColor = {
+    name: LUCKY_COLORS[colorIndex].name,
+    nameTh: LUCKY_COLORS[colorIndex].nameTh,
+    hex: LUCKY_COLORS[colorIndex].hex,
+  };
 
   // Lucky number: life path + daily offset, 1-9
   const luckyNumber = ((lifePath + seededRandom(dailySeed, 5, 9)) % 9) + 1;
 
   // Lucky direction: element-based + daily offset
   const dirIndex = (birthMonth + seededRandom(dailySeed, 6, 8)) % DIRECTIONS.length;
-  const luckyDirection = DIRECTIONS[dirIndex];
-
-  // Insight text
+  const direction = DIRECTIONS[dirIndex];
   const insight = selectInsight(energyScore, birthMonth, seededRandom(dailySeed, 7, 100));
 
   return {
     date: input.currentDate,
     energyScore,
-    insight,
+    insightEn: insight.en,
+    insightTh: insight.th,
     luckyColor,
     luckyNumber,
-    luckyDirection,
+    luckyDirection: direction.en,
+    luckyDirectionTh: direction.th,
     subScores: { business, heart, body },
   };
 }
