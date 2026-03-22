@@ -61,7 +61,7 @@ For new icons, use `viewBox="0 0 24 24"` and thin strokes (`strokeWidth={1.5}`).
 
 - [ ] **Step 2: Verify file compiles**
 
-Run: `npx tsc --noEmit src/components/icons/TarotIcons.tsx`
+Run: `npx tsc --noEmit` (must use project tsconfig for path alias resolution)
 Expected: No errors
 
 - [ ] **Step 3: Commit**
@@ -130,9 +130,8 @@ git commit -m "feat: add tarot-style images for concerns, power-ups, and emblem"
 - [ ] **Step 1: Replace emoji with SVG icons and tarot image**
 
 Changes:
-1. Add imports at top:
+1. Add import (`Image` is already imported in this file):
    ```tsx
-   import { Image } from 'react-native';
    import { SparkleIcon } from '@/src/components/icons/TarotIcons';
    ```
 2. Replace the emblem diamond `<Text style={styles.emblemDiamond}>◆</Text>` (line 127) with:
@@ -142,7 +141,7 @@ Changes:
      style={styles.emblemImage}
    />
    ```
-3. Add `emblemImage` style: `{ width: 96, height: 96, resizeMode: 'contain' }`
+3. Add `emblemImage` style: `{ width: 96, height: 96 }` and add `resizeMode="contain"` as a prop on the `<Image>` component
 4. Remove `emblemDiamond` style (no longer used)
 5. Replace divider sparkle `<Text style={styles.dividerSparkle}>✦</Text>` (line 170) with:
    ```tsx
@@ -251,13 +250,10 @@ git commit -m "feat(name-numbers): replace emoji with SVG sparkle icon"
 - [ ] **Step 1: Replace concern emoji with tarot images**
 
 Changes:
-1. Add import:
-   ```tsx
-   import { Image, ImageSourcePropType } from 'react-native';
-   ```
+1. Add `Image` to the `react-native` import (already imports `ScrollView`, etc.)
 2. Replace the `CONCERNS` array emoji field with image sources:
    ```tsx
-   const CONCERNS: { concern: Concern; image: ImageSourcePropType; label: string }[] = [
+   const CONCERNS: { concern: Concern; image: number; label: string }[] = [
      { concern: 'love', image: require('@/assets/images/tarot/concern-love.webp'), label: 'Love' },
      { concern: 'career', image: require('@/assets/images/tarot/concern-career.webp'), label: 'Career' },
      { concern: 'money', image: require('@/assets/images/tarot/concern-money.webp'), label: 'Money' },
@@ -270,7 +266,7 @@ Changes:
    ```tsx
    <Image source={image} style={styles.chipImage} />
    ```
-4. Add `chipImage` style: `{ width: 40, height: 40, resizeMode: 'contain' }`
+4. Add `chipImage` style: `{ width: 40, height: 40 }` and add `resizeMode="contain"` as a prop on the `<Image>` component
 5. Remove `chipEmoji` style
 6. Remove `Text as RNText` import if no longer used
 
@@ -313,7 +309,7 @@ Changes:
      style={styles.cardImage}
    />
    ```
-4. Add `cardImage` style: `{ width: 48, height: 48, resizeMode: 'contain', marginBottom: 12 }`
+4. Add `cardImage` style: `{ width: 48, height: 48, marginBottom: 12 }` and add `resizeMode="contain"` as a prop on the `<Image>` components
 5. Remove `cardIcon` style
 6. Replace `✓` in toggle text. Change `'Enabled ✓'` (lines 82, 109) to use a `CheckIcon` inline:
    ```tsx
@@ -368,15 +364,15 @@ Changes:
    ```tsx
    <item.Icon size={16} color={colors.gold.DEFAULT} />
    ```
-4. Replace quote icon `<Text style={styles.quoteIcon}>❝</Text>` (line 97) with:
+4. Replace quote icon `<Text style={styles.quoteIcon}>❝</Text>` (line 85) with:
    ```tsx
    <QuoteIcon size={22} color={colors.gold.DEFAULT} />
    ```
-5. Replace lucky direction `<RNText style={styles.luckyIcon}>→</RNText>` (line 122) with:
+5. Replace lucky direction `<RNText style={styles.luckyIcon}>→</RNText>` (line 110) with:
    ```tsx
    <ArrowRightIcon size={22} color={colors.gold.DEFAULT} />
    ```
-6. Replace back arrow `<Text style={styles.backArrow}>←</Text>` (line 61) with:
+6. Replace back arrow `<Text style={styles.backArrow}>←</Text>` (line 48) with:
    ```tsx
    <ArrowLeftIcon size={24} color={colors.gold.DEFAULT} />
    ```
