@@ -15,8 +15,6 @@ import { Text } from '@/src/components/ui/Text';
 import { EnergyScoreRing } from '@/src/components/ui/EnergyScoreRing';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
-import { useAuthStore } from '@/src/stores/authStore';
-import { syncBirthData } from '@/src/services/birth-data';
 
 const SUB_SCORES = [
   { icon: '★', label: 'Business', value: 78 },
@@ -27,20 +25,10 @@ const SUB_SCORES = [
 export default function SoulSnapshot() {
   const router = useRouter();
   const completeOnboarding = useOnboardingStore((s) => s.completeOnboarding);
-  const birthData = useOnboardingStore((s) => s.birthData);
-  const nameData = useOnboardingStore((s) => s.nameData);
-  const concerns = useOnboardingStore((s) => s.concerns);
-  const urgencyContext = useOnboardingStore((s) => s.urgencyContext);
-  const authMode = useAuthStore((s) => s.authMode);
   const { width } = useWindowDimensions();
 
   const handleEnterRealms = () => {
     completeOnboarding();
-    if (authMode === 'account' && birthData) {
-      syncBirthData({ birthData, nameData, concerns, urgencyContext }).catch((err) => {
-        console.warn('Failed to sync birth data, will use local computation:', err);
-      });
-    }
     router.replace('/(main)/pulse');
   };
 

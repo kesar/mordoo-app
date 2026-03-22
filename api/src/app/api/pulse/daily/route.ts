@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServiceClient, createAuthClient } from '../../../../lib/supabase';
+import { createServiceClient } from '../../../../lib/supabase';
+import { authenticateRequest } from '../../../../lib/auth';
 import { computeReading } from '@shared/compute-reading';
 import { validateLang, localizePulseReading } from '../../../../lib/localize';
 
 export async function GET(request: NextRequest) {
-  // 1. Extract and validate token
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Missing authorization' }, { status: 401 });
-  }
-  const token = authHeader.slice(7);
+  // 1. Validate auth
+  const { user, error: authError } = await authenticateRequest(request);
+  if (authError) return authError;
 
-  // 2. Get user from token
-  const authClient = createAuthClient(token);
-  const { data: { user }, error: userError } = await authClient.auth.getUser();
-  if (userError || !user) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-  }
-
-  // 3. Get date and lang parameters
+  // 2. Get date and lang parameters
   const date = request.nextUrl.searchParams.get('date');
   if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return NextResponse.json({ error: 'Invalid date parameter' }, { status: 400 });
@@ -27,7 +18,7 @@ export async function GET(request: NextRequest) {
 
   const serviceClient = createServiceClient();
 
-  // 4. Check cache
+  // 3. Check cache
   const { data: cached } = await serviceClient
     .from('daily_readings')
     .select('*')
@@ -58,7 +49,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(localizePulseReading(reading, lang));
   }
 
-  // 5. Delete stale cache row if it exists but lacks bilingual data
+  // 4. Delete stale cache row if it exists but lacks bilingual data
   if (cached) {
     await serviceClient
       .from('daily_readings')
@@ -67,7 +58,7 @@ export async function GET(request: NextRequest) {
       .eq('reading_date', date);
   }
 
-  // 6. Fetch birth data
+  // 5. Fetch birth data
   const { data: birthData, error: birthError } = await serviceClient
     .from('birth_data')
     .select('*')
@@ -78,7 +69,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'No birth data found' }, { status: 404 });
   }
 
-  // 7. Compute reading
+  // 6. Compute reading
   const reading = computeReading({
     userId: user.id,
     dateOfBirth: birthData.date_of_birth,
@@ -86,8 +77,8 @@ export async function GET(request: NextRequest) {
     currentDate: date,
   });
 
-  // 8. Cache result with both languages
-  await serviceClient.from('daily_readings').insert({
+  // 7. Cache result with both languages
+  const { error: cacheError } = await serviceClient.from('daily_readings').insert({
     user_id: user.id,
     reading_date: date,
     energy_score: reading.energyScore,
@@ -104,6 +95,10 @@ export async function GET(request: NextRequest) {
     sub_score_body: reading.subScores.body,
   });
 
-  // 9. Return localized response
+  if (cacheError) {
+    console.error('Failed to cache daily reading:', cacheError);
+  }
+
+  // 8. Return localized response
   return NextResponse.json(localizePulseReading(reading, lang));
 }

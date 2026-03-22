@@ -1,6 +1,15 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { createServiceClient, createAuthClient } from '../../../../lib/supabase';
+import { createServiceClient } from '../../../../lib/supabase';
+import { authenticateRequest } from '../../../../lib/auth';
+import { getTodayString } from '../../../../lib/date';
+import {
+  ORACLE_MODEL,
+  ORACLE_MAX_TOKENS,
+  ORACLE_TEMPERATURE,
+  FREE_ORACLE_QUESTIONS_PER_DAY,
+  PGRST_NOT_FOUND,
+} from '../../../../lib/config';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -78,33 +87,15 @@ function getChineseZodiac(year: number): string {
 
 export async function POST(request: NextRequest) {
   // 1. Validate auth
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return new Response(JSON.stringify({ error: 'Missing authorization' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-  const token = authHeader.slice(7);
-
-  const authClient = createAuthClient(token);
-  const { data: { user }, error: userError } = await authClient.auth.getUser();
-  if (userError || !user) {
-    return new Response(JSON.stringify({ error: 'Invalid token' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  const { user, error: authError } = await authenticateRequest(request);
+  if (authError) return authError;
 
   // 2. Parse request
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
   const { message, birthData, lang: rawLang } = body as {
@@ -114,10 +105,7 @@ export async function POST(request: NextRequest) {
   };
 
   if (!message || typeof message !== 'string') {
-    return new Response(JSON.stringify({ error: 'Message required' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return NextResponse.json({ error: 'Message required' }, { status: 400 });
   }
 
   // Validate birthData shape if provided
@@ -128,18 +116,13 @@ export async function POST(request: NextRequest) {
       typeof birthData.dateOfBirth !== 'string' ||
       !Array.isArray(birthData.concerns)
     ) {
-      return new Response(JSON.stringify({ error: 'Invalid birth data' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return NextResponse.json({ error: 'Invalid birth data' }, { status: 400 });
     }
   }
 
   // 3. Check quota
   const serviceClient = createServiceClient();
-  // Use the client-provided date context or fall back to server date
-  const now = new Date();
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const today = getTodayString();
 
   const { data: quota, error: quotaError } = await serviceClient
     .from('user_quotas')
@@ -147,12 +130,8 @@ export async function POST(request: NextRequest) {
     .eq('user_id', user.id)
     .single();
 
-  // If quota query failed for a reason other than "not found", bail
-  if (quotaError && quotaError.code !== 'PGRST116') {
-    return new Response(JSON.stringify({ error: 'Failed to check quota' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  if (quotaError && quotaError.code !== PGRST_NOT_FOUND) {
+    return NextResponse.json({ error: 'Failed to check quota' }, { status: 500 });
   }
 
   // Get user tier
@@ -163,7 +142,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   const tier = profile?.tier || 'free';
-  const maxQuestions = tier === 'standard' ? Infinity : 1;
+  const maxQuestions = tier === 'standard' ? Infinity : FREE_ORACLE_QUESTIONS_PER_DAY;
 
   if (quota) {
     const questionsToday = quota.oracle_last_reset === today
@@ -171,34 +150,41 @@ export async function POST(request: NextRequest) {
       : 0;
 
     if (questionsToday >= maxQuestions) {
-      return new Response(JSON.stringify({ error: 'Daily quota exceeded' }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return NextResponse.json({ error: 'Daily quota exceeded' }, { status: 429 });
     }
 
     // Increment quota
-    await serviceClient.from('user_quotas').update({
+    const { error: updateError } = await serviceClient.from('user_quotas').update({
       oracle_questions_today: questionsToday + 1,
       oracle_last_reset: today,
       updated_at: new Date().toISOString(),
     }).eq('user_id', user.id);
+
+    if (updateError) {
+      console.error('Failed to update oracle quota:', updateError);
+      return NextResponse.json({ error: 'Failed to update quota' }, { status: 500 });
+    }
   } else {
     // Create quota record
-    await serviceClient.from('user_quotas').insert({
+    const { error: insertError } = await serviceClient.from('user_quotas').insert({
       user_id: user.id,
       oracle_questions_today: 1,
       oracle_last_reset: today,
     });
+
+    if (insertError) {
+      console.error('Failed to create oracle quota:', insertError);
+      return NextResponse.json({ error: 'Failed to update quota' }, { status: 500 });
+    }
   }
 
   // 4. Call Claude API with streaming
   const systemPrompt = buildSystemPrompt(birthData ?? undefined, rawLang ?? undefined);
 
   const stream = await anthropic.messages.stream({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 500,
-    temperature: 0.8,
+    model: ORACLE_MODEL,
+    max_tokens: ORACLE_MAX_TOKENS,
+    temperature: ORACLE_TEMPERATURE,
     system: systemPrompt,
     messages: [{ role: 'user', content: message }],
   });

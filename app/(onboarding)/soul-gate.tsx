@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Pressable, StyleSheet, Platform, Alert, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withRepeat,
+  withSequence,
+  Easing,
+  FadeIn,
+  FadeInUp,
+  FadeInDown,
+} from 'react-native-reanimated';
 import { Text } from '@/src/components/ui/Text';
 import { ProgressIndicator } from '@/src/components/ui/ProgressIndicator';
 import { GoldButton } from '@/src/components/ui/GoldButton';
@@ -14,9 +25,37 @@ import { features } from '@/src/config/features';
 
 export default function SoulGate() {
   const router = useRouter();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('onboarding');
   const setLanguage = useOnboardingStore((s) => s.setLanguage);
   const [loading, setLoading] = useState(false);
+
+  // Diamond pulse animation
+  const diamondScale = useSharedValue(1);
+  const diamondGlow = useSharedValue(0.4);
+
+  useEffect(() => {
+    diamondScale.value = withRepeat(
+      withSequence(
+        withTiming(1.15, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+      ),
+      -1,
+      true,
+    );
+    diamondGlow.value = withRepeat(
+      withSequence(
+        withTiming(0.8, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.4, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+      ),
+      -1,
+      true,
+    );
+  }, []);
+
+  const diamondAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: diamondScale.value }],
+    opacity: diamondGlow.value,
+  }));
 
   const selectLanguage = (lang: 'en' | 'th') => {
     i18n.changeLanguage(lang);
@@ -73,24 +112,32 @@ export default function SoulGate() {
           <ProgressIndicator
             currentStep={1}
             totalSteps={3}
-            label="Step 1: Initiation"
+            label={t('soulGate.step')}
           />
         </View>
 
         {/* Main content */}
         <View style={styles.mainContent}>
           {/* Sacred Geometry Emblem */}
-          <View style={styles.emblemOuterRing}>
-            <View style={styles.emblemContainer}>
+          <Animated.View
+            entering={FadeInDown.duration(800).delay(200)}
+            style={styles.emblemOuterRing}
+          >
+            <Animated.View style={[styles.emblemContainer, diamondAnimStyle]}>
               <Text style={styles.emblemDiamond}>◆</Text>
-            </View>
-          </View>
+            </Animated.View>
+          </Animated.View>
 
           {/* Title */}
-          <Text style={styles.title}>MOR DOO</Text>
+          <Animated.View entering={FadeInUp.duration(800).delay(500)}>
+            <Text style={styles.title}>MOR DOO</Text>
+          </Animated.View>
 
           {/* Language Selection */}
-          <View style={styles.languageRow}>
+          <Animated.View
+            entering={FadeIn.duration(600).delay(800)}
+            style={styles.languageRow}
+          >
             <Pressable
               style={[
                 styles.langCard,
@@ -112,30 +159,36 @@ export default function SoulGate() {
               <Image source={{ uri: 'https://flagcdn.com/w160/gb.png' }} style={styles.flagImage} />
               <Text style={styles.langLabelEnglish}>ENGLISH</Text>
             </Pressable>
-          </View>
+          </Animated.View>
 
           {/* Gold Divider */}
-          <View style={styles.dividerRow}>
+          <Animated.View
+            entering={FadeIn.duration(600).delay(1000)}
+            style={styles.dividerRow}
+          >
             <View style={styles.dividerLine} />
             <Text style={styles.dividerSparkle}>✦</Text>
             <View style={styles.dividerLine} />
-          </View>
+          </Animated.View>
 
           {/* CTA Buttons */}
-          <View style={styles.ctaSection}>
+          <Animated.View
+            entering={FadeInUp.duration(600).delay(1100)}
+            style={styles.ctaSection}
+          >
             {loading ? (
               <ActivityIndicator color={colors.gold.DEFAULT} size="large" />
             ) : (
               <>
                 <GoldButton
-                  title="CONTINUE WITH PHONE"
+                  title={t('soulGate.continueWithPhone')}
                   onPress={handlePhoneAuth}
                   variant="filled"
                   fullWidth
                 />
                 {features.appleSignIn && Platform.OS === 'ios' && (
                   <GoldButton
-                    title="CONTINUE WITH APPLE"
+                    title={t('soulGate.continueWithApple')}
                     onPress={handleAppleAuth}
                     variant="outlined"
                     fullWidth
@@ -143,7 +196,7 @@ export default function SoulGate() {
                 )}
                 {features.googleSignIn && (
                   <GoldButton
-                    title="CONTINUE WITH GOOGLE"
+                    title={t('soulGate.continueWithGoogle')}
                     onPress={handleGoogleAuth}
                     variant="outlined"
                     fullWidth
@@ -151,14 +204,17 @@ export default function SoulGate() {
                 )}
               </>
             )}
-          </View>
+          </Animated.View>
         </View>
 
         {/* Footer */}
-        <View style={styles.footer}>
+        <Animated.View
+          entering={FadeIn.duration(600).delay(1300)}
+          style={styles.footer}
+        >
           <Text style={styles.footerSparkle}>✦</Text>
-          <Text style={styles.footerText}>The Soul Gate</Text>
-        </View>
+          <Text style={styles.footerText}>{t('soulGate.footer')}</Text>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

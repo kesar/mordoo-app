@@ -5,19 +5,27 @@ import { useAuthStore } from '@/src/stores/authStore';
 export function useAuthListener() {
   const setSupabaseSession = useAuthStore((s) => s.setSupabaseSession);
   const logout = useAuthStore((s) => s.logout);
-  const authMode = useAuthStore((s) => s.authMode);
 
   useEffect(() => {
+    // Check current session on mount — clear stale auth if expired
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setSupabaseSession(session);
+      } else if (useAuthStore.getState().isAuthenticated) {
+        logout();
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (_event, session) => {
         if (session) {
           setSupabaseSession(session);
-        } else if (event === 'SIGNED_OUT' && authMode === 'account') {
+        } else if (useAuthStore.getState().isAuthenticated) {
           logout();
         }
       },
     );
 
     return () => subscription.unsubscribe();
-  }, [setSupabaseSession, logout, authMode]);
+  }, [setSupabaseSession, logout]);
 }

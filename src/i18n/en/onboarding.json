@@ -2,8 +2,11 @@
   "soulGate": {
     "title": "Welcome, Seeker",
     "subtitle": "Choose your language to begin",
-    "guestMode": "Continue as Guest",
-    "createAccount": "Create Account"
+"continueWithPhone": "Continue with Phone",
+    "continueWithApple": "Continue with Apple",
+    "continueWithGoogle": "Continue with Google",
+    "step": "Step 1: Initiation",
+    "footer": "The Soul Gate"
   },
   "birthData": {
     "title": "Your Celestial Foundation",

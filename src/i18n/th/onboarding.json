@@ -2,8 +2,11 @@
   "soulGate": {
     "title": "ยินดีต้อนรับ ผู้แสวงหา",
     "subtitle": "เลือกภาษาของคุณเพื่อเริ่มต้น",
-    "guestMode": "ดำเนินการในฐานะผู้เยี่ยมชม",
-    "createAccount": "สร้างบัญชี"
+"continueWithPhone": "เข้าสู่ระบบด้วยโทรศัพท์",
+    "continueWithApple": "เข้าสู่ระบบด้วย Apple",
+    "continueWithGoogle": "เข้าสู่ระบบด้วย Google",
+    "step": "ขั้นตอนที่ 1: เริ่มต้น",
+    "footer": "ประตูจิตวิญญาณ"
   },
   "birthData": {
     "title": "รากฐานแห่งดวงดาวของคุณ",

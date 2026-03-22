@@ -176,7 +176,7 @@ export default function OracleScreen() {
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const flatListRef = useRef<FlatList<ChatMessage>>(null);
 
-  const authMode = useAuthStore((s) => s.authMode);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const messages = useOracleStore((s) => s.messages);
   const isStreaming = useOracleStore((s) => s.isStreaming);
   const addMessage = useOracleStore((s) => s.addMessage);
@@ -212,8 +212,8 @@ export default function OracleScreen() {
     };
     addMessage(userMsg);
 
-    // If guest mode, navigate to sign-in
-    if (!authMode) {
+    // If not authenticated, navigate to sign-in
+    if (!isAuthenticated) {
       sendingRef.current = false;
       router.push('/(onboarding)/soul-gate');
       return;
@@ -263,7 +263,7 @@ export default function OracleScreen() {
   }, [
     input,
     isStreaming,
-    authMode,
+    isAuthenticated,
     birthData,
     nameData,
     concerns,
