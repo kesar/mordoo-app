@@ -5,13 +5,12 @@ import type { Session } from '@supabase/supabase-js';
 
 interface AuthState {
   isAuthenticated: boolean;
-  authMode: 'guest' | 'account' | null;
+  authMode: 'account' | null;
   userId: string | null;
   supabaseUserId: string | null;
   token: string | null;
 
   setSupabaseSession: (session: Session) => void;
-  setGuestAuth: () => void;
   logout: () => void;
 }
 
@@ -31,17 +30,6 @@ export const useAuthStore = create<AuthState>()(
           userId: session.user.id,
           supabaseUserId: session.user.id,
           token: session.access_token,
-        });
-      },
-
-      setGuestAuth: () => {
-        const guestId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-        set({
-          isAuthenticated: true,
-          authMode: 'guest',
-          userId: guestId,
-          supabaseUserId: null,
-          token: null,
         });
       },
 

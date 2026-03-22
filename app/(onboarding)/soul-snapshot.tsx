@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   Text as RNText,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
@@ -30,15 +31,12 @@ export default function SoulSnapshot() {
   const nameData = useOnboardingStore((s) => s.nameData);
   const concerns = useOnboardingStore((s) => s.concerns);
   const urgencyContext = useOnboardingStore((s) => s.urgencyContext);
-  const setGuestAuth = useAuthStore((s) => s.setGuestAuth);
   const authMode = useAuthStore((s) => s.authMode);
   const { width } = useWindowDimensions();
 
   const handleEnterRealms = () => {
     completeOnboarding();
-    if (!authMode) {
-      setGuestAuth();
-    } else if (authMode === 'account' && birthData) {
+    if (authMode === 'account' && birthData) {
       syncBirthData({ birthData, nameData, concerns, urgencyContext }).catch((err) => {
         console.warn('Failed to sync birth data, will use local computation:', err);
       });
@@ -47,7 +45,7 @@ export default function SoulSnapshot() {
   };
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen} edges={['top']}>
       {/* Ambient background blobs */}
       <View style={[styles.blob, styles.blobTopLeft]} />
       <View style={[styles.blob, styles.blobBottomRight]} />
@@ -157,7 +155,7 @@ export default function SoulSnapshot() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
