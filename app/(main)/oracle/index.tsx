@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -10,30 +10,24 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Markdown from 'react-native-markdown-display';
+import { SimpleMarkdown } from '@/src/components/ui/SimpleMarkdown';
 import { router } from 'expo-router';
 import { Text } from '@/src/components/ui/Text';
 import { StarIcon, LockIcon, BambooIcon, SendArrowIcon } from '@/src/components/icons/TarotIcons';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
-import { useOracleStore, type ChatMessage } from '@/src/stores/oracleStore';
+import { useOracleStore, type ChatMessage, type PastConversation } from '@/src/stores/oracleStore';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useSettingsStore } from '@/src/stores/settingsStore';
-import { sendOracleMessage } from '@/src/services/oracle';
+import {
+  sendOracleMessage,
+  fetchTodayConversation,
+  fetchConversationHistory,
+  type ConversationMessage,
+} from '@/src/services/oracle';
 import { lightHaptic } from '@/src/utils/haptics';
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const WELCOME_MESSAGE: ChatMessage = {
-  id: 'welcome',
-  role: 'assistant',
-  content:
-    'The constellations shift in your favor, seeker. What shall we decode from the stars?',
-  timestamp: new Date().toISOString(),
-};
+import { useTranslation } from 'react-i18next';
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -46,6 +40,7 @@ function ModeToggle({
   mode: 'mordoo' | 'strategist';
   onSelect: (m: 'mordoo' | 'strategist') => void;
 }) {
+  const { t } = useTranslation('oracle');
   return (
     <View style={styles.modeToggleContainer}>
       <View style={styles.modePill}>
@@ -56,7 +51,7 @@ function ModeToggle({
           <View style={styles.modeBtnRow}>
             <StarIcon size={11} color={mode === 'mordoo' ? colors.onPrimary : 'rgba(228,225,240,0.7)'} />
             <Text style={[styles.modeBtnText, mode === 'mordoo' && styles.modeBtnTextActive]}>
-              {' '}Mor Doo
+              {' '}{t('modes.mordoo')}
             </Text>
           </View>
         </Pressable>
@@ -68,7 +63,7 @@ function ModeToggle({
         >
           <View style={styles.modeBtnRow}>
             <LockIcon size={11} />
-            <Text style={[styles.modeBtnText, styles.modeBtnTextLocked]}>{' '}Strategist</Text>
+            <Text style={[styles.modeBtnText, styles.modeBtnTextLocked]}>{' '}{t('modes.strategist')}</Text>
           </View>
         </Pressable>
       </View>
@@ -144,7 +139,7 @@ function AiMessageBubble({ message }: { message: ChatMessage }) {
     <View style={styles.aiRow}>
       <Image source={mordooAvatar} style={styles.avatar} />
       <View style={styles.aiBubble}>
-        <Markdown style={markdownStyles}>{message.content}</Markdown>
+        <SimpleMarkdown style={markdownStyles}>{message.content}</SimpleMarkdown>
         <Text style={styles.aiBubbleTime}>{time}</Text>
       </View>
     </View>
@@ -180,12 +175,28 @@ function TypingIndicator() {
 }
 
 function QuotaExceeded() {
+  const { t } = useTranslation('oracle');
   return (
     <View style={styles.quotaCard}>
-      <Text style={styles.quotaTitle}>DAILY LIMIT REACHED</Text>
+      <Text style={styles.quotaTitle}>{t('chat.quotaTitle')}</Text>
       <Text style={styles.quotaBody}>
-        Your next reading will be available tomorrow.
+        {t('chat.quotaBody')}
       </Text>
+    </View>
+  );
+}
+
+function DateDivider({ date }: { date: string }) {
+  const formatted = new Date(date + 'T00:00:00').toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+  return (
+    <View style={styles.dateDivider}>
+      <View style={styles.dateDividerLine} />
+      <Text style={styles.dateDividerText}>{formatted}</Text>
+      <View style={styles.dateDividerLine} />
     </View>
   );
 }
@@ -195,10 +206,16 @@ function QuotaExceeded() {
 // ---------------------------------------------------------------------------
 
 export default function OracleScreen() {
+  const { t } = useTranslation('oracle');
   const [mode, setMode] = useState<'mordoo' | 'strategist'>('mordoo');
   const [input, setInput] = useState('');
   const [quotaExceeded, setQuotaExceeded] = useState(false);
-  const flatListRef = useRef<FlatList<ChatMessage>>(null);
+
+  type ListItem =
+    | (ChatMessage & { type: 'message' })
+    | { type: 'date-divider'; id: string; date: string };
+
+  const flatListRef = useRef<FlatList<ListItem>>(null);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const messages = useOracleStore((s) => s.messages);
@@ -214,11 +231,98 @@ export default function OracleScreen() {
 
   const lang = useSettingsStore((s) => s.language);
 
-  const displayMessages =
-    messages.length === 0 ? [WELCOME_MESSAGE] : messages;
+  const conversationDate = useOracleStore((s) => s.conversationDate);
+  const pastConversations = useOracleStore((s) => s.pastConversations);
+  const hasMoreHistory = useOracleStore((s) => s.hasMoreHistory);
+  const isLoadingHistory = useOracleStore((s) => s.isLoadingHistory);
+  const setTodayConversation = useOracleStore((s) => s.setTodayConversation);
+  const appendHistory = useOracleStore((s) => s.appendHistory);
+  const setLoadingHistory = useOracleStore((s) => s.setLoadingHistory);
 
-  // Inverted FlatList needs data in reverse order
-  const invertedMessages = [...displayMessages].reverse();
+  // Load today's conversation on mount — always fetch to let server determine "today" (Bangkok time)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    fetchTodayConversation()
+      .then((data) => {
+        // Server returns the authoritative "today" date in Bangkok timezone
+        if (data.conversationDate !== conversationDate) {
+          const msgs = data.messages.map((m: ConversationMessage) => ({
+            id: m.id,
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+            timestamp: m.createdAt,
+          }));
+          setTodayConversation(data.conversationId, data.conversationDate, msgs);
+        }
+      })
+      .catch(() => {
+        // Keep cached messages if fetch fails
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  const welcomeMessage = useMemo<ChatMessage>(() => ({
+    id: 'welcome',
+    role: 'assistant',
+    content: t('chat.welcomeMessage'),
+    timestamp: new Date().toISOString(),
+  }), [t]);
+
+  const loadMoreHistory = useCallback(() => {
+    if (isLoadingHistory || !hasMoreHistory) return;
+
+    const oldestDate = pastConversations.length > 0
+      ? pastConversations[pastConversations.length - 1].conversationDate
+      : conversationDate || undefined;
+
+    if (!oldestDate) return;
+
+    setLoadingHistory(true);
+    fetchConversationHistory(oldestDate)
+      .then((data) => {
+        const mapped: PastConversation[] = data.conversations.map((c) => ({
+          id: c.id,
+          conversationDate: c.conversationDate,
+          summary: c.summary,
+          messages: c.messages.map((m) => ({
+            id: m.id,
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+            timestamp: m.createdAt,
+          })),
+        }));
+        appendHistory(mapped, data.hasMore);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingHistory(false));
+  }, [isLoadingHistory, hasMoreHistory, pastConversations, conversationDate, setLoadingHistory, appendHistory]);
+
+  const allItems = useMemo<ListItem[]>(() => {
+    const items: ListItem[] = [];
+
+    // Past conversations (oldest first since they're loaded in desc order)
+    const pastReversed = [...pastConversations].reverse();
+    for (const conv of pastReversed) {
+      items.push({ type: 'date-divider', id: `div-${conv.conversationDate}`, date: conv.conversationDate });
+      for (const msg of conv.messages) {
+        items.push({ ...msg, type: 'message' });
+      }
+    }
+
+    // Today's messages
+    const todayMsgs = messages.length === 0 ? [welcomeMessage] : messages;
+    if (conversationDate && pastConversations.length > 0) {
+      items.push({ type: 'date-divider', id: `div-${conversationDate}`, date: conversationDate });
+    }
+    for (const msg of todayMsgs) {
+      items.push({ ...msg, type: 'message' });
+    }
+
+    return items;
+  }, [messages, pastConversations, conversationDate, welcomeMessage]);
+
+  const invertedItems = useMemo(() => [...allItems].reverse(), [allItems]);
 
   const sendingRef = useRef(false);
 
@@ -284,7 +388,7 @@ export default function OracleScreen() {
           setQuotaExceeded(true);
         } else {
           appendToLastMessage(
-            '\n\n_The astral connection was disrupted. Please try again._',
+            t('chat.errorDisrupted'),
           );
         }
       },
@@ -297,6 +401,7 @@ export default function OracleScreen() {
     nameData,
     concerns,
     lang,
+    t,
     addMessage,
     removeLastMessage,
     appendToLastMessage,
@@ -304,7 +409,8 @@ export default function OracleScreen() {
   ]);
 
   const renderItem = useCallback(
-    ({ item }: { item: ChatMessage }) => {
+    ({ item }: { item: ListItem }) => {
+      if (item.type === 'date-divider') return <DateDivider date={item.date} />;
       if (item.role === 'assistant') return <AiMessageBubble message={item} />;
       return <UserMessageBubble message={item} />;
     },
@@ -331,13 +437,15 @@ export default function OracleScreen() {
       >
         <FlatList
           ref={flatListRef}
-          data={invertedMessages}
+          data={invertedItems}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           inverted={true}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.messageList}
+          onEndReached={loadMoreHistory}
+          onEndReachedThreshold={0.5}
           ListHeaderComponent={
             <>
               {isStreaming ? <TypingIndicator /> : null}
@@ -353,7 +461,7 @@ export default function OracleScreen() {
               style={styles.textInput}
               value={input}
               onChangeText={setInput}
-              placeholder="Ask the stars..."
+              placeholder={t('chat.placeholder')}
               placeholderTextColor="rgba(228,225,240,0.35)"
               onSubmitEditing={sendMessage}
               returnKeyType="send"
@@ -556,6 +664,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.onSurfaceVariant,
     lineHeight: 20,
+  },
+
+  // ---- Date Divider ----
+  dateDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    gap: 10,
+  },
+  dateDividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(201,168,76,0.2)',
+  },
+  dateDividerText: {
+    fontFamily: fonts.display.regular,
+    fontSize: 11,
+    color: 'rgba(201,168,76,0.5)',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 
   // ---- Input Bar ----
