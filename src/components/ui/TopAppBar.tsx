@@ -1,7 +1,9 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '@/src/components/ui/Text';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
+import { ArrowLeftIcon, MenuIcon } from '@/src/components/icons/TarotIcons';
 
 interface TopAppBarProps {
   showBackButton?: boolean;
@@ -24,7 +26,11 @@ export function TopAppBar({
         accessibilityRole="button"
         accessibilityLabel={showBackButton ? 'Go back' : 'Open menu'}
       >
-        <Text style={styles.iconText}>{showBackButton ? '←' : '☰'}</Text>
+        {showBackButton ? (
+          <ArrowLeftIcon size={24} color={colors.gold.light} />
+        ) : (
+          <MenuIcon size={24} color={colors.gold.light} />
+        )}
       </Pressable>
 
       {/* Center title */}
@@ -55,11 +61,6 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  iconText: {
-    color: colors.gold.light,
-    fontSize: 24,
-    lineHeight: 28,
   },
   title: {
     fontFamily: fonts.display.bold,

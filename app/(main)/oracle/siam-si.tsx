@@ -99,7 +99,7 @@ export default function SiamSiScreen() {
         <Text style={styles.headerTitle}>SIAM SI</Text>
         <View style={styles.quotaBadge}>
           <Text style={styles.quotaText}>
-            {drawsRemaining === null ? '∞' : drawsRemaining} left
+            {drawsRemaining === null ? 'unlimited' : `${drawsRemaining} left`}
           </Text>
         </View>
       </View>

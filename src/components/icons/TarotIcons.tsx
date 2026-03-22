@@ -173,3 +173,13 @@ export function CheckIcon({ size = 24, color = colors.gold.DEFAULT }: IconProps)
     </Svg>
   );
 }
+
+export function MenuIcon({ size = 24, color = colors.gold.DEFAULT }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round">
+      <Line x1="4" y1="6" x2="20" y2="6" />
+      <Line x1="4" y1="12" x2="20" y2="12" />
+      <Line x1="4" y1="18" x2="20" y2="18" />
+    </Svg>
+  );
+}
