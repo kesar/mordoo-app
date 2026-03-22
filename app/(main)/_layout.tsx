@@ -1,6 +1,6 @@
 import { View, Pressable, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
-import { StarIcon, OracleHeartIcon } from '@/src/components/icons/TarotIcons';
+import { StarIcon, OracleHeartIcon, ProfileIcon } from '@/src/components/icons/TarotIcons';
 import { useTranslation } from 'react-i18next';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
@@ -21,7 +21,7 @@ export default function MainLayout() {
           height: 88,
           paddingBottom: 32,
           paddingTop: 0,
-          paddingHorizontal: 48,
+          paddingHorizontal: 24,
           borderTopLeftRadius: 40,
           borderTopRightRadius: 40,
           position: 'absolute',
@@ -62,6 +62,16 @@ export default function MainLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        listeners={{ tabPress: () => lightHaptic() }}
+        options={{
+          title: t('tabs.profile'),
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="profile" color={color} focused={focused} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
@@ -91,6 +101,8 @@ function TabIcon({ name, color }: { name: string; color: string; focused: boolea
       <StarIcon size={size} color={color} />
     ) : name === 'oracle' ? (
       <OracleHeartIcon size={size} color={color} />
+    ) : name === 'profile' ? (
+      <ProfileIcon size={size} color={color} />
     ) : null;
   return <View style={tabStyles.iconWrap}>{icon}</View>;
 }
