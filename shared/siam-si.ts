@@ -38,15 +38,7 @@ export const SIAM_SI_STICKS: SiamSiStick[] = [
   { number: 28, fortune: 'fair', titleEn: 'Twilight Hour', titleTh: 'ยามสนธยา', meaningEn: 'An ending and a beginning overlap. Honor what passes while welcoming what arrives.', meaningTh: 'จุดจบและจุดเริ่มต้นซ้อนทับกัน ให้เกียรติสิ่งที่ผ่านไปขณะต้อนรับสิ่งที่มา' },
 ];
 
-// Deterministic draw function
-function hashCode(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash + char) | 0;
-  }
-  return Math.abs(hash);
-}
+import { hashCode } from './hash';
 
 export function drawSiamSi(userId: string, yearMonth: string, drawIndex: number): SiamSiStick {
   const seed = hashCode(`${userId}:${yearMonth}:${drawIndex}`);

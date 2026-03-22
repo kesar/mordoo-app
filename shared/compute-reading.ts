@@ -1,15 +1,6 @@
 import type { BirthDataInput, DailyPulseResponse } from './types';
 import { selectInsight } from './insight-templates';
-
-// Simple string hash → unsigned 32-bit integer
-function hashCode(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash + char) | 0;
-  }
-  return Math.abs(hash);
-}
+import { hashCode } from './hash';
 
 // Seeded pseudo-random: returns 0..max-1
 function seededRandom(seed: number, offset: number, max: number): number {
@@ -19,7 +10,9 @@ function seededRandom(seed: number, offset: number, max: number): number {
 
 // Life path number: sum digits of birth date recursively to single digit
 function lifePathNumber(dateOfBirth: string): number {
-  const digits = dateOfBirth.replace(/-/g, '');
+  // Handle full ISO strings like "2000-01-15T00:00:00.000Z" — extract date part only
+  const datePart = dateOfBirth.split('T')[0];
+  const digits = datePart.replace(/-/g, '');
   let sum = 0;
   for (const d of digits) {
     sum += parseInt(d, 10);
