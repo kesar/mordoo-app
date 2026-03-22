@@ -9,13 +9,14 @@ interface SendMessageParams {
     fullName?: string;
     concerns: string[];
   };
+  lang?: 'en' | 'th';
   onChunk: (chunk: string) => void;
   onDone: () => void;
   onError: (error: Error) => void;
 }
 
 export async function sendOracleMessage(params: SendMessageParams): Promise<void> {
-  const { message, birthData, onChunk, onDone, onError } = params;
+  const { message, birthData, lang, onChunk, onDone, onError } = params;
 
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) {
@@ -30,7 +31,7 @@ export async function sendOracleMessage(params: SendMessageParams): Promise<void
         'Content-Type': 'application/json',
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ message, birthData }),
+      body: JSON.stringify({ message, birthData, lang }),
     });
 
     if (!response.ok) {
@@ -87,4 +88,39 @@ export async function sendOracleMessage(params: SendMessageParams): Promise<void
   } catch (error) {
     onError(error instanceof Error ? error : new Error('Network error'));
   }
+}
+
+export interface SiamSiDrawResponse {
+  number: number;
+  fortune: 'excellent' | 'good' | 'fair' | 'caution';
+  titleEn: string;
+  titleTh: string;
+  meaningEn: string;
+  meaningTh: string;
+  drawsUsed: number;
+  drawsTotal: number | null;
+  drawsRemaining: number | null;
+}
+
+export async function fetchSiamSiDraw(): Promise<SiamSiDrawResponse> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Not authenticated');
+
+  const response = await fetch(`${API_BASE_URL}/api/oracle/siam-si`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({}),
+  });
+
+  if (!response.ok) {
+    if (response.status === 429) {
+      throw new Error('QUOTA_EXCEEDED');
+    }
+    throw new Error(`Siam Si API error: ${response.status}`);
+  }
+
+  return response.json();
 }
