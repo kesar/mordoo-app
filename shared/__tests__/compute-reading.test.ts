@@ -195,3 +195,30 @@ describe('computeReading sub-scores', () => {
     expect(a.subScores).toEqual(b.subScores);
   });
 });
+
+describe('computeReading non-sub-score fields', () => {
+  it('luckyColor has name, nameTh, hex', () => {
+    const result = computeReading(BASE_INPUT);
+    expect(result.luckyColor.name).toBeTruthy();
+    expect(result.luckyColor.nameTh).toBeTruthy();
+    expect(result.luckyColor.hex).toMatch(/^#[0-9a-f]{6}$/i);
+  });
+
+  it('luckyNumber is 1-9', () => {
+    const result = computeReading(BASE_INPUT);
+    expect(result.luckyNumber).toBeGreaterThanOrEqual(1);
+    expect(result.luckyNumber).toBeLessThanOrEqual(9);
+  });
+
+  it('luckyDirection is a valid direction', () => {
+    const result = computeReading(BASE_INPUT);
+    const valid = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+    expect(valid).toContain(result.luckyDirection);
+  });
+
+  it('insight strings are non-empty', () => {
+    const result = computeReading(BASE_INPUT);
+    expect(result.insightEn.length).toBeGreaterThan(0);
+    expect(result.insightTh.length).toBeGreaterThan(0);
+  });
+});
