@@ -7,11 +7,13 @@ import enCommon from './en/common.json';
 import enOnboarding from './en/onboarding.json';
 import enPulse from './en/pulse.json';
 import enOracle from './en/oracle.json';
+import enSettings from './en/settings.json';
 
 import thCommon from './th/common.json';
 import thOnboarding from './th/onboarding.json';
 import thPulse from './th/pulse.json';
 import thOracle from './th/oracle.json';
+import thSettings from './th/settings.json';
 
 const savedLang = storage.getString('mordoo-lang');
 const deviceLang = getLocales()[0]?.languageCode;
@@ -19,7 +21,7 @@ const deviceLang = getLocales()[0]?.languageCode;
 i18n.use(initReactI18next).init({
   lng: savedLang || (deviceLang === 'th' ? 'th' : 'en'),
   fallbackLng: 'en',
-  ns: ['common', 'onboarding', 'pulse', 'oracle'],
+  ns: ['common', 'onboarding', 'pulse', 'oracle', 'settings'],
   defaultNS: 'common',
   resources: {
     en: {
@@ -27,12 +29,14 @@ i18n.use(initReactI18next).init({
       onboarding: enOnboarding,
       pulse: enPulse,
       oracle: enOracle,
+      settings: enSettings,
     },
     th: {
       common: thCommon,
       onboarding: thOnboarding,
       pulse: thPulse,
       oracle: thOracle,
+      settings: thSettings,
     },
   },
   interpolation: { escapeValue: false },

@@ -1,0 +1,14 @@
+{
+  "profile": "โปรไฟล์",
+  "preferences": "การตั้งค่า",
+  "language": "ภาษา",
+  "languageEnglish": "English",
+  "languageThai": "ไทย",
+  "notifications": "การแจ้งเตือน",
+  "account": "บัญชี",
+  "signOut": "ออกจากระบบ",
+  "signOutConfirmTitle": "ออกจากระบบ",
+  "signOutConfirmMessage": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
+  "signOutConfirmCancel": "ยกเลิก",
+  "signOutConfirmOk": "ออกจากระบบ"
+}

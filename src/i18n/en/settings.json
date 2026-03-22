@@ -1,0 +1,14 @@
+{
+  "profile": "Profile",
+  "preferences": "Preferences",
+  "language": "Language",
+  "languageEnglish": "English",
+  "languageThai": "ไทย",
+  "notifications": "Notifications",
+  "account": "Account",
+  "signOut": "Sign Out",
+  "signOutConfirmTitle": "Sign Out",
+  "signOutConfirmMessage": "Are you sure you want to sign out?",
+  "signOutConfirmCancel": "Cancel",
+  "signOutConfirmOk": "Sign Out"
+}

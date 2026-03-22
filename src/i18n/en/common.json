@@ -2,7 +2,8 @@
   "appName": "Mor Doo",
   "tabs": {
     "pulse": "The Pulse",
-    "oracle": "The Oracle"
+    "oracle": "The Oracle",
+    "profile": "Profile"
   },
   "actions": {
     "continue": "Continue",
