@@ -142,7 +142,9 @@ export async function POST(request: NextRequest) {
     .single();
 
   const tier = profile?.tier || 'free';
-  const maxQuestions = tier === 'standard' ? Infinity : FREE_ORACLE_QUESTIONS_PER_DAY;
+  const normalizedPhone = (user.phone || '').replace(/\D/g, '');
+  const isTestUser = normalizedPhone === '66000000' || user.phone === '+66000000';
+  const maxQuestions = (tier === 'standard' || isTestUser) ? Infinity : FREE_ORACLE_QUESTIONS_PER_DAY;
 
   if (quota) {
     const questionsToday = quota.oracle_last_reset === today

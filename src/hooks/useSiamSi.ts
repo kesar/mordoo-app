@@ -1,18 +1,21 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Accelerometer } from 'expo-sensors';
 import { fetchSiamSiDraw, type SiamSiDrawResponse } from '@/src/services/oracle';
+import { TIERS } from '@/src/constants/tiers';
 
 const SHAKE_THRESHOLD = 1.8;
 const SHAKE_DURATION_MS = 300;
 const COOLDOWN_MS = 2000;
+
+const FREE_SIAM_SI_LIMIT = TIERS.free.entitlements.siamSiPerDay;
 
 export function useSiamSi() {
   const [isShaking, setIsShaking] = useState(false);
   const [currentStick, setCurrentStick] = useState<SiamSiDrawResponse | null>(null);
   const [isRevealing, setIsRevealing] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [drawsRemaining, setDrawsRemaining] = useState<number | null>(null);
-  const [drawsTotal, setDrawsTotal] = useState<number | null>(null);
+  const [drawsRemaining, setDrawsRemaining] = useState<number | null>(FREE_SIAM_SI_LIMIT);
+  const [drawsTotal, setDrawsTotal] = useState<number | null>(FREE_SIAM_SI_LIMIT);
   const [error, setError] = useState<string | null>(null);
 
   const shakeStartRef = useRef<number | null>(null);

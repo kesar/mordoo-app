@@ -61,6 +61,18 @@ const LUCKY_COLORS = [
   { name: 'Amber', nameTh: 'อำพัน', hex: '#d97706' },
   { name: 'Rose', nameTh: 'กุหลาบ', hex: '#e11d48' },
   { name: 'Indigo', nameTh: 'คราม', hex: '#4f46e5' },
+  { name: 'Pearl', nameTh: 'ไข่มุก', hex: '#e2e8f0' },
+  { name: 'Garnet', nameTh: 'โกเมน', hex: '#991b1b' },
+  { name: 'Turquoise', nameTh: 'เทอร์ควอยซ์', hex: '#14b8a6' },
+  { name: 'Obsidian', nameTh: 'ออบซิเดียน', hex: '#1e1b4b' },
+  { name: 'Peridot', nameTh: 'เพอริดอต', hex: '#84cc16' },
+  { name: 'Copper', nameTh: 'ทองแดง', hex: '#b45309' },
+  { name: 'Lavender', nameTh: 'ลาเวนเดอร์', hex: '#a78bfa' },
+  { name: 'Topaz', nameTh: 'โทแพซ', hex: '#f59e0b' },
+  { name: 'Opal', nameTh: 'โอปอล', hex: '#c4b5fd' },
+  { name: 'Onyx', nameTh: 'นิล', hex: '#18181b' },
+  { name: 'Citrine', nameTh: 'ซิทริน', hex: '#eab308' },
+  { name: 'Teal', nameTh: 'เขียวน้ำทะเล', hex: '#0d9488' },
 ] as const;
 
 const DIRECTIONS = [
@@ -94,7 +106,7 @@ export function computeReading(input: BirthDataInput): DailyPulseReading {
 
   // Lucky color: based on birth month element + daily offset
   const birthMonth = parseInt(input.dateOfBirth.split('-')[1], 10);
-  const colorIndex = (birthMonth + seededRandom(dailySeed, 4, 12)) % LUCKY_COLORS.length;
+  const colorIndex = (birthMonth + seededRandom(dailySeed, 4, LUCKY_COLORS.length)) % LUCKY_COLORS.length;
   const luckyColor = {
     name: LUCKY_COLORS[colorIndex].name,
     nameTh: LUCKY_COLORS[colorIndex].nameTh,

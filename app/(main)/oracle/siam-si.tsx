@@ -184,7 +184,7 @@ export default function SiamSiScreen() {
               disabled={!canDraw}
             >
               <Text style={styles.drawBtnText}>
-                {canDraw ? 'DRAW A STICK' : 'COME BACK NEXT MONTH'}
+                {canDraw ? 'DRAW A STICK' : 'COME BACK TOMORROW'}
               </Text>
             </Pressable>
           </View>

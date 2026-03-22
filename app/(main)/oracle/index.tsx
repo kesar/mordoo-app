@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import {
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -11,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Text } from '@/src/components/ui/Text';
-import { StarIcon, LockIcon, BambooIcon, ChevronRightIcon, SendArrowIcon } from '@/src/components/icons/TarotIcons';
+import { StarIcon, LockIcon, BambooIcon, SendArrowIcon } from '@/src/components/icons/TarotIcons';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
 import { useOracleStore, type ChatMessage } from '@/src/stores/oracleStore';
@@ -29,7 +30,7 @@ const WELCOME_MESSAGE: ChatMessage = {
   id: 'welcome',
   role: 'assistant',
   content:
-    'The constellations shift in your favor, seeker. I sense the threads of fate gathering around you. What whispers of destiny shall we decode from the astral tapestries?',
+    'The constellations shift in your favor, seeker. What shall we decode from the stars?',
   timestamp: new Date().toISOString(),
 };
 
@@ -52,7 +53,7 @@ function ModeToggle({
           onPress={() => onSelect('mordoo')}
         >
           <View style={styles.modeBtnRow}>
-            <StarIcon size={12} color={mode === 'mordoo' ? colors.onPrimary : 'rgba(228,225,240,0.7)'} />
+            <StarIcon size={11} color={mode === 'mordoo' ? colors.onPrimary : 'rgba(228,225,240,0.7)'} />
             <Text style={[styles.modeBtnText, mode === 'mordoo' && styles.modeBtnTextActive]}>
               {' '}Mor Doo
             </Text>
@@ -65,7 +66,7 @@ function ModeToggle({
           }}
         >
           <View style={styles.modeBtnRow}>
-            <LockIcon size={12} />
+            <LockIcon size={11} />
             <Text style={[styles.modeBtnText, styles.modeBtnTextLocked]}>{' '}Strategist</Text>
           </View>
         </Pressable>
@@ -74,21 +75,9 @@ function ModeToggle({
   );
 }
 
-function SiamSiEntryCard() {
-  return (
-    <Pressable
-      style={styles.siamSiCard}
-      onPress={() => router.push('/(main)/oracle/siam-si')}
-    >
-      <BambooIcon size={28} />
-      <View style={styles.siamSiTextContainer}>
-        <Text style={styles.siamSiTitle}>SIAM SI</Text>
-        <Text style={styles.siamSiSubtitle}>Shake for fortune sticks</Text>
-      </View>
-      <ChevronRightIcon size={18} color={colors.gold.DEFAULT} />
-    </Pressable>
-  );
-}
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mordooAvatar = require('@/assets/images/mordoo-avatar.png');
 
 function AiMessageBubble({ message }: { message: ChatMessage }) {
   const time = new Date(message.timestamp).toLocaleTimeString([], {
@@ -96,33 +85,40 @@ function AiMessageBubble({ message }: { message: ChatMessage }) {
     minute: '2-digit',
   });
   return (
-    <View style={styles.aiBubble}>
-      <Text style={styles.aiBubbleBody}>{message.content}</Text>
-      <View style={styles.aiBubbleFooter}>
-        <Text style={styles.aiBubbleFooterText}>{time}</Text>
-        <Text style={styles.aiBubbleFooterText}>{'  ·  DIVINE CONNECTION'}</Text>
+    <View style={styles.aiRow}>
+      <Image source={mordooAvatar} style={styles.avatar} />
+      <View style={styles.aiBubble}>
+        <Text style={styles.aiBubbleBody}>{message.content}</Text>
+        <Text style={styles.aiBubbleTime}>{time}</Text>
       </View>
     </View>
   );
 }
 
 function UserMessageBubble({ message }: { message: ChatMessage }) {
+  const time = new Date(message.timestamp).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
   return (
     <View style={styles.userBubble}>
       <Text style={styles.userBubbleText}>{message.content}</Text>
+      <Text style={styles.userBubbleTime}>{time}</Text>
     </View>
   );
 }
 
 function TypingIndicator() {
   return (
-    <View style={styles.typingContainer}>
-      <View style={styles.typingDots}>
-        <View style={styles.typingDot} />
-        <View style={styles.typingDot} />
-        <View style={styles.typingDot} />
+    <View style={styles.aiRow}>
+      <Image source={mordooAvatar} style={styles.avatar} />
+      <View style={styles.typingContainer}>
+        <View style={styles.typingDots}>
+          <View style={styles.typingDot} />
+          <View style={styles.typingDot} />
+          <View style={styles.typingDot} />
+        </View>
       </View>
-      <Text style={styles.typingLabel}>ORACLE IS GAZING INTO THE VOID...</Text>
     </View>
   );
 }
@@ -130,9 +126,9 @@ function TypingIndicator() {
 function QuotaExceeded() {
   return (
     <View style={styles.quotaCard}>
-      <Text style={styles.quotaTitle}>DAILY WISDOM LIMIT REACHED</Text>
+      <Text style={styles.quotaTitle}>DAILY LIMIT REACHED</Text>
       <Text style={styles.quotaBody}>
-        The stars need time to realign. Your next reading will be available tomorrow.
+        Your next reading will be available tomorrow.
       </Text>
     </View>
   );
@@ -152,6 +148,7 @@ export default function OracleScreen() {
   const messages = useOracleStore((s) => s.messages);
   const isStreaming = useOracleStore((s) => s.isStreaming);
   const addMessage = useOracleStore((s) => s.addMessage);
+  const removeLastMessage = useOracleStore((s) => s.removeLastMessage);
   const appendToLastMessage = useOracleStore((s) => s.appendToLastMessage);
   const setStreaming = useOracleStore((s) => s.setStreaming);
 
@@ -163,6 +160,9 @@ export default function OracleScreen() {
 
   const displayMessages =
     messages.length === 0 ? [WELCOME_MESSAGE] : messages;
+
+  // Inverted FlatList needs data in reverse order
+  const invertedMessages = [...displayMessages].reverse();
 
   const sendingRef = useRef(false);
 
@@ -224,6 +224,7 @@ export default function OracleScreen() {
         setStreaming(false);
         sendingRef.current = false;
         if (error.message === 'QUOTA_EXCEEDED') {
+          removeLastMessage(); // Remove empty assistant placeholder
           setQuotaExceeded(true);
         } else {
           appendToLastMessage(
@@ -241,6 +242,7 @@ export default function OracleScreen() {
     concerns,
     lang,
     addMessage,
+    removeLastMessage,
     appendToLastMessage,
     setStreaming,
   ]);
@@ -255,61 +257,65 @@ export default function OracleScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Compact header with mode toggle and Siam Si */}
+      <View style={styles.header}>
+        <ModeToggle mode={mode} onSelect={setMode} />
+        <Pressable
+          style={styles.siamSiBtn}
+          onPress={() => router.push('/(main)/oracle/siam-si')}
+        >
+          <BambooIcon size={18} />
+        </Pressable>
+      </View>
+
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={80}
+        keyboardVerticalOffset={0}
       >
         <FlatList
           ref={flatListRef}
-          data={displayMessages}
+          data={invertedMessages}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          inverted={false}
+          inverted={true}
           keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.messageList}
-          onContentSizeChange={() =>
-            flatListRef.current?.scrollToEnd({ animated: true })
-          }
           ListHeaderComponent={
-            <>
-              <ModeToggle mode={mode} onSelect={setMode} />
-              <SiamSiEntryCard />
-            </>
-          }
-          ListFooterComponent={
             <>
               {isStreaming ? <TypingIndicator /> : null}
               {quotaExceeded ? <QuotaExceeded /> : null}
             </>
           }
         />
-      </KeyboardAvoidingView>
 
-      {/* Fixed input bar above tab bar */}
-      <View style={styles.inputBar}>
-        <View style={styles.inputBarInner}>
-          <TextInput
-            style={styles.textInput}
-            value={input}
-            onChangeText={setInput}
-            placeholder="Ask the stars..."
-            placeholderTextColor="rgba(228,225,240,0.4)"
-            onSubmitEditing={sendMessage}
-            returnKeyType="send"
-            multiline={false}
-            editable={!isStreaming}
-          />
+        {/* Input bar — inside KAV so it moves with keyboard */}
+        <View style={styles.inputBar}>
+          <View style={styles.inputBarInner}>
+            <TextInput
+              style={styles.textInput}
+              value={input}
+              onChangeText={setInput}
+              placeholder="Ask the stars..."
+              placeholderTextColor="rgba(228,225,240,0.35)"
+              onSubmitEditing={sendMessage}
+              returnKeyType="send"
+              multiline={true}
+              maxLength={500}
+              editable={!isStreaming}
+            />
 
-          <Pressable
-            style={[styles.sendBtn, isStreaming && styles.sendBtnDisabled]}
-            onPress={sendMessage}
-            disabled={isStreaming}
-          >
-            <SendArrowIcon size={16} color={colors.onPrimary} />
-          </Pressable>
+            <Pressable
+              style={[styles.sendBtn, (!input.trim() || isStreaming) && styles.sendBtnDisabled]}
+              onPress={sendMessage}
+              disabled={isStreaming || !input.trim()}
+            >
+              <SendArrowIcon size={16} color={colors.onPrimary} />
+            </Pressable>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -327,19 +333,36 @@ const styles = StyleSheet.create({
     backgroundColor: colors.night.DEFAULT,
   },
 
+  // ---- Header ----
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(201,168,76,0.15)',
+  },
+  siamSiBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(201,168,76,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   // ---- Message list ----
   messageList: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 160,
-    gap: 16,
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 8,
+    gap: 6,
   },
 
   // ---- Mode Toggle ----
   modeToggleContainer: {
+    flex: 1,
     alignItems: 'center',
-    paddingTop: 8,
-    paddingBottom: 12,
   },
   modePill: {
     flexDirection: 'row',
@@ -347,17 +370,12 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     borderWidth: 1,
     borderColor: 'rgba(77,70,55,0.3)',
-    padding: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 4,
+    padding: 3,
   },
   modeBtn: {
     borderRadius: 9999,
-    paddingHorizontal: 24,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
   },
   modeBtnRow: {
     flexDirection: 'row',
@@ -368,7 +386,7 @@ const styles = StyleSheet.create({
   },
   modeBtnText: {
     fontFamily: fonts.display.regular,
-    fontSize: 14,
+    fontSize: 12,
     color: 'rgba(228,225,240,0.7)',
   },
   modeBtnTextActive: {
@@ -379,179 +397,151 @@ const styles = StyleSheet.create({
     color: 'rgba(228,225,240,0.5)',
   },
 
-  // ---- Siam Si Entry Card ----
-  siamSiCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.night.card,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.gold.border,
-    padding: 16,
-    gap: 12,
-  },
-  siamSiTextContainer: {
-    flex: 1,
-    gap: 2,
-  },
-  siamSiTitle: {
-    fontFamily: fonts.display.bold,
-    fontSize: 14,
-    color: colors.gold.DEFAULT,
-    letterSpacing: 3,
-  },
-  siamSiSubtitle: {
-    fontFamily: fonts.body.regular,
-    fontSize: 14,
-    color: colors.onSurfaceVariant,
-  },
-
   // ---- AI Bubble ----
-  aiBubble: {
-    maxWidth: '90%',
+  aiRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 6,
+    maxWidth: '85%',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(41,41,52,0.9)',
-    padding: 14,
+  },
+  avatar: {
+    width: 28,
+    height: 28,
     borderRadius: 14,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.gold.DEFAULT,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
-    gap: 4,
+  },
+  aiBubble: {
+    flex: 1,
+    backgroundColor: 'rgba(35,35,48,0.95)',
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 6,
+    borderRadius: 16,
+    borderTopLeftRadius: 4,
+    gap: 2,
   },
   aiBubbleBody: {
     fontFamily: fonts.body.regular,
     fontSize: 15,
-    fontStyle: 'italic',
     color: colors.onSurface,
-    lineHeight: 22,
+    lineHeight: 21,
   },
-  aiBubbleFooter: {
-    flexDirection: 'row',
-    marginTop: 4,
-  },
-  aiBubbleFooterText: {
-    fontFamily: fonts.display.regular,
-    fontSize: 10,
-    color: 'rgba(201,168,76,0.6)',
-    letterSpacing: 3,
-    textTransform: 'uppercase',
+  aiBubbleTime: {
+    fontFamily: fonts.body.regular,
+    fontSize: 11,
+    color: 'rgba(201,168,76,0.5)',
+    alignSelf: 'flex-end',
   },
 
   // ---- User Bubble ----
   userBubble: {
-    maxWidth: '90%',
+    maxWidth: '78%',
     alignSelf: 'flex-end',
-    backgroundColor: colors.surface.containerLowest,
-    padding: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(77,70,55,0.2)',
+    backgroundColor: 'rgba(201,168,76,0.15)',
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 6,
+    borderRadius: 16,
+    borderTopRightRadius: 4,
+    gap: 2,
   },
   userBubbleText: {
     fontFamily: fonts.body.regular,
     fontSize: 15,
-    color: 'rgba(228,225,240,0.95)',
-    lineHeight: 22,
+    color: colors.onSurface,
+    lineHeight: 21,
+  },
+  userBubbleTime: {
+    fontFamily: fonts.body.regular,
+    fontSize: 11,
+    color: 'rgba(228,225,240,0.35)',
+    alignSelf: 'flex-end',
   },
 
   // ---- Typing Indicator ----
   typingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(35,35,48,0.95)',
+    borderRadius: 16,
+    borderTopLeftRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
   typingDots: {
     flexDirection: 'row',
-    gap: 5,
+    gap: 4,
     alignItems: 'center',
   },
   typingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
     backgroundColor: colors.gold.DEFAULT,
-  },
-  typingLabel: {
-    fontFamily: fonts.display.regular,
-    fontSize: 10,
-    color: 'rgba(201,168,76,0.8)',
-    letterSpacing: 3,
-    textTransform: 'uppercase',
+    opacity: 0.6,
   },
 
   // ---- Quota Exceeded ----
   quotaCard: {
-    backgroundColor: colors.night.card,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(35,35,48,0.95)',
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.energy.low,
-    padding: 20,
-    alignItems: 'center',
-    gap: 8,
+    padding: 14,
+    gap: 4,
+    maxWidth: '78%',
   },
   quotaTitle: {
     fontFamily: fonts.display.bold,
-    fontSize: 12,
+    fontSize: 11,
     color: colors.energy.low,
-    letterSpacing: 3,
+    letterSpacing: 2,
   },
   quotaBody: {
     fontFamily: fonts.body.regular,
-    fontSize: 16,
+    fontSize: 14,
     color: colors.onSurfaceVariant,
-    textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 20,
   },
 
   // ---- Input Bar ----
   inputBar: {
-    position: 'absolute',
-    bottom: 96,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
+    paddingTop: 6,
+    paddingBottom: Platform.OS === 'ios' ? 90 : 96,
+    backgroundColor: colors.night.DEFAULT,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(201,168,76,0.12)',
   },
   inputBarInner: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     gap: 8,
-    backgroundColor: 'rgba(13,13,23,0.95)',
+    backgroundColor: 'rgba(20,20,32,0.95)',
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.3)',
-    borderRadius: 16,
-    padding: 8,
-    paddingRight: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    borderColor: 'rgba(201,168,76,0.2)',
+    borderRadius: 22,
+    paddingLeft: 14,
+    paddingRight: 6,
+    paddingVertical: 6,
   },
   textInput: {
     flex: 1,
     backgroundColor: 'transparent',
     fontFamily: fonts.body.regular,
-    fontSize: 20,
+    fontSize: 16,
     color: colors.onSurface,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 4,
+    maxHeight: 100,
   },
   sendBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: colors.gold.DEFAULT,
     alignItems: 'center',
     justifyContent: 'center',
   },
   sendBtnDisabled: {
-    opacity: 0.5,
+    opacity: 0.3,
   },
   sendBtnText: {
     fontSize: 16,

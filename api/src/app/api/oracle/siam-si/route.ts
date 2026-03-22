@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '../../../../lib/supabase';
 import { authenticateRequest } from '../../../../lib/auth';
-import { getCurrentMonthString } from '../../../../lib/date';
-import { FREE_SIAM_SI_DRAWS_PER_MONTH, PGRST_NOT_FOUND } from '../../../../lib/config';
+import { getTodayString } from '../../../../lib/date';
+import { FREE_SIAM_SI_DRAWS_PER_DAY, PGRST_NOT_FOUND } from '../../../../lib/config';
 import { drawSiamSi } from '@shared/siam-si';
 
 export async function POST(request: NextRequest) {
@@ -20,10 +20,10 @@ export async function POST(request: NextRequest) {
     .single();
 
   const tier = profile?.tier || 'free';
-  const maxDraws = tier === 'standard' ? Infinity : FREE_SIAM_SI_DRAWS_PER_MONTH;
+  const maxDraws = tier === 'standard' ? Infinity : FREE_SIAM_SI_DRAWS_PER_DAY;
 
   // 3. Get/create quota record
-  const currentMonth = getCurrentMonthString();
+  const today = getTodayString();
 
   const { data: quota, error: quotaError } = await serviceClient
     .from('user_quotas')
@@ -35,18 +35,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to check quota' }, { status: 500 });
   }
 
-  let drawsThisMonth = 0;
+  let drawsToday = 0;
 
   if (quota) {
-    if (quota.siam_si_last_reset !== currentMonth) {
-      drawsThisMonth = 0;
+    if (quota.siam_si_last_reset !== today) {
+      drawsToday = 0;
     } else {
-      drawsThisMonth = quota.siam_si_draws_this_month || 0;
+      drawsToday = quota.siam_si_draws_this_month || 0;
     }
   }
 
   // 4. Check quota
-  if (maxDraws !== Infinity && drawsThisMonth >= maxDraws) {
+  if (maxDraws !== Infinity && drawsToday >= maxDraws) {
     return NextResponse.json(
       { error: 'QUOTA_EXCEEDED', drawsTotal: maxDraws, drawsRemaining: 0 },
       { status: 429 },
@@ -54,14 +54,14 @@ export async function POST(request: NextRequest) {
   }
 
   // 5. Perform draw using server-side draw index
-  const stick = drawSiamSi(user.id, currentMonth, drawsThisMonth);
+  const stick = drawSiamSi(user.id, today, drawsToday);
 
   // 6. Increment quota
-  const newDrawCount = drawsThisMonth + 1;
+  const newDrawCount = drawsToday + 1;
   if (quota) {
     const { error: updateError } = await serviceClient.from('user_quotas').update({
       siam_si_draws_this_month: newDrawCount,
-      siam_si_last_reset: currentMonth,
+      siam_si_last_reset: today,
       updated_at: new Date().toISOString(),
     }).eq('user_id', user.id);
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     const { error: insertError } = await serviceClient.from('user_quotas').insert({
       user_id: user.id,
       siam_si_draws_this_month: newDrawCount,
-      siam_si_last_reset: currentMonth,
+      siam_si_last_reset: today,
     });
 
     if (insertError) {

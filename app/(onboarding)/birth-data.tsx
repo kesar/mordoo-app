@@ -352,7 +352,7 @@ export default function BirthDataScreen() {
         </SacredCard>
 
         {/* ── Gender ── */}
-        <SacredCard variant="high" style={styles.card}>
+        <SacredCard variant="high" style={[styles.card, { overflow: 'visible' }]}>
           {/* Card label */}
           <View style={styles.cardLabelRow}>
             <Text style={styles.cardLabel}>Vessel Identity (Optional)</Text>

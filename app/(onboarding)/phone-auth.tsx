@@ -16,6 +16,8 @@ import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
 import { signInWithPhone, verifyOTP } from '@/src/services/auth';
+import { fetchExistingBirthData } from '@/src/services/birth-data';
+import { useOnboardingStore } from '@/src/stores/onboardingStore';
 
 type Step = 'phone' | 'otp';
 
@@ -56,7 +58,21 @@ export default function PhoneAuth() {
     setLoading(true);
     try {
       await verifyOTP(phone, otpCode);
-      router.replace('/(onboarding)/birth-data');
+
+      // Check if user already has birth data in the database
+      const existing = await fetchExistingBirthData();
+      if (existing) {
+        // Restore onboarding store from server data and skip to main app
+        const store = useOnboardingStore.getState();
+        store.setBirthData(existing.birthData);
+        if (existing.nameData) store.setNameData(existing.nameData);
+        if (existing.concerns.length > 0) store.setConcerns(existing.concerns);
+        if (existing.urgencyContext) store.setUrgencyContext(existing.urgencyContext);
+        store.completeOnboarding();
+        router.replace('/(main)/pulse');
+      } else {
+        router.replace('/(onboarding)/birth-data');
+      }
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Invalid verification code.');
     } finally {

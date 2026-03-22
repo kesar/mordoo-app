@@ -14,6 +14,7 @@ interface OracleState {
   isStreaming: boolean;
 
   addMessage: (msg: ChatMessage) => void;
+  removeLastMessage: () => void;
   appendToLastMessage: (chunk: string) => void;
   setStreaming: (streaming: boolean) => void;
   clearConversation: () => void;
@@ -27,6 +28,10 @@ export const useOracleStore = create<OracleState>()(
 
       addMessage: (msg) => set((state) => ({
         messages: [...state.messages, msg],
+      })),
+
+      removeLastMessage: () => set((state) => ({
+        messages: state.messages.slice(0, -1),
       })),
 
       appendToLastMessage: (chunk) => set((state) => {

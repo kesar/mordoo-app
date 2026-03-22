@@ -8,6 +8,64 @@ interface SyncParams {
   urgencyContext: string | null;
 }
 
+interface ExistingBirthData {
+  birthData: BirthData;
+  nameData: NameData | null;
+  concerns: Concern[];
+  urgencyContext: string | null;
+}
+
+/**
+ * Fetches existing birth data from Supabase for the current user.
+ * Returns null if no data exists.
+ */
+export async function fetchExistingBirthData(): Promise<ExistingBirthData | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from('birth_data')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  if (error || !data) return null;
+
+  const birthData: BirthData = {
+    dateOfBirth: data.date_of_birth,
+    timeOfBirth: parseTimeString(data.time_of_birth),
+    timeApproximate: data.time_approximate ?? false,
+    placeOfBirth: {
+      name: data.place_name ?? '',
+      latitude: data.latitude ?? 0,
+      longitude: data.longitude ?? 0,
+      country: data.country ?? '',
+    },
+    gender: data.gender ?? undefined,
+  };
+
+  const nameData: NameData | null = data.full_name
+    ? {
+        fullName: data.full_name,
+        phoneNumber: data.phone_number ?? undefined,
+        carPlate: data.car_plate ?? undefined,
+      }
+    : null;
+
+  return {
+    birthData,
+    nameData,
+    concerns: (data.concerns as Concern[]) ?? [],
+    urgencyContext: data.urgency_context ?? null,
+  };
+}
+
+function parseTimeString(timeStr: string | null): { hour: number; minute: number } {
+  if (!timeStr) return { hour: 12, minute: 0 };
+  const [h, m] = timeStr.split(':').map(Number);
+  return { hour: h, minute: m };
+}
+
 export async function syncBirthData(params: SyncParams) {
   const { birthData, nameData, concerns, urgencyContext } = params;
 
