@@ -3,6 +3,7 @@ import {
   Animated,
   Pressable,
   StyleSheet,
+  Text as RNText,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,13 +12,7 @@ import { Text } from '@/src/components/ui/Text';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
 import { useSiamSi } from '@/src/hooks/useSiamSi';
-import { useAuthStore } from '@/src/stores/authStore';
 import { mediumHaptic, successHaptic } from '@/src/utils/haptics';
-
-const TIER_LIMITS = {
-  free: 5,
-  standard: Infinity,
-} as const;
 
 const FORTUNE_COLORS: Record<string, string> = {
   excellent: colors.energy.high,
@@ -34,17 +29,17 @@ const FORTUNE_LABELS: Record<string, string> = {
 };
 
 export default function SiamSiScreen() {
-  const authMode = useAuthStore((s) => s.authMode);
-  const maxDraws = authMode === 'account' ? TIER_LIMITS.standard : TIER_LIMITS.free;
-
   const {
     isShaking,
     currentStick,
     isRevealing,
+    isDrawing,
     drawsRemaining,
+    drawsTotal,
     canDraw,
+    error,
     performDraw,
-  } = useSiamSi(maxDraws);
+  } = useSiamSi();
 
   // Animations
   const shakeAnim = useRef(new Animated.Value(0)).current;
@@ -104,7 +99,7 @@ export default function SiamSiScreen() {
         <Text style={styles.headerTitle}>SIAM SI</Text>
         <View style={styles.quotaBadge}>
           <Text style={styles.quotaText}>
-            {drawsRemaining === Infinity ? '∞' : drawsRemaining} left
+            {drawsRemaining === null ? '∞' : drawsRemaining} left
           </Text>
         </View>
       </View>
@@ -160,7 +155,7 @@ export default function SiamSiScreen() {
               ]}
             >
               <View style={styles.cup}>
-                <Text style={styles.cupIcon}>🎋</Text>
+                <RNText style={styles.cupIcon}>🎋</RNText>
                 <View style={styles.sticksContainer}>
                   {[...Array(5)].map((_, i) => (
                     <View
