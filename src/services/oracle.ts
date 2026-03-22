@@ -89,6 +89,68 @@ export async function sendOracleMessage(params: SendMessageParams): Promise<void
   xhr.send(JSON.stringify({ message, birthData, lang }));
 }
 
+export interface ConversationMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  createdAt: string;
+}
+
+export interface TodayConversationResponse {
+  conversationId: string | null;
+  conversationDate: string;
+  messages: ConversationMessage[];
+}
+
+export interface PastConversationResponse {
+  id: string;
+  conversationDate: string;
+  summary: string | null;
+  messages: ConversationMessage[];
+}
+
+export interface HistoryResponse {
+  conversations: PastConversationResponse[];
+  hasMore: boolean;
+}
+
+export async function fetchTodayConversation(): Promise<TodayConversationResponse> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Not authenticated');
+
+  const response = await fetch(`${API_BASE_URL}/api/oracle/today`, {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch today's conversation: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function fetchConversationHistory(before?: string): Promise<HistoryResponse> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Not authenticated');
+
+  const params = new URLSearchParams();
+  if (before) params.set('before', before);
+
+  const response = await fetch(`${API_BASE_URL}/api/oracle/history?${params}`, {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch history: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 export interface SiamSiDrawResponse {
   number: number;
   fortune: 'excellent' | 'good' | 'fair' | 'caution';

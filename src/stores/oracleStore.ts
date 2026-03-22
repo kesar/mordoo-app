@@ -9,22 +9,46 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export interface PastConversation {
+  id: string;
+  conversationDate: string;
+  summary: string | null;
+  messages: ChatMessage[];
+}
+
 interface OracleState {
+  // Today's conversation
+  conversationId: string | null;
+  conversationDate: string | null;
   messages: ChatMessage[];
   isStreaming: boolean;
 
+  // History (lazy-loaded, not persisted)
+  pastConversations: PastConversation[];
+  hasMoreHistory: boolean;
+  isLoadingHistory: boolean;
+
+  // Actions
   addMessage: (msg: ChatMessage) => void;
   removeLastMessage: () => void;
   appendToLastMessage: (chunk: string) => void;
   setStreaming: (streaming: boolean) => void;
+  setTodayConversation: (id: string | null, date: string, messages: ChatMessage[]) => void;
+  appendHistory: (conversations: PastConversation[], hasMore: boolean) => void;
+  setLoadingHistory: (loading: boolean) => void;
   clearConversation: () => void;
 }
 
 export const useOracleStore = create<OracleState>()(
   persist(
     (set) => ({
+      conversationId: null,
+      conversationDate: null,
       messages: [],
       isStreaming: false,
+      pastConversations: [],
+      hasMoreHistory: true,
+      isLoadingHistory: false,
 
       addMessage: (msg) => set((state) => ({
         messages: [...state.messages, msg],
@@ -47,12 +71,33 @@ export const useOracleStore = create<OracleState>()(
 
       setStreaming: (streaming) => set({ isStreaming: streaming }),
 
-      clearConversation: () => set({ messages: [] }),
+      setTodayConversation: (id, date, messages) => set({
+        conversationId: id,
+        conversationDate: date,
+        messages,
+      }),
+
+      appendHistory: (conversations, hasMore) => set((state) => ({
+        pastConversations: [...state.pastConversations, ...conversations],
+        hasMoreHistory: hasMore,
+      })),
+
+      setLoadingHistory: (loading) => set({ isLoadingHistory: loading }),
+
+      clearConversation: () => set({
+        conversationId: null,
+        conversationDate: null,
+        messages: [],
+        pastConversations: [],
+        hasMoreHistory: true,
+      }),
     }),
     {
       name: 'mordoo-oracle',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
+        conversationId: state.conversationId,
+        conversationDate: state.conversationDate,
         messages: state.messages,
       }),
     },
