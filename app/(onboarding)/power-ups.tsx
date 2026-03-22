@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 72, // offset for TopAppBar height (56) + extra spacing
+    paddingTop: 24,
     paddingBottom: 40,
     paddingHorizontal: 24,
     gap: 32,

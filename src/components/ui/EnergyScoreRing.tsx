@@ -1,8 +1,10 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, Filter, FeGaussianBlur, FeComposite } from 'react-native-svg';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 interface EnergyScoreRingProps {
   score: number;        // 0-100
@@ -17,12 +19,47 @@ export function EnergyScoreRing({
   label = 'Energy Score',
   strokeWidth = 4,
 }: EnergyScoreRingProps) {
-  const clampedScore = Math.max(0, Math.min(100, score));
+  const clampedScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
 
   const center = size / 2;
   const radius = center - strokeWidth * 2;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - clampedScore / 100);
+  const targetOffset = circumference * (1 - clampedScore / 100);
+
+  // Animated arc fill
+  const animatedOffset = useRef(new Animated.Value(circumference)).current;
+
+  useEffect(() => {
+    Animated.timing(animatedOffset, {
+      toValue: targetOffset,
+      duration: 1200,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [targetOffset, animatedOffset]);
+
+  // Subtle glow pulse
+  const glowOpacity = useRef(new Animated.Value(0.25)).current;
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowOpacity, {
+          toValue: 0.15,
+          duration: 2000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+        Animated.timing(glowOpacity, {
+          toValue: 0.35,
+          duration: 2000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [glowOpacity]);
 
   // Inner circle visual dimensions
   const innerCircleSize = size * 0.72;
@@ -54,7 +91,7 @@ export function EnergyScoreRing({
         />
 
         {/* Glow layer for score arc (blurred, wider stroke) */}
-        <Circle
+        <AnimatedCircle
           cx={center}
           cy={center}
           r={radius}
@@ -63,13 +100,13 @@ export function EnergyScoreRing({
           fill="none"
           strokeLinecap="round"
           strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={strokeDashoffset}
-          opacity={0.25}
+          strokeDashoffset={animatedOffset}
+          opacity={glowOpacity}
           transform={`rotate(-90, ${center}, ${center})`}
         />
 
         {/* Score arc */}
-        <Circle
+        <AnimatedCircle
           cx={center}
           cy={center}
           r={radius}
@@ -78,7 +115,7 @@ export function EnergyScoreRing({
           fill="none"
           strokeLinecap="round"
           strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={strokeDashoffset}
+          strokeDashoffset={animatedOffset}
           transform={`rotate(-90, ${center}, ${center})`}
         />
       </Svg>

@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 56 + 24, // TopAppBar height + spacing
+    paddingTop: 24,
     paddingBottom: 40,
     paddingHorizontal: 24,
     gap: 24,

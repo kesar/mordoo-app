@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
 
@@ -17,14 +17,15 @@ export function TopAppBar({
   return (
     <View style={styles.container}>
       {/* Left icon */}
-      <TouchableOpacity
+      <Pressable
         style={styles.iconButton}
         onPress={showBackButton ? onBackPress : onMenuPress}
+        hitSlop={16}
         accessibilityRole="button"
         accessibilityLabel={showBackButton ? 'Go back' : 'Open menu'}
       >
         <Text style={styles.iconText}>{showBackButton ? '←' : '☰'}</Text>
-      </TouchableOpacity>
+      </Pressable>
 
       {/* Center title */}
       <Text style={styles.title}>MOR DOO</Text>
@@ -33,28 +34,25 @@ export function TopAppBar({
       <View style={styles.avatar} />
 
       {/* Bottom gold divider */}
-      <View style={styles.bottomLine} />
+      <View style={styles.bottomLine} pointerEvents="none" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
+    width: '100%',
     height: 56,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     backgroundColor: 'rgba(10, 10, 20, 0.9)',
+    zIndex: 10,
   },
   iconButton: {
-    width: 32,
-    height: 32,
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
   },

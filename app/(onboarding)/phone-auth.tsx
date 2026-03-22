@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 80,
+    paddingTop: 24,
     alignItems: 'center',
     gap: 24,
   },

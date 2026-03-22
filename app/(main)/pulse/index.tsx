@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated, View, ScrollView, StyleSheet, Text as RNText, ActivityIndicator } from 'react-native';
+import { Animated, View, ScrollView, StyleSheet, Text as RNText, ActivityIndicator, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { colors } from '@/src/constants/colors';
@@ -8,6 +8,8 @@ import { Text } from '@/src/components/ui/Text';
 import { EnergyScoreRing } from '@/src/components/ui/EnergyScoreRing';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { useDailyPulse } from '@/src/hooks/useDailyPulse';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 // ─── Static constellation data (decorative) ─────────────────────────────────
 
@@ -48,8 +50,67 @@ const LINES: [number, number][] = [
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
+// ─── Twinkling star component ─────────────────────────────────────────────────
+
+function TwinklingStar({ cx, cy, r }: { cx: number; cy: number; r: number }) {
+  const opacity = useRef(new Animated.Value(0.4 + Math.random() * 0.4)).current;
+
+  useEffect(() => {
+    const duration = 2000 + Math.random() * 3000;
+    const delay = Math.random() * 2000;
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.timing(opacity, {
+          toValue: 0.15 + Math.random() * 0.3,
+          duration,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0.6 + Math.random() * 0.4,
+          duration,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [opacity]);
+
+  return (
+    <AnimatedCircle cx={cx} cy={cy} r={r} fill={colors.gold.light} opacity={opacity} />
+  );
+}
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
+
 export default function PulseScreen() {
   const { data: pulse, isLoading, error, refetch } = useDailyPulse();
+
+  // Slow vertical drift for constellation background
+  const driftY = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(driftY, {
+          toValue: -12,
+          duration: 8000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(driftY, {
+          toValue: 0,
+          duration: 8000,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [driftY]);
 
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', {
@@ -60,45 +121,42 @@ export default function PulseScreen() {
 
   return (
     <SafeAreaView style={styles.scrollView} edges={['top']}>
+      {/* Star constellation background */}
+      <Animated.View style={[styles.starMapBackground, { transform: [{ translateY: driftY }] }]}>
+        <View style={styles.glowBlob} />
+        <Svg
+          width="100%"
+          height="100%"
+          style={StyleSheet.absoluteFill}
+        >
+          {LINES.map(([a, b], i) => (
+            <Line
+              key={`line-${i}`}
+              x1={STARS[a].x} y1={STARS[a].y}
+              x2={STARS[b].x} y2={STARS[b].y}
+              stroke={colors.gold.light}
+              strokeWidth={0.5}
+              opacity={0.3}
+            />
+          ))}
+          {STARS.map((star, i) => (
+            <TwinklingStar key={`star-${i}`} cx={star.x} cy={star.y} r={star.r} />
+          ))}
+        </Svg>
+      </Animated.View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 1. Star Map Header */}
-        <View style={styles.starMapContainer}>
-          <View style={styles.glowBlob} />
-          <Svg
-            width="100%"
-            height={400}
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-          >
-            {LINES.map(([a, b], i) => (
-              <Line
-                key={`line-${i}`}
-                x1={STARS[a].x} y1={STARS[a].y}
-                x2={STARS[b].x} y2={STARS[b].y}
-                stroke={colors.gold.light}
-                strokeWidth={0.5}
-                opacity={0.3}
-              />
-            ))}
-            {STARS.map((star, i) => (
-              <Circle
-                key={`star-${i}`}
-                cx={star.x} cy={star.y} r={star.r}
-                fill={colors.gold.light}
-                opacity={0.7}
-              />
-            ))}
-          </Svg>
-          <View style={styles.starMapTextOverlay}>
-            <Text style={styles.starMapLocation}>YOUR DAILY READING</Text>
-            <Text style={styles.starMapDate}>{dateStr}</Text>
-            <Text style={styles.starMapMoon}><RNText>{'✦ '}</RNText>PRANA INDEX</Text>
-          </View>
+        {/* Header text */}
+        <View style={styles.headerSection}>
+          <Text style={styles.starMapLocation}>YOUR DAILY READING</Text>
+          <Text style={styles.starMapDate}>{dateStr}</Text>
+          <Text style={styles.starMapMoon}><RNText>{'✦ '}</RNText>PRANA INDEX</Text>
         </View>
 
-        {/* 2. Dynamic Content */}
+        {/* Dynamic Content */}
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <View style={styles.loadingRingPlaceholder}>
@@ -213,12 +271,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
 
-  // Star Map Header
-  starMapContainer: {
-    height: 400,
-    backgroundColor: colors.surface.containerLowest,
+  // Star Map Background
+  starMapBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     overflow: 'hidden',
-    justifyContent: 'flex-end',
   },
   glowBlob: {
     position: 'absolute',
@@ -230,10 +290,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gold.DEFAULT,
     opacity: 0.1,
   },
-  starMapTextOverlay: {
-    position: 'absolute',
-    bottom: 56,
-    left: 24,
+
+  // Header
+  headerSection: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
   },
   starMapLocation: {
     fontFamily: fonts.display.regular,
@@ -303,10 +365,8 @@ const styles = StyleSheet.create({
 
   // Energy Score
   energyScoreWrapper: {
-    marginTop: -48,
     paddingHorizontal: 24,
     alignItems: 'center',
-    zIndex: 10,
   },
   energyScoreCard: {
     backgroundColor: 'rgba(41, 41, 52, 0.80)',
@@ -322,13 +382,13 @@ const styles = StyleSheet.create({
   },
   insightText: {
     fontFamily: fonts.body.regular,
-    fontSize: fontSizes.xl,
+    fontSize: fontSizes.base,
     fontStyle: 'italic',
     color: colors.onSurface,
     textAlign: 'center',
-    marginTop: 24,
-    maxWidth: 280,
-    lineHeight: 28,
+    marginTop: 20,
+    maxWidth: 260,
+    lineHeight: 22,
   },
 
   // Lucky Elements
@@ -352,9 +412,9 @@ const styles = StyleSheet.create({
   },
   luckyCardLabel: {
     fontFamily: fonts.body.regular,
-    fontSize: 9,
+    fontSize: 8,
     color: colors.gold.DEFAULT,
-    letterSpacing: 3,
+    letterSpacing: 2,
     textTransform: 'uppercase',
   },
   luckyCardContent: {
@@ -374,11 +434,11 @@ const styles = StyleSheet.create({
     color: colors.gold.light,
   },
   luckyDirectionIcon: {
-    fontSize: 36,
+    fontSize: 28,
   },
   luckyCardValue: {
     fontFamily: fonts.display.regular,
-    fontSize: fontSizes.sm,
+    fontSize: 11,
     color: colors.onSurface,
     textAlign: 'center',
   },

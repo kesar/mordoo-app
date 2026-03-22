@@ -11,6 +11,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
 import { Text } from '@/src/components/ui/Text';
@@ -78,11 +79,7 @@ export default function BirthDataScreen() {
       : 0;
 
     const birthData: BirthData = {
-      dateOfBirth: new Date(
-        parseInt(data.year),
-        parseInt(data.month) - 1,
-        parseInt(data.day),
-      ).toISOString(),
+      dateOfBirth: `${data.year.padStart(4, '0')}-${data.month.padStart(2, '0')}-${data.day.padStart(2, '0')}`,
       timeOfBirth: { hour: hour24, minute: data.minute ? parseInt(data.minute) : 0 },
       timeApproximate: !data.hour,
       placeOfBirth: { name: data.birthPlace, latitude: 0, longitude: 0, country: '' },
@@ -102,7 +99,7 @@ export default function BirthDataScreen() {
   ];
 
   return (
-    <View style={styles.screenContainer}>
+    <SafeAreaView style={styles.screenContainer} edges={['top']}>
       <TopAppBar showBackButton onBackPress={() => router.back()} />
 
       <ScrollView
@@ -401,7 +398,7 @@ export default function BirthDataScreen() {
         {/* Footer */}
         <Text style={styles.footerText}>Fate awaits your initiation</Text>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -427,7 +424,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 72 + 24, // TopAppBar height + spacing
+    paddingTop: 24,
     paddingHorizontal: 24,
     paddingBottom: 48,
     gap: 24,

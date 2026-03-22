@@ -10,6 +10,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
 import { Text } from '@/src/components/ui/Text';
@@ -65,7 +66,7 @@ export default function NameNumbersScreen() {
   };
 
   return (
-    <View style={styles.screenContainer}>
+    <SafeAreaView style={styles.screenContainer} edges={['top']}>
       <TopAppBar showBackButton onBackPress={() => router.back()} />
 
       <ScrollView
@@ -194,7 +195,7 @@ export default function NameNumbersScreen() {
         {/* Footer */}
         <Text style={styles.footerText}>Your name echoes in the cosmic ledger</Text>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingTop: 72 + 24, // TopAppBar height + spacing
+    paddingTop: 24,
     paddingHorizontal: 24,
     paddingBottom: 48,
     gap: 24,
