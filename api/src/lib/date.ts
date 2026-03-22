@@ -7,3 +7,9 @@ export function getTodayString(now = new Date()): string {
 export function getCurrentMonthString(now = new Date()): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
+
+/** Returns today's date in Bangkok timezone (UTC+7) as YYYY-MM-DD string. */
+export function getBangkokDateString(now = new Date()): string {
+  const bangkok = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+  return `${bangkok.getUTCFullYear()}-${String(bangkok.getUTCMonth() + 1).padStart(2, '0')}-${String(bangkok.getUTCDate()).padStart(2, '0')}`;
+}
