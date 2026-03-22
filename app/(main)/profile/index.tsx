@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.sm,
   },
   signOutText: {
-    color: colors.energy.low,
+    color: colors.error,
     fontSize: fontSizes.sm,
   },
 });
