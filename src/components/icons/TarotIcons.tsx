@@ -183,3 +183,12 @@ export function MenuIcon({ size = 24, color = colors.gold.DEFAULT }: IconProps) 
     </Svg>
   );
 }
+
+export function ProfileIcon({ size = 24, color = colors.gold.DEFAULT }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx={12} cy={8} r={4} />
+      <Path d="M20 21c0-3.87-3.58-7-8-7s-8 3.13-8 7" />
+    </Svg>
+  );
+}
