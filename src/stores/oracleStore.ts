@@ -12,39 +12,18 @@ export interface ChatMessage {
 interface OracleState {
   messages: ChatMessage[];
   isStreaming: boolean;
-  oracleQuestionsToday: number;
-  oracleLastReset: string;
-  siamSiThisMonth: number;
-  siamSiLastReset: string;
 
   addMessage: (msg: ChatMessage) => void;
   appendToLastMessage: (chunk: string) => void;
   setStreaming: (streaming: boolean) => void;
-  incrementOracleQuota: () => void;
-  incrementSiamSiQuota: () => void;
-  checkAndResetQuotas: () => void;
   clearConversation: () => void;
-}
-
-function getToday(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-}
-
-function getCurrentYearMonth(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
 
 export const useOracleStore = create<OracleState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       messages: [],
       isStreaming: false,
-      oracleQuestionsToday: 0,
-      oracleLastReset: getToday(),
-      siamSiThisMonth: 0,
-      siamSiLastReset: getCurrentYearMonth(),
 
       addMessage: (msg) => set((state) => ({
         messages: [...state.messages, msg],
@@ -63,33 +42,6 @@ export const useOracleStore = create<OracleState>()(
 
       setStreaming: (streaming) => set({ isStreaming: streaming }),
 
-      incrementOracleQuota: () => set((state) => ({
-        oracleQuestionsToday: state.oracleQuestionsToday + 1,
-      })),
-
-      incrementSiamSiQuota: () => set((state) => ({
-        siamSiThisMonth: state.siamSiThisMonth + 1,
-      })),
-
-      checkAndResetQuotas: () => {
-        const state = get();
-        const today = getToday();
-        const currentMonth = getCurrentYearMonth();
-        const updates: Partial<OracleState> = {};
-
-        if (state.oracleLastReset !== today) {
-          updates.oracleQuestionsToday = 0;
-          updates.oracleLastReset = today;
-        }
-        if (state.siamSiLastReset !== currentMonth) {
-          updates.siamSiThisMonth = 0;
-          updates.siamSiLastReset = currentMonth;
-        }
-        if (Object.keys(updates).length > 0) {
-          set(updates);
-        }
-      },
-
       clearConversation: () => set({ messages: [] }),
     }),
     {
@@ -97,10 +49,6 @@ export const useOracleStore = create<OracleState>()(
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
         messages: state.messages,
-        oracleQuestionsToday: state.oracleQuestionsToday,
-        oracleLastReset: state.oracleLastReset,
-        siamSiThisMonth: state.siamSiThisMonth,
-        siamSiLastReset: state.siamSiLastReset,
       }),
     },
   ),
