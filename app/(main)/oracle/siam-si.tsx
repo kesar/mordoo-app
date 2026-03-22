@@ -3,12 +3,12 @@ import {
   Animated,
   Pressable,
   StyleSheet,
-  Text as RNText,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Text } from '@/src/components/ui/Text';
+import { BambooIcon, ChevronLeftIcon } from '@/src/components/icons/TarotIcons';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
 import { useSiamSi } from '@/src/hooks/useSiamSi';
@@ -94,7 +94,7 @@ export default function SiamSiScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>{'<'}</Text>
+          <ChevronLeftIcon size={24} color={colors.gold.DEFAULT} />
         </Pressable>
         <Text style={styles.headerTitle}>SIAM SI</Text>
         <View style={styles.quotaBadge}>
@@ -155,7 +155,7 @@ export default function SiamSiScreen() {
               ]}
             >
               <View style={styles.cup}>
-                <RNText style={styles.cupIcon}>🎋</RNText>
+                <BambooIcon size={48} color={colors.gold.DEFAULT} />
                 <View style={styles.sticksContainer}>
                   {[...Array(5)].map((_, i) => (
                     <View
@@ -212,11 +212,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backText: {
-    fontSize: 24,
-    color: colors.gold.DEFAULT,
-    fontFamily: fonts.display.bold,
-  },
   headerTitle: {
     fontFamily: fonts.display.bold,
     fontSize: 16,
@@ -262,10 +257,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-  },
-  cupIcon: {
-    fontSize: 48,
-    marginBottom: 8,
   },
   sticksContainer: {
     position: 'absolute',

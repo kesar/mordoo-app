@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
+  Image,
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
-  Text as RNText,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -18,13 +18,13 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, Concern } from '@/src/stores/onboardingStore';
 
-const CONCERNS: { concern: Concern; emoji: string; label: string }[] = [
-  { concern: 'love', emoji: '♥', label: 'Love' },
-  { concern: 'career', emoji: '★', label: 'Career' },
-  { concern: 'money', emoji: '◈', label: 'Money' },
-  { concern: 'health', emoji: '✦', label: 'Health' },
-  { concern: 'family', emoji: '♦', label: 'Family' },
-  { concern: 'spiritual', emoji: '◎', label: 'Spiritual' },
+const CONCERNS: { concern: Concern; image: number; label: string }[] = [
+  { concern: 'love', image: require('@/assets/images/tarot/concern-love.webp'), label: 'Love' },
+  { concern: 'career', image: require('@/assets/images/tarot/concern-career.webp'), label: 'Career' },
+  { concern: 'money', image: require('@/assets/images/tarot/concern-money.webp'), label: 'Money' },
+  { concern: 'health', image: require('@/assets/images/tarot/concern-health.webp'), label: 'Health' },
+  { concern: 'family', image: require('@/assets/images/tarot/concern-family.webp'), label: 'Family' },
+  { concern: 'spiritual', image: require('@/assets/images/tarot/concern-spiritual.webp'), label: 'Spiritual' },
 ];
 
 export default function LifeContext() {
@@ -82,7 +82,7 @@ export default function LifeContext() {
             <Text style={styles.cardLabel}>Life Forces</Text>
           </View>
           <View style={styles.chipsGrid}>
-            {CONCERNS.map(({ concern, emoji, label }) => {
+            {CONCERNS.map(({ concern, image, label }) => {
               const isActive = selectedConcerns.includes(concern);
               return (
                 <TouchableOpacity
@@ -94,7 +94,7 @@ export default function LifeContext() {
                   accessibilityState={{ checked: isActive }}
                   accessibilityLabel={label}
                 >
-                  <RNText style={styles.chipEmoji}>{emoji}</RNText>
+                  <Image source={image} style={styles.chipImage} resizeMode="contain" />
                   <Text style={[styles.chipLabel, isActive && styles.chipLabelActive]}>
                     {label}
                   </Text>
@@ -221,9 +221,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gold.muted,
     borderColor: colors.gold.DEFAULT,
   },
-  chipEmoji: {
-    fontSize: 24,
-    lineHeight: 28,
+  chipImage: {
+    width: 40,
+    height: 40,
   },
   chipLabel: {
     fontFamily: fonts.body.medium,

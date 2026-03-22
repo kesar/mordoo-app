@@ -19,6 +19,7 @@ import { SacredCard } from '@/src/components/ui/SacredCard';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, NameData } from '@/src/stores/onboardingStore';
+import { SparkleIcon } from '@/src/components/icons/TarotIcons';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -93,7 +94,9 @@ export default function NameNumbersScreen() {
         {/* ── Full Name ── */}
         <SacredCard variant="low" style={styles.card}>
           {/* Decorative icon */}
-          <Text style={styles.cardDecorativeIcon}>✨</Text>
+          <View style={styles.cardDecorativeIcon}>
+            <SparkleIcon size={28} color={colors.gold.DEFAULT} />
+          </View>
 
           {/* Card label */}
           <View style={styles.cardLabelRow}>
@@ -253,7 +256,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     right: 16,
-    fontSize: 28,
     opacity: 0.2,
   },
   cardLabelRow: {

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated, View, ScrollView, StyleSheet, Text as RNText, ActivityIndicator, Easing } from 'react-native';
+import { Animated, View, ScrollView, StyleSheet, ActivityIndicator, Easing } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { colors } from '@/src/constants/colors';
@@ -8,6 +8,13 @@ import { Text } from '@/src/components/ui/Text';
 import { EnergyScoreRing } from '@/src/components/ui/EnergyScoreRing';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { useDailyPulse } from '@/src/hooks/useDailyPulse';
+import {
+  SparkleIcon,
+  BusinessStarIcon,
+  HeartIcon,
+  BodyDiamondIcon,
+  ArrowRightIcon,
+} from '@/src/components/icons/TarotIcons';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -153,7 +160,10 @@ export default function PulseScreen() {
         <View style={styles.headerSection}>
           <Text style={styles.starMapLocation}>YOUR DAILY READING</Text>
           <Text style={styles.starMapDate}>{dateStr}</Text>
-          <Text style={styles.starMapMoon}><RNText>{'✦ '}</RNText>PRANA INDEX</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <SparkleIcon size={12} color={colors.onSurfaceVariant} />
+            <Text style={styles.starMapMoon}>PRANA INDEX</Text>
+          </View>
         </View>
 
         {/* Dynamic Content */}
@@ -202,7 +212,7 @@ export default function PulseScreen() {
                 <View style={styles.luckyCard}>
                   <Text style={styles.luckyCardLabel}>LUCKY DIRECTION</Text>
                   <View style={styles.luckyCardContent}>
-                    <RNText style={styles.luckyDirectionIcon}>→</RNText>
+                    <ArrowRightIcon size={28} color={colors.gold.DEFAULT} />
                   </View>
                   <Text style={styles.luckyCardValue}>{pulse.luckyDirection}</Text>
                 </View>
@@ -211,9 +221,9 @@ export default function PulseScreen() {
 
             {/* Sub-Scores */}
             <View style={styles.subScoresSection}>
-              <SubScoreBar icon="★" label="Business" value={pulse.subScores.business} color={colors.elements.fire} />
-              <SubScoreBar icon="♥" label="Heart" value={pulse.subScores.heart} color="#ec4899" />
-              <SubScoreBar icon="◆" label="Body" value={pulse.subScores.body} color={colors.elements.wood} />
+              <SubScoreBar Icon={BusinessStarIcon} label="Business" value={pulse.subScores.business} color={colors.elements.fire} />
+              <SubScoreBar Icon={HeartIcon} label="Heart" value={pulse.subScores.heart} color="#ec4899" />
+              <SubScoreBar Icon={BodyDiamondIcon} label="Body" value={pulse.subScores.body} color={colors.elements.wood} />
             </View>
           </>
         ) : null}
@@ -226,8 +236,8 @@ export default function PulseScreen() {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SubScoreBar({ icon, label, value, color }: {
-  icon: string;
+function SubScoreBar({ Icon, label, value, color }: {
+  Icon: React.ComponentType<{ size?: number; color?: string }>;
   label: string;
   value: number;
   color: string;
@@ -250,7 +260,7 @@ function SubScoreBar({ icon, label, value, color }: {
 
   return (
     <View style={styles.subScoreRow}>
-      <RNText style={styles.subScoreIcon}>{icon}</RNText>
+      <Icon size={16} color={color} />
       <Text style={styles.subScoreLabel}>{label}</Text>
       <View style={styles.subScoreBarTrack}>
         <Animated.View style={[styles.subScoreBarFill, { width, backgroundColor: color }]} />
@@ -433,9 +443,6 @@ const styles = StyleSheet.create({
     fontSize: fontSizes['4xl'],
     color: colors.gold.light,
   },
-  luckyDirectionIcon: {
-    fontSize: 28,
-  },
   luckyCardValue: {
     fontFamily: fonts.display.regular,
     fontSize: 11,
@@ -453,11 +460,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-  },
-  subScoreIcon: {
-    fontSize: 16,
-    width: 20,
-    textAlign: 'center',
   },
   subScoreLabel: {
     fontFamily: fonts.body.regular,

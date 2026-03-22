@@ -15,6 +15,7 @@ import Animated, {
   FadeInDown,
 } from 'react-native-reanimated';
 import { Text } from '@/src/components/ui/Text';
+import { SparkleIcon } from '@/src/components/icons/TarotIcons';
 import { ProgressIndicator } from '@/src/components/ui/ProgressIndicator';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { colors } from '@/src/constants/colors';
@@ -124,7 +125,11 @@ export default function SoulGate() {
             style={styles.emblemOuterRing}
           >
             <Animated.View style={[styles.emblemContainer, diamondAnimStyle]}>
-              <Text style={styles.emblemDiamond}>◆</Text>
+              <Image
+                source={require('@/assets/images/tarot/emblem-soul-gate.webp')}
+                style={styles.emblemImage}
+                resizeMode="contain"
+              />
             </Animated.View>
           </Animated.View>
 
@@ -167,7 +172,7 @@ export default function SoulGate() {
             style={styles.dividerRow}
           >
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerSparkle}>✦</Text>
+            <SparkleIcon size={14} color={colors.gold.DEFAULT} />
             <View style={styles.dividerLine} />
           </Animated.View>
 
@@ -212,7 +217,7 @@ export default function SoulGate() {
           entering={FadeIn.duration(600).delay(1300)}
           style={styles.footer}
         >
-          <Text style={styles.footerSparkle}>✦</Text>
+          <SparkleIcon size={12} color="rgba(201, 168, 76, 0.6)" />
           <Text style={styles.footerText}>{t('soulGate.footer')}</Text>
         </Animated.View>
       </ScrollView>
@@ -297,10 +302,9 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 10,
   },
-  emblemDiamond: {
-    fontSize: 48,
-    color: colors.gold.DEFAULT,
-    lineHeight: 56,
+  emblemImage: {
+    width: 96,
+    height: 96,
   },
 
   // Title
@@ -365,10 +369,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: 'rgba(201, 168, 76, 0.5)',
   },
-  dividerSparkle: {
-    fontSize: fontSizes.sm,
-    color: colors.gold.DEFAULT,
-  },
 
   // CTA section
   ctaSection: {
@@ -382,10 +382,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     paddingTop: 8,
-  },
-  footerSparkle: {
-    fontSize: 12,
-    color: 'rgba(201, 168, 76, 0.6)',
   },
   footerText: {
     fontFamily: fonts.body.regular,

@@ -4,7 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Text as RNText,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -16,6 +16,7 @@ import { ProgressIndicator } from '@/src/components/ui/ProgressIndicator';
 import { SacredCard } from '@/src/components/ui/SacredCard';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
+import { CheckIcon } from '@/src/components/icons/TarotIcons';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 
 export default function PowerUps() {
@@ -59,7 +60,11 @@ export default function PowerUps() {
         <View style={styles.cardsWrapper}>
           {/* Location card */}
           <SacredCard variant="low">
-            <RNText style={styles.cardIcon}>◉</RNText>
+            <Image
+              source={require('@/assets/images/tarot/powerup-location.webp')}
+              style={styles.cardImage}
+              resizeMode="contain"
+            />
             <Text style={styles.cardTitle}>Sacred Coordinates</Text>
             <Text style={styles.cardDescription}>
               Your location helps calculate precise planetary positions for accurate readings.
@@ -79,7 +84,7 @@ export default function PowerUps() {
                     locationEnabled ? styles.toggleTextActive : styles.toggleTextInactive,
                   ]}
                 >
-                  {locationEnabled ? 'Enabled ✓' : 'Enable'}
+                  {locationEnabled ? 'Enabled' : 'Enable'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -87,7 +92,11 @@ export default function PowerUps() {
 
           {/* Notifications card */}
           <SacredCard variant="high">
-            <RNText style={styles.cardIcon}>✧</RNText>
+            <Image
+              source={require('@/assets/images/tarot/powerup-notifications.webp')}
+              style={styles.cardImage}
+              resizeMode="contain"
+            />
             <Text style={styles.cardTitle}>Daily Oracle Whispers</Text>
             <Text style={styles.cardDescription}>
               Receive your daily energy score and cosmic alerts each morning.
@@ -107,7 +116,7 @@ export default function PowerUps() {
                     notificationsEnabled ? styles.toggleTextActive : styles.toggleTextInactive,
                   ]}
                 >
-                  {notificationsEnabled ? 'Enabled ✓' : 'Enable'}
+                  {notificationsEnabled ? 'Enabled' : 'Enable'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -187,8 +196,9 @@ const styles = StyleSheet.create({
   cardsWrapper: {
     gap: 16,
   },
-  cardIcon: {
-    fontSize: 32,
+  cardImage: {
+    width: 48,
+    height: 48,
     marginBottom: 12,
   },
   cardTitle: {

@@ -20,6 +20,7 @@ import { SacredCard } from '@/src/components/ui/SacredCard';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, BirthData } from '@/src/stores/onboardingStore';
+import { CalendarIcon, LocationPinIcon, SearchIcon, InfoCircleIcon } from '@/src/components/icons/TarotIcons';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -126,7 +127,9 @@ export default function BirthDataScreen() {
         {/* ── Date of Birth ── */}
         <SacredCard variant="low" style={styles.card}>
           {/* Decorative icon */}
-          <Text style={styles.cardDecorativeIcon}>📅</Text>
+          <View style={styles.cardDecorativeIcon}>
+            <CalendarIcon size={28} color={colors.gold.DEFAULT} />
+          </View>
 
           {/* Card label */}
           <View style={styles.cardLabelRow}>
@@ -310,7 +313,7 @@ export default function BirthDataScreen() {
 
           {/* Info note */}
           <View style={styles.infoNote}>
-            <Text style={styles.infoNoteIcon}>ℹ️</Text>
+            <InfoCircleIcon size={14} color={colors.gold.DEFAULT} />
             <Text style={styles.infoNoteText}>
               Even an approximate hour significantly changes your reading.
             </Text>
@@ -325,7 +328,7 @@ export default function BirthDataScreen() {
           </View>
 
           <View style={styles.placeRow}>
-            <Text style={styles.placeIcon}>📍</Text>
+            <LocationPinIcon size={18} color={colors.gold.DEFAULT} />
             <Controller
               control={control}
               name="birthPlace"
@@ -344,7 +347,7 @@ export default function BirthDataScreen() {
                 />
               )}
             />
-            <Text style={styles.placeSearchIcon}>🔍</Text>
+            <SearchIcon size={18} color={colors.gold.DEFAULT} />
           </View>
         </SacredCard>
 
@@ -459,7 +462,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     right: 16,
-    fontSize: 28,
     opacity: 0.2,
   },
   cardLabelRow: {
@@ -577,9 +579,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
   },
-  infoNoteIcon: {
-    fontSize: 14,
-  },
   infoNoteText: {
     fontFamily: fonts.body.regular,
     fontSize: fontSizes.sm,
@@ -597,9 +596,6 @@ const styles = StyleSheet.create({
     borderBottomColor: OUTLINE_50,
     paddingBottom: 4,
   },
-  placeIcon: {
-    fontSize: 18,
-  },
   placeInput: {
     flex: 1,
     fontFamily: fonts.body.regular,
@@ -610,10 +606,6 @@ const styles = StyleSheet.create({
   placeInputFocused: {
     // borderBottom is on the row, handled by parent focus state separately
   },
-  placeSearchIcon: {
-    fontSize: 18,
-  },
-
   // ── Gender grid ──────────────────────────────────────────────────────────
   genderGrid: {
     flexDirection: 'row',

@@ -5,21 +5,28 @@ import {
   ScrollView,
   Pressable,
   useWindowDimensions,
-  Text as RNText,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
 import { Text } from '@/src/components/ui/Text';
+import {
+  BusinessStarIcon,
+  HeartIcon,
+  BodyDiamondIcon,
+  QuoteIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+} from '@/src/components/icons/TarotIcons';
 import { EnergyScoreRing } from '@/src/components/ui/EnergyScoreRing';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 
 const SUB_SCORES = [
-  { icon: '★', label: 'Business', value: 78 },
-  { icon: '♥', label: 'Heart', value: 45 },
-  { icon: '◆', label: 'Body', value: 91 },
+  { Icon: BusinessStarIcon, label: 'Business', value: 78 },
+  { Icon: HeartIcon, label: 'Heart', value: 45 },
+  { Icon: BodyDiamondIcon, label: 'Body', value: 91 },
 ] as const;
 
 export default function SoulSnapshot() {
@@ -45,7 +52,7 @@ export default function SoulSnapshot() {
         {/* Top Navigation */}
         <View style={styles.topNav}>
           <Pressable onPress={() => router.back()} hitSlop={12}>
-            <Text style={styles.backArrow}>←</Text>
+            <ArrowLeftIcon size={24} color={colors.gold.DEFAULT} />
           </Pressable>
           <Text style={styles.navTitle}>MOR DOO</Text>
         </View>
@@ -67,7 +74,7 @@ export default function SoulSnapshot() {
           <View style={styles.subScoresRow}>
             {SUB_SCORES.map((item) => (
               <View key={item.label} style={styles.subScoreCol}>
-                <RNText style={styles.subScoreIcon}>{item.icon}</RNText>
+                <item.Icon size={16} color={colors.gold.DEFAULT} />
                 <Text style={styles.subScoreLabel}>{item.label}</Text>
                 <View style={styles.barTrack}>
                   <View
@@ -82,7 +89,7 @@ export default function SoulSnapshot() {
           {/* Primary Insight */}
           <View style={styles.insightCard}>
             <View style={styles.quoteIconWrap}>
-              <Text style={styles.quoteIcon}>❝</Text>
+              <QuoteIcon size={22} color={colors.gold.DEFAULT} />
             </View>
             <Text style={styles.insightText}>
               Your Mercury in Scorpio combined with Life Path 8 means you think
@@ -107,7 +114,7 @@ export default function SoulSnapshot() {
             </View>
             <View style={styles.luckyCell}>
               <View style={styles.luckyCellTop}>
-                <RNText style={styles.luckyIcon}>→</RNText>
+                <ArrowRightIcon size={22} color={colors.gold.DEFAULT} />
               </View>
               <Text style={styles.luckyCellLabel}>East</Text>
             </View>
@@ -186,11 +193,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 16,
   },
-  backArrow: {
-    fontSize: 24,
-    color: colors.gold.DEFAULT,
-    lineHeight: 28,
-  },
   navTitle: {
     fontFamily: fonts.display.bold,
     fontSize: fontSizes.xl,
@@ -251,10 +253,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  subScoreIcon: {
-    fontSize: 16,
-    lineHeight: 20,
-  },
   subScoreLabel: {
     fontFamily: fonts.body.regular,
     fontSize: 10,
@@ -299,11 +297,6 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 4,
   },
-  quoteIcon: {
-    fontSize: 22,
-    color: colors.gold.DEFAULT,
-    lineHeight: 26,
-  },
   insightText: {
     fontFamily: fonts.body.regular,
     fontSize: 18,
@@ -343,10 +336,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.display.regular,
     fontSize: fontSizes['2xl'],
     color: colors.gold.light,
-    lineHeight: 28,
-  },
-  luckyIcon: {
-    fontSize: 22,
     lineHeight: 28,
   },
   luckyCellLabel: {

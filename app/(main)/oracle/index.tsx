@@ -9,9 +9,9 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
 import { router } from 'expo-router';
 import { Text } from '@/src/components/ui/Text';
+import { StarIcon, LockIcon, BambooIcon, ChevronRightIcon, SendArrowIcon } from '@/src/components/icons/TarotIcons';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
 import { useOracleStore, type ChatMessage } from '@/src/stores/oracleStore';
@@ -20,34 +20,6 @@ import { useAuthStore } from '@/src/stores/authStore';
 import { useSettingsStore } from '@/src/stores/settingsStore';
 import { sendOracleMessage } from '@/src/services/oracle';
 import { lightHaptic } from '@/src/utils/haptics';
-
-// ---------------------------------------------------------------------------
-// SVG Icons
-// ---------------------------------------------------------------------------
-
-function StarIcon({ size = 14, color = colors.gold.DEFAULT }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-      <Path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-    </Svg>
-  );
-}
-
-function LockIcon({ size = 14, color = 'rgba(228,225,240,0.5)' }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-      <Path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z" />
-    </Svg>
-  );
-}
-
-function BambooIcon({ size = 28, color = colors.gold.DEFAULT }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M12 2v20M12 6c-2 0-4-1-5-3M12 6c2 0 4-1 5-3M12 12c-2 0-4-1-5-3M12 12c2 0 4-1 5-3M12 18c-2 0-4-1-5-3M12 18c2 0 4-1 5-3" />
-    </Svg>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -113,7 +85,7 @@ function SiamSiEntryCard() {
         <Text style={styles.siamSiTitle}>SIAM SI</Text>
         <Text style={styles.siamSiSubtitle}>Shake for fortune sticks</Text>
       </View>
-      <Text style={styles.siamSiArrow}>{'>'}</Text>
+      <ChevronRightIcon size={18} color={colors.gold.DEFAULT} />
     </Pressable>
   );
 }
@@ -334,9 +306,7 @@ export default function OracleScreen() {
             onPress={sendMessage}
             disabled={isStreaming}
           >
-            <Svg width={16} height={16} viewBox="0 0 24 24" fill={colors.onPrimary}>
-              <Path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-            </Svg>
+            <SendArrowIcon size={16} color={colors.onPrimary} />
           </Pressable>
         </View>
       </View>
@@ -393,9 +363,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  modeBtnEmoji: {
-    fontSize: 14,
-  },
   modeBtnActive: {
     backgroundColor: colors.gold.DEFAULT,
   },
@@ -423,9 +390,6 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
-  siamSiIcon: {
-    fontSize: 28,
-  },
   siamSiTextContainer: {
     flex: 1,
     gap: 2,
@@ -440,11 +404,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body.regular,
     fontSize: 14,
     color: colors.onSurfaceVariant,
-  },
-  siamSiArrow: {
-    fontFamily: fonts.display.bold,
-    fontSize: 18,
-    color: colors.gold.DEFAULT,
   },
 
   // ---- AI Bubble ----
