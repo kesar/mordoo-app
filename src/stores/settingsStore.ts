@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { mmkvStorage } from '@/src/utils/zustand-mmkv';
+import i18n from '@/src/i18n';
 
 interface SettingsState {
   language: 'en' | 'th';
@@ -15,7 +16,10 @@ export const useSettingsStore = create<SettingsState>()(
       language: 'en',
       notificationsEnabled: false,
 
-      setLanguage: (language) => set({ language }),
+      setLanguage: (language) => {
+        i18n.changeLanguage(language);
+        set({ language });
+      },
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
     }),
     {
