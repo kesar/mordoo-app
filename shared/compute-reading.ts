@@ -92,6 +92,26 @@ function computeEnergyScore(lifePath: number, namNum: number, dailySeed: number)
   return Math.max(0, Math.min(100, baseScore + nameModifier));
 }
 
+export function profileWeights(
+  lifePath: number, namNum: number, birthDay: number, birthMonth: number,
+): { business: number; heart: number; body: number } {
+  const lp = lifePath === 11 ? 2 : lifePath === 22 ? 4 : lifePath;
+
+  const rawBusiness = namNum + (birthDay % 10);
+  const rawHeart    = birthMonth + (namNum * 2 % 7);
+  const rawBody     = lp + (birthMonth % 5) + (birthDay % 4);
+
+  const normalize = (raw: number) => 0.7 + ((raw - 1) / 17) * 0.6;
+
+  const weights = [normalize(rawBusiness), normalize(rawHeart), normalize(rawBody)];
+  const avg = (weights[0] + weights[1] + weights[2]) / 3;
+  return {
+    business: weights[0] / avg,
+    heart:    weights[1] / avg,
+    body:     weights[2] / avg,
+  };
+}
+
 export function computeReading(input: BirthDataInput): DailyPulseReading {
   const lifePath = lifePathNumber(input.dateOfBirth);
   const namNum = input.fullName ? nameNumber(input.fullName) : 5;
