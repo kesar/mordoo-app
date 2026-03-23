@@ -39,6 +39,7 @@ interface OnboardingState {
   setConcerns: (concerns: Concern[]) => void;
   setUrgencyContext: (context: string | null) => void;
   completeOnboarding: () => void;
+  resetStore: () => void;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -59,6 +60,14 @@ export const useOnboardingStore = create<OnboardingState>()(
       setConcerns: (concerns) => set({ concerns }),
       setUrgencyContext: (urgencyContext) => set({ urgencyContext }),
       completeOnboarding: () => set({ isComplete: true }),
+      resetStore: () => set({
+        step: 1,
+        birthData: null,
+        nameData: null,
+        concerns: [],
+        urgencyContext: null,
+        isComplete: false,
+      }),
     }),
     {
       name: 'mordoo-onboarding',

@@ -96,10 +96,17 @@ export interface ConversationMessage {
   createdAt: string;
 }
 
+export interface OracleQuota {
+  used: number;
+  total: number | null;
+  remaining: number | null;
+}
+
 export interface TodayConversationResponse {
   conversationId: string | null;
   conversationDate: string;
   messages: ConversationMessage[];
+  quota: OracleQuota;
 }
 
 export interface PastConversationResponse {

@@ -31,6 +31,13 @@ export default function PhoneAuth() {
   const [loading, setLoading] = useState(false);
   const otpInputRef = useRef<TextInput>(null);
 
+  /** Normalize to E.164: strip spaces/dashes and remove leading 0 after country code */
+  const normalizePhone = (raw: string): string => {
+    const stripped = raw.replace(/[\s\-()]/g, '');
+    // +660XXXXXXXX → +66XXXXXXXX
+    return stripped.replace(/^(\+\d{1,3})0+/, '$1');
+  };
+
   const handleSendOTP = async () => {
     if (phone !== '+66000000' && phone.length < 10) {
       Alert.alert(t('phoneAuth.invalidNumberTitle'), t('phoneAuth.invalidNumberMessage'));
@@ -38,7 +45,7 @@ export default function PhoneAuth() {
     }
     setLoading(true);
     try {
-      await signInWithPhone(phone);
+      await signInWithPhone(normalizePhone(phone));
       setStep('otp');
       if (phone === '+66000000') {
         setOtpCode('000000');
@@ -59,7 +66,7 @@ export default function PhoneAuth() {
     }
     setLoading(true);
     try {
-      await verifyOTP(phone, otpCode);
+      await verifyOTP(normalizePhone(phone), otpCode);
 
       // Check if user already has birth data in the database
       const existing = await fetchExistingBirthData();

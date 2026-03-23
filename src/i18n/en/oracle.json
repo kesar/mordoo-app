@@ -7,6 +7,7 @@
     "dailyLimit": "You've used your free question today",
     "upgradePrompt": "Unlock unlimited readings with Standard — ฿149/month",
     "errorDisrupted": "\n\n_The astral connection was disrupted. Please try again._",
+    "remaining": "{{count}} of {{total}} questions left today",
     "quotaTitle": "DAILY LIMIT REACHED",
     "quotaBody": "Your next reading will be available tomorrow.",
     "thinking": [

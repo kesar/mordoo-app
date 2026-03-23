@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '../../../../lib/supabase';
 import { authenticateRequest } from '../../../../lib/auth';
 import { getBangkokDateString } from '../../../../lib/date';
+import { FREE_ORACLE_QUESTIONS_PER_DAY } from '../../../../lib/config';
 
 export async function GET(request: NextRequest) {
   const { user, error: authError } = await authenticateRequest(request);
@@ -10,19 +11,49 @@ export async function GET(request: NextRequest) {
   const serviceClient = createServiceClient();
   const today = getBangkokDateString();
 
-  // Find today's conversation
-  const { data: conversation } = await serviceClient
-    .from('oracle_conversations')
-    .select('id, conversation_date')
-    .eq('user_id', user.id)
-    .eq('conversation_date', today)
-    .single();
+  // Fetch conversation and quota in parallel
+  const [conversationResult, quotaResult, profileResult] = await Promise.all([
+    serviceClient
+      .from('oracle_conversations')
+      .select('id, conversation_date')
+      .eq('user_id', user.id)
+      .eq('conversation_date', today)
+      .single(),
+    serviceClient
+      .from('user_quotas')
+      .select('oracle_questions_today, oracle_last_reset')
+      .eq('user_id', user.id)
+      .single(),
+    serviceClient
+      .from('profiles')
+      .select('tier')
+      .eq('id', user.id)
+      .single(),
+  ]);
+
+  const tier = profileResult.data?.tier || 'free';
+  const normalizedPhone = (user.phone || '').replace(/\D/g, '');
+  const isTestUser = normalizedPhone === '66000000' || user.phone === '+66000000';
+  const isUnlimited = tier === 'standard' || isTestUser;
+  const maxQuestions = isUnlimited ? null : FREE_ORACLE_QUESTIONS_PER_DAY;
+  const questionsUsed = quotaResult.data?.oracle_last_reset === today
+    ? quotaResult.data.oracle_questions_today
+    : 0;
+
+  const quota = {
+    used: questionsUsed,
+    total: maxQuestions,
+    remaining: maxQuestions !== null ? Math.max(0, maxQuestions - questionsUsed) : null,
+  };
+
+  const conversation = conversationResult.data;
 
   if (!conversation) {
     return NextResponse.json({
       conversationId: null,
       conversationDate: today,
       messages: [],
+      quota,
     });
   }
 
@@ -42,5 +73,6 @@ export async function GET(request: NextRequest) {
       content: m.content,
       createdAt: m.created_at,
     })),
+    quota,
   });
 }

@@ -252,36 +252,47 @@ export default function OracleScreen() {
 
   const lang = useSettingsStore((s) => s.language);
 
+  const currentUserId = useAuthStore((s) => s.supabaseUserId);
+  const cachedUserId = useOracleStore((s) => s.userId);
+  const quotaRemaining = useOracleStore((s) => s.quotaRemaining);
+  const quotaTotal = useOracleStore((s) => s.quotaTotal);
+  const setQuota = useOracleStore((s) => s.setQuota);
   const conversationDate = useOracleStore((s) => s.conversationDate);
   const pastConversations = useOracleStore((s) => s.pastConversations);
   const hasMoreHistory = useOracleStore((s) => s.hasMoreHistory);
   const isLoadingHistory = useOracleStore((s) => s.isLoadingHistory);
   const setTodayConversation = useOracleStore((s) => s.setTodayConversation);
+  const clearConversation = useOracleStore((s) => s.clearConversation);
+  const setOracleUserId = useOracleStore((s) => s.setUserId);
   const appendHistory = useOracleStore((s) => s.appendHistory);
   const setLoadingHistory = useOracleStore((s) => s.setLoadingHistory);
 
-  // Load today's conversation on mount — always fetch to let server determine "today" (Bangkok time)
+  // Load today's conversation on mount — always fetch from server to ensure fresh data
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !currentUserId) return;
+
+    // Stale cache from a different user — wipe before fetching
+    if (cachedUserId && cachedUserId !== currentUserId) {
+      clearConversation();
+    }
 
     fetchTodayConversation()
       .then((data) => {
-        // Server returns the authoritative "today" date in Bangkok timezone
-        if (data.conversationDate !== conversationDate) {
-          const msgs = data.messages.map((m: ConversationMessage) => ({
-            id: m.id,
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-            timestamp: m.createdAt,
-          }));
-          setTodayConversation(data.conversationId, data.conversationDate, msgs);
-        }
+        const msgs = data.messages.map((m: ConversationMessage) => ({
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          timestamp: m.createdAt,
+        }));
+        setTodayConversation(data.conversationId, data.conversationDate, msgs);
+        setOracleUserId(currentUserId);
+        setQuota(data.quota.used, data.quota.total, data.quota.remaining);
       })
       .catch(() => {
         // Keep cached messages if fetch fails
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
+  }, [isAuthenticated, currentUserId]);
 
   const welcomeMessage = useMemo<ChatMessage>(() => ({
     id: 'welcome',
@@ -364,6 +375,7 @@ export default function OracleScreen() {
       timestamp: new Date().toISOString(),
     };
     addMessage(userMsg);
+    if (currentUserId) setOracleUserId(currentUserId);
 
     // If not authenticated, navigate to sign-in
     if (!isAuthenticated) {
@@ -400,6 +412,14 @@ export default function OracleScreen() {
       onDone: () => {
         setStreaming(false);
         sendingRef.current = false;
+        // Optimistically decrement remaining quota
+        if (quotaRemaining !== null) {
+          setQuota(
+            (quotaTotal ?? 0) - Math.max(0, quotaRemaining - 1),
+            quotaTotal,
+            Math.max(0, quotaRemaining - 1),
+          );
+        }
       },
       onError: (error) => {
         setStreaming(false);
@@ -418,6 +438,7 @@ export default function OracleScreen() {
     input,
     isStreaming,
     isAuthenticated,
+    currentUserId,
     birthData,
     nameData,
     concerns,
@@ -427,6 +448,10 @@ export default function OracleScreen() {
     removeLastMessage,
     appendToLastMessage,
     setStreaming,
+    setOracleUserId,
+    quotaRemaining,
+    quotaTotal,
+    setQuota,
   ]);
 
   const renderItem = useCallback(
@@ -477,6 +502,11 @@ export default function OracleScreen() {
 
         {/* Input bar — inside KAV so it moves with keyboard */}
         <View style={styles.inputBar}>
+          {quotaTotal !== null && quotaRemaining !== null && (
+            <Text style={styles.quotaIndicator}>
+              {t('chat.remaining', { count: quotaRemaining, total: quotaTotal })}
+            </Text>
+          )}
           <View style={styles.inputBarInner}>
             <TextInput
               style={styles.textInput}
@@ -702,6 +732,13 @@ const styles = StyleSheet.create({
   },
 
   // ---- Input Bar ----
+  quotaIndicator: {
+    fontFamily: fonts.body.regular,
+    fontSize: 11,
+    color: 'rgba(201,168,76,0.5)',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
   inputBar: {
     paddingHorizontal: 10,
     paddingTop: 6,

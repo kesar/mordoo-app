@@ -17,11 +17,19 @@ export interface PastConversation {
 }
 
 interface OracleState {
+  // Owner — used to discard stale cache from a different user
+  userId: string | null;
+
   // Today's conversation
   conversationId: string | null;
   conversationDate: string | null;
   messages: ChatMessage[];
   isStreaming: boolean;
+
+  // Quota (not persisted — refreshed from server)
+  quotaUsed: number;
+  quotaTotal: number | null;
+  quotaRemaining: number | null;
 
   // History (lazy-loaded, not persisted)
   pastConversations: PastConversation[];
@@ -29,6 +37,8 @@ interface OracleState {
   isLoadingHistory: boolean;
 
   // Actions
+  setUserId: (userId: string) => void;
+  setQuota: (used: number, total: number | null, remaining: number | null) => void;
   addMessage: (msg: ChatMessage) => void;
   removeLastMessage: () => void;
   appendToLastMessage: (chunk: string) => void;
@@ -42,13 +52,20 @@ interface OracleState {
 export const useOracleStore = create<OracleState>()(
   persist(
     (set) => ({
+      userId: null,
       conversationId: null,
       conversationDate: null,
       messages: [],
       isStreaming: false,
+      quotaUsed: 0,
+      quotaTotal: null,
+      quotaRemaining: null,
       pastConversations: [],
       hasMoreHistory: true,
       isLoadingHistory: false,
+
+      setUserId: (userId) => set({ userId }),
+      setQuota: (used, total, remaining) => set({ quotaUsed: used, quotaTotal: total, quotaRemaining: remaining }),
 
       addMessage: (msg) => set((state) => ({
         messages: [...state.messages, msg],
@@ -85,6 +102,7 @@ export const useOracleStore = create<OracleState>()(
       setLoadingHistory: (loading) => set({ isLoadingHistory: loading }),
 
       clearConversation: () => set({
+        userId: null,
         conversationId: null,
         conversationDate: null,
         messages: [],
@@ -96,6 +114,7 @@ export const useOracleStore = create<OracleState>()(
       name: 'mordoo-oracle',
       storage: createJSONStorage(() => mmkvStorage),
       partialize: (state) => ({
+        userId: state.userId,
         conversationId: state.conversationId,
         conversationDate: state.conversationDate,
         messages: state.messages,

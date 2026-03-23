@@ -8,7 +8,7 @@ export const ORACLE_MAX_TOKENS = Number(process.env.ORACLE_MAX_TOKENS) || 300;
 export const ORACLE_TEMPERATURE = Number(process.env.ORACLE_TEMPERATURE) || 0.8;
 
 /** Free tier: max Oracle questions per day. */
-export const FREE_ORACLE_QUESTIONS_PER_DAY = 1;
+export const FREE_ORACLE_QUESTIONS_PER_DAY = 5;
 
 /** Free tier: max Siam Si draws per day. */
 export const FREE_SIAM_SI_DRAWS_PER_DAY = 2;
