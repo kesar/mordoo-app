@@ -11,6 +11,7 @@ import { colors } from '@/src/constants/colors';
 import { useHydration } from '@/src/hooks/useHydration';
 import { useAuthListener } from '@/src/hooks/useAuthListener';
 import { useSyncBirthData } from '@/src/hooks/useSyncBirthData';
+import { useDayChangeRefresh } from '@/src/hooks/useDayChangeRefresh';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +24,30 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+function AppContent() {
+  useDayChangeRefresh();
+
+  return (
+    <>
+      <StatusBar style="light" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.night.DEFAULT },
+          animation: 'fade',
+        }}
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen
+          name="(onboarding)"
+          options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen name="(main)" />
+      </Stack>
+    </>
+  );
+}
 
 export default function RootLayout() {
   const hydrated = useHydration();
@@ -50,21 +75,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.night.DEFAULT }}>
       <QueryClientProvider client={queryClient}>
         <I18nextProvider i18n={i18n}>
-          <StatusBar style="light" />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: colors.night.DEFAULT },
-              animation: 'fade',
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen
-              name="(onboarding)"
-              options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
-            />
-            <Stack.Screen name="(main)" />
-          </Stack>
+          <AppContent />
         </I18nextProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
