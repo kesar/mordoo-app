@@ -14,13 +14,15 @@ export const fonts = {
   },
 } as const;
 
+import { moderateScale } from '@/src/utils/scale';
+
 export const fontSizes = {
-  xs: 12,
-  sm: 14,
-  base: 16,
-  lg: 18,
-  xl: 20,
-  '2xl': 24,
-  '3xl': 30,
-  '4xl': 36,
-} as const;
+  xs: moderateScale(12),
+  sm: moderateScale(14),
+  base: moderateScale(16),
+  lg: moderateScale(18),
+  xl: moderateScale(20),
+  '2xl': moderateScale(24),
+  '3xl': moderateScale(30),
+  '4xl': moderateScale(36),
+};

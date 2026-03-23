@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Animated,
   FlatList,
   Image,
   KeyboardAvoidingView,
@@ -130,17 +131,52 @@ const markdownStyles = {
   },
 };
 
-function AiMessageBubble({ message }: { message: ChatMessage }) {
+function AiMessageBubble({ message, isThinking }: { message: ChatMessage; isThinking?: boolean }) {
+  const { t } = useTranslation('oracle');
   const time = new Date(message.timestamp).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
   });
+
+  const [phrase] = useState(() => {
+    const phrases = t('chat.thinking', { returnObjects: true }) as string[];
+    return phrases[Math.floor(Math.random() * phrases.length)];
+  });
+
+  const thinkingOpacity = useRef(new Animated.Value(1)).current;
+  const hasContent = message.content.length > 0;
+  const [showThinking, setShowThinking] = useState(!!isThinking);
+
+  useEffect(() => {
+    if (hasContent && showThinking) {
+      Animated.timing(thinkingOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setShowThinking(false));
+    }
+  }, [hasContent, showThinking, thinkingOpacity]);
+
+  // Not thinking and no content — hide entirely (shouldn't normally happen)
+  if (!showThinking && !hasContent) return null;
+
   return (
     <View style={styles.aiRow}>
       <Image source={mordooAvatar} style={styles.avatar} />
-      <View style={styles.aiBubble}>
-        <SimpleMarkdown style={markdownStyles}>{message.content}</SimpleMarkdown>
-        <Text style={styles.aiBubbleTime}>{time}</Text>
+      <View style={{ flex: 1 }}>
+        {/* Thinking phrase — fades out when content arrives */}
+        {showThinking && (
+          <Animated.View style={[styles.typingContainer, { opacity: thinkingOpacity }]}>
+            <Text style={styles.typingText}>{phrase}</Text>
+          </Animated.View>
+        )}
+        {/* Actual content bubble */}
+        {hasContent && (
+          <View style={styles.aiBubble}>
+            <SimpleMarkdown style={markdownStyles}>{message.content}</SimpleMarkdown>
+            <Text style={styles.aiBubbleTime}>{time}</Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -155,21 +191,6 @@ function UserMessageBubble({ message }: { message: ChatMessage }) {
     <View style={styles.userBubble}>
       <Text style={styles.userBubbleText}>{message.content}</Text>
       <Text style={styles.userBubbleTime}>{time}</Text>
-    </View>
-  );
-}
-
-function TypingIndicator() {
-  return (
-    <View style={styles.aiRow}>
-      <Image source={mordooAvatar} style={styles.avatar} />
-      <View style={styles.typingContainer}>
-        <View style={styles.typingDots}>
-          <View style={styles.typingDot} />
-          <View style={styles.typingDot} />
-          <View style={styles.typingDot} />
-        </View>
-      </View>
     </View>
   );
 }
@@ -411,10 +432,13 @@ export default function OracleScreen() {
   const renderItem = useCallback(
     ({ item }: { item: ListItem }) => {
       if (item.type === 'date-divider') return <DateDivider date={item.date} />;
-      if (item.role === 'assistant') return <AiMessageBubble message={item} />;
+      if (item.role === 'assistant') {
+        const isLastAssistant = isStreaming && item.id === messages[messages.length - 1]?.id;
+        return <AiMessageBubble message={item} isThinking={isLastAssistant} />;
+      }
       return <UserMessageBubble message={item} />;
     },
-    [],
+    [isStreaming, messages],
   );
 
   return (
@@ -447,10 +471,7 @@ export default function OracleScreen() {
           onEndReached={loadMoreHistory}
           onEndReachedThreshold={0.5}
           ListHeaderComponent={
-            <>
-              {isStreaming ? <TypingIndicator /> : null}
-              {quotaExceeded ? <QuotaExceeded /> : null}
-            </>
+            quotaExceeded ? <QuotaExceeded /> : null
           }
         />
 
@@ -631,17 +652,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  typingDots: {
-    flexDirection: 'row',
-    gap: 4,
-    alignItems: 'center',
-  },
-  typingDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: colors.gold.DEFAULT,
-    opacity: 0.6,
+  typingText: {
+    fontFamily: fonts.body.regular,
+    fontStyle: 'italic',
+    fontSize: 14,
+    color: 'rgba(201,168,76,0.7)',
   },
 
   // ---- Quota Exceeded ----

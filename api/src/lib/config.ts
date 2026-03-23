@@ -2,7 +2,7 @@
 export const ORACLE_MODEL = process.env.ORACLE_MODEL || 'claude-sonnet-4-6';
 
 /** Max tokens for Oracle chat responses. */
-export const ORACLE_MAX_TOKENS = Number(process.env.ORACLE_MAX_TOKENS) || 500;
+export const ORACLE_MAX_TOKENS = Number(process.env.ORACLE_MAX_TOKENS) || 300;
 
 /** Temperature for Oracle chat responses. */
 export const ORACLE_TEMPERATURE = Number(process.env.ORACLE_TEMPERATURE) || 0.8;

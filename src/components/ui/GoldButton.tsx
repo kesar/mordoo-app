@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
 import { lightHaptic } from '@/src/utils/haptics';
+import { scale } from '@/src/utils/scale';
 
 interface GoldButtonProps {
   title: string;
@@ -52,6 +53,7 @@ export function GoldButton({
             disabled && styles.disabledText,
           ]}
           numberOfLines={1}
+          adjustsFontSizeToFit
         >
           {title}
         </Text>
@@ -64,8 +66,8 @@ const styles = StyleSheet.create({
   base: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 32,
+    paddingVertical: scale(20),
+    paddingHorizontal: scale(32),
     alignSelf: 'center',
   },
   fullWidth: {
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
 
   // Text base
   baseText: {
-    letterSpacing: 3.5,
+    letterSpacing: scale(3.5),
     textTransform: 'uppercase',
   },
 
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.display.bold,
     fontSize: fontSizes.base,
     color: colors.gold.light,
-    letterSpacing: 3.5,
+    letterSpacing: scale(3.5),
   },
 
   // Ghost text

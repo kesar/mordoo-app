@@ -8,7 +8,29 @@
     "upgradePrompt": "Unlock unlimited readings with Standard — ฿149/month",
     "errorDisrupted": "\n\n_The astral connection was disrupted. Please try again._",
     "quotaTitle": "DAILY LIMIT REACHED",
-    "quotaBody": "Your next reading will be available tomorrow."
+    "quotaBody": "Your next reading will be available tomorrow.",
+    "thinking": [
+      "Consulting the stars…",
+      "Reading the celestial map…",
+      "Aligning the planets…",
+      "Shuffling the cards…",
+      "Gazing into the crystal ball…",
+      "Channeling the ancestors…",
+      "Decoding the constellations…",
+      "Communing with the cosmos…",
+      "Interpreting the runes…",
+      "Tracing the lunar path…",
+      "Asking the spirits…",
+      "Unraveling the threads of fate…",
+      "Studying the birth chart…",
+      "Listening to the whispers…",
+      "Casting the cosmic net…",
+      "Peering beyond the veil…",
+      "Meditating on your energy…",
+      "Summoning ancient wisdom…",
+      "Connecting the star signs…",
+      "Seeking divine guidance…"
+    ]
   },
   "tarot": {
     "title": "Tarot Reading",
