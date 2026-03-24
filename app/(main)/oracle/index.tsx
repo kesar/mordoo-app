@@ -267,7 +267,7 @@ export default function OracleScreen() {
   const appendHistory = useOracleStore((s) => s.appendHistory);
   const setLoadingHistory = useOracleStore((s) => s.setLoadingHistory);
 
-  // Load today's conversation on mount — always fetch from server to ensure fresh data
+  // Load today's conversation + first page of history on mount
   useEffect(() => {
     if (!isAuthenticated || !currentUserId) return;
 
@@ -287,6 +287,24 @@ export default function OracleScreen() {
         setTodayConversation(data.conversationId, data.conversationDate, msgs);
         setOracleUserId(currentUserId);
         setQuota(data.quota.used, data.quota.total, data.quota.remaining);
+
+        // Automatically load first page of past conversations
+        return fetchConversationHistory(data.conversationDate);
+      })
+      .then((historyData) => {
+        if (!historyData) return;
+        const mapped: PastConversation[] = historyData.conversations.map((c) => ({
+          id: c.id,
+          conversationDate: c.conversationDate,
+          summary: c.summary,
+          messages: c.messages.map((m) => ({
+            id: m.id,
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+            timestamp: m.createdAt,
+          })),
+        }));
+        appendHistory(mapped, historyData.hasMore);
       })
       .catch(() => {
         // Keep cached messages if fetch fails
