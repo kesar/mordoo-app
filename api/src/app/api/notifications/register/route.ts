@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   const { error: updateError } = await serviceClient
     .from('profiles')
     .update(update)
-    .eq('user_id', user.id);
+    .eq('id', user.id);
 
   if (updateError) {
     console.error('Failed to update notification preferences:', updateError);
