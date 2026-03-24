@@ -42,9 +42,17 @@ export default function ProfileScreen() {
     enabled: !!userId,
   });
 
-  const handleLanguageToggle = () => {
+  const handleLanguageToggle = async () => {
     lightHaptic();
-    setLanguage(language === 'en' ? 'th' : 'en');
+    const newLang = language === 'en' ? 'th' : 'en';
+    setLanguage(newLang);
+    if (notificationsEnabled) {
+      try {
+        await updateNotificationPreferences(true, undefined, newLang);
+      } catch {
+        // Language sync failed silently — will retry on next change
+      }
+    }
   };
 
   const handleNotificationsToggle = async (value: boolean) => {
