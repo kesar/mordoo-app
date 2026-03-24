@@ -64,6 +64,10 @@
       "good": "โชคดี",
       "fair": "โชคปานกลาง",
       "caution": "ระวัง"
+    },
+    "share": {
+      "button": "แชร์",
+      "message": "ฉันจับได้เซียมซีใบที่ #{{number}} — {{fortune}}! ลองเสี่ยงดูบน Mordoo"
     }
   },
   "modes": {

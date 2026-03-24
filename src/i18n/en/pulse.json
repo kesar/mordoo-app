@@ -37,5 +37,9 @@
     "title": "Power Windows",
     "seeFullDay": "See full day",
     "locked": "Upgrade to unlock hourly insights"
+  },
+  "share": {
+    "button": "Share",
+    "message": "My cosmic energy is {{score}} today! Check yours on Mordoo."
   }
 }

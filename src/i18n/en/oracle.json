@@ -64,6 +64,10 @@
       "good": "GOOD FORTUNE",
       "fair": "FAIR FORTUNE",
       "caution": "CAUTION"
+    },
+    "share": {
+      "button": "Share",
+      "message": "I drew fortune stick #{{number}} — {{fortune}}! Try your luck on Mordoo."
     }
   },
   "modes": {
