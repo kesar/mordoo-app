@@ -12,6 +12,7 @@ import { useHydration } from '@/src/hooks/useHydration';
 import { useAuthListener } from '@/src/hooks/useAuthListener';
 import { useSyncBirthData } from '@/src/hooks/useSyncBirthData';
 import { useDayChangeRefresh } from '@/src/hooks/useDayChangeRefresh';
+import { useNotificationHandler } from '@/src/hooks/useNotificationHandler';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,6 +28,7 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   useDayChangeRefresh();
+  useNotificationHandler();
 
   return (
     <>
