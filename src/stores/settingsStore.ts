@@ -6,8 +6,10 @@ import i18n from '@/src/i18n';
 interface SettingsState {
   language: 'en' | 'th';
   notificationsEnabled: boolean;
+  notificationTime: string;
   setLanguage: (lang: 'en' | 'th') => void;
   setNotificationsEnabled: (enabled: boolean) => void;
+  setNotificationTime: (time: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -15,12 +17,14 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       language: 'en',
       notificationsEnabled: false,
+      notificationTime: '07:00',
 
       setLanguage: (language) => {
         i18n.changeLanguage(language);
         set({ language });
       },
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
+      setNotificationTime: (notificationTime) => set({ notificationTime }),
     }),
     {
       name: 'mordoo-settings',
@@ -28,6 +32,7 @@ export const useSettingsStore = create<SettingsState>()(
       partialize: (state) => ({
         language: state.language,
         notificationsEnabled: state.notificationsEnabled,
+        notificationTime: state.notificationTime,
       }),
     },
   ),
