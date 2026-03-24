@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { Animated, View, ScrollView, StyleSheet, ActivityIndicator, Easing } from 'react-native';
+import { Animated, View, ScrollView, StyleSheet, ActivityIndicator, Easing, Pressable } from 'react-native';
+import ViewShot from 'react-native-view-shot';
+import { PulseShareCard } from '@/src/components/sharing/PulseShareCard';
+import { useShareCard } from '@/src/hooks/useShareCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { colors } from '@/src/constants/colors';
@@ -97,6 +100,7 @@ function TwinklingStar({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 export default function PulseScreen() {
   const { t, i18n } = useTranslation('pulse');
   const { data: pulse, isLoading, error, refetch } = useDailyPulse();
+  const { viewShotRef, shareCard, isSharing } = useShareCard();
 
   // Slow vertical drift for constellation background
   const driftY = useRef(new Animated.Value(0)).current;
@@ -228,11 +232,49 @@ export default function PulseScreen() {
               <SubScoreBar Icon={HeartIcon} label={t('subScores.heart')} value={pulse.subScores.heart} color="#ec4899" />
               <SubScoreBar Icon={BodyDiamondIcon} label={t('subScores.body')} value={pulse.subScores.body} color={colors.elements.wood} />
             </View>
+
+            {/* Share Button */}
+            <View style={styles.shareSection}>
+              <Pressable
+                style={({ pressed }) => [styles.shareBtn, pressed && { opacity: 0.7 }]}
+                onPress={() => shareCard(t('share.message', { score: pulse.energyScore }))}
+                disabled={isSharing}
+              >
+                <Text style={styles.shareBtnText}>
+                  {isSharing ? '...' : t('share.button')}
+                </Text>
+              </Pressable>
+            </View>
           </>
         ) : null}
 
         <View style={styles.bottomPadding} />
       </ScrollView>
+
+      {/* Off-screen share card */}
+      {pulse && (
+        <ViewShot
+          ref={viewShotRef}
+          options={{ format: 'png', quality: 1, width: 1080, height: 1350 }}
+          style={styles.offScreen}
+        >
+          <PulseShareCard
+            pulse={pulse}
+            dateStr={dateStr}
+            lang={i18n.language as 'en' | 'th'}
+            subScoreLabels={{
+              business: t('subScores.business'),
+              heart: t('subScores.heart'),
+              body: t('subScores.body'),
+            }}
+            luckyLabels={{
+              color: t('luckyElements.color'),
+              number: t('luckyElements.number'),
+              direction: t('luckyElements.direction'),
+            }}
+          />
+        </ViewShot>
+      )}
     </SafeAreaView>
   );
 }
@@ -492,5 +534,34 @@ const styles = StyleSheet.create({
   // Bottom padding
   bottomPadding: {
     height: 120,
+  },
+
+  // Share
+  shareSection: {
+    marginTop: 32,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  shareBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.gold.muted,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 9999,
+    borderWidth: 1,
+    borderColor: colors.gold.border,
+  },
+  shareBtnText: {
+    fontFamily: fonts.display.bold,
+    fontSize: 12,
+    color: colors.gold.light,
+    letterSpacing: 3,
+  },
+  offScreen: {
+    position: 'absolute',
+    left: -9999,
+    top: -9999,
   },
 });
