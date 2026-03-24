@@ -47,7 +47,9 @@
         {
           "color": "#c9a84c"
         }
-      ]
+      ],
+      "expo-sharing",
+      "expo-splash-screen"
     ],
     "extra": {
       "eas": {

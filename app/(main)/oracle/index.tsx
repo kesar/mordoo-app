@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
   Animated,
   FlatList,
@@ -311,6 +312,35 @@ export default function OracleScreen() {
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, currentUserId]);
+
+  // Refresh quota (and conversation if new day) on screen focus
+  const hasMountedRef = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      // Skip the initial mount — the effect above handles that
+      if (!hasMountedRef.current) {
+        hasMountedRef.current = true;
+        return;
+      }
+      if (!isAuthenticated || !currentUserId) return;
+
+      fetchTodayConversation()
+        .then((data) => {
+          // If the server date differs from cached date, it's a new day — reload conversation
+          if (data.conversationDate !== conversationDate) {
+            const msgs = data.messages.map((m: ConversationMessage) => ({
+              id: m.id,
+              role: m.role as 'user' | 'assistant',
+              content: m.content,
+              timestamp: m.createdAt,
+            }));
+            setTodayConversation(data.conversationId, data.conversationDate, msgs);
+          }
+          setQuota(data.quota.used, data.quota.total, data.quota.remaining);
+        })
+        .catch(() => {});
+    }, [isAuthenticated, currentUserId, conversationDate, setTodayConversation, setQuota]),
+  );
 
   const welcomeMessage = useMemo<ChatMessage>(() => ({
     id: 'welcome',
