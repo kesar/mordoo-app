@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -8,6 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { getExpoPushToken, registerPushToken, getTimezone } from '@/src/services/notifications';
+import { useSettingsStore } from '@/src/stores/settingsStore';
 
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
@@ -25,7 +28,10 @@ export default function PowerUps() {
   const setStep = useOnboardingStore((s) => s.setStep);
   const completeOnboarding = useOnboardingStore((s) => s.completeOnboarding);
   const [locationEnabled, setLocationEnabled] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notifToggle, setNotifToggle] = useState(false);
+  const language = useSettingsStore((s) => s.language);
+  const storeSetNotifications = useSettingsStore((s) => s.setNotificationsEnabled);
+  const [isRequesting, setIsRequesting] = useState(false);
 
   const handleContinue = () => {
     // For now, just track preference. Actual permissions requested later.
@@ -109,18 +115,45 @@ export default function PowerUps() {
               <TouchableOpacity
                 style={[
                   styles.toggleButton,
-                  notificationsEnabled ? styles.toggleButtonActive : styles.toggleButtonInactive,
+                  notifToggle ? styles.toggleButtonActive : styles.toggleButtonInactive,
                 ]}
-                onPress={() => setNotificationsEnabled((v) => !v)}
+                onPress={async () => {
+                  if (notifToggle) {
+                    setNotifToggle(false);
+                    storeSetNotifications(false);
+                    return;
+                  }
+                  if (isRequesting) return;
+                  setIsRequesting(true);
+                  try {
+                    const token = await getExpoPushToken();
+                    if (!token) {
+                      Alert.alert(
+                        t('powerUps.notifications.denied'),
+                        t('powerUps.notifications.deniedMessage'),
+                      );
+                      setIsRequesting(false);
+                      return;
+                    }
+                    setNotifToggle(true);
+                    storeSetNotifications(true);
+                    await registerPushToken(token, getTimezone(), language);
+                  } catch (error) {
+                    console.error('Failed to register push token:', error);
+                    setNotifToggle(true); // permission was granted even if API call failed
+                  } finally {
+                    setIsRequesting(false);
+                  }
+                }}
                 activeOpacity={0.8}
               >
                 <Text
                   style={[
                     styles.toggleText,
-                    notificationsEnabled ? styles.toggleTextActive : styles.toggleTextInactive,
+                    notifToggle ? styles.toggleTextActive : styles.toggleTextInactive,
                   ]}
                 >
-                  {notificationsEnabled ? t('powerUps.enabled') : t('powerUps.enable')}
+                  {notifToggle ? t('powerUps.enabled') : t('powerUps.enable')}
                 </Text>
               </TouchableOpacity>
             </View>

@@ -98,7 +98,9 @@
     },
     "notifications": {
       "title": "Daily Oracle Whispers",
-      "description": "Receive your daily energy score and cosmic alerts each morning."
+      "description": "Receive your daily energy score and cosmic alerts each morning.",
+      "denied": "Notifications Blocked",
+      "deniedMessage": "You can enable notifications later in your device settings."
     },
     "enabled": "Enabled",
     "enable": "Enable",
