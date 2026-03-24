@@ -23,7 +23,7 @@ BEGIN
   WHERE p.notifications_enabled = true
     AND p.push_token IS NOT NULL
     AND (p.last_notification_sent IS NULL OR p.last_notification_sent < CURRENT_DATE)
-    AND (CURRENT_TIME AT TIME ZONE p.timezone) >= p.notification_time
-    AND (CURRENT_TIME AT TIME ZONE p.timezone) < p.notification_time + INTERVAL '15 minutes';
+    AND (CURRENT_TIMESTAMP AT TIME ZONE p.timezone)::time >= p.notification_time
+    AND (CURRENT_TIMESTAMP AT TIME ZONE p.timezone)::time < p.notification_time + INTERVAL '15 minutes';
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

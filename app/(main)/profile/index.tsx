@@ -19,6 +19,12 @@ import {
   getTimezone,
 } from '@/src/services/notifications';
 
+const TIMES = Array.from({ length: 96 }, (_, i) => {
+  const h = String(Math.floor(i / 4)).padStart(2, '0');
+  const m = String((i % 4) * 15).padStart(2, '0');
+  return `${h}:${m}`;
+});
+
 export default function ProfileScreen() {
   const { t } = useTranslation('settings');
   const router = useRouter();
@@ -53,7 +59,7 @@ export default function ProfileScreen() {
           setNotificationsEnabled(previousValue); // rollback
           Alert.alert(
             t('notifications'),
-            'Please enable notifications in your device settings.',
+            t('notificationsDenied'),
           );
           return;
         }
@@ -68,12 +74,6 @@ export default function ProfileScreen() {
   };
 
   const [showTimePicker, setShowTimePicker] = useState(false);
-
-  const TIMES = Array.from({ length: 96 }, (_, i) => {
-    const h = String(Math.floor(i / 4)).padStart(2, '0');
-    const m = String((i % 4) * 15).padStart(2, '0');
-    return `${h}:${m}`;
-  });
 
   const handleTimeChange = async (time: string) => {
     lightHaptic();
@@ -205,7 +205,7 @@ export default function ProfileScreen() {
           style={styles.modalOverlay}
           onPress={() => setShowTimePicker(false)}
         >
-          <View style={styles.modalContent}>
+          <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
             <Text style={styles.modalTitle}>{t('notificationTime')}</Text>
             <FlatList
               data={TIMES}

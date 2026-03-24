@@ -72,19 +72,24 @@ Deno.serve(async (req) => {
       const result = await response.json();
       const tickets = result.data ?? [];
 
+      const successIds: string[] = [];
       for (let i = 0; i < tickets.length; i++) {
         const ticket = tickets[i];
         const user = batch[i];
 
         if (ticket.status === 'ok') {
-          await supabase
-            .from('profiles')
-            .update({ last_notification_sent: new Date().toISOString().split('T')[0] })
-            .eq('user_id', user.user_id);
+          successIds.push(user.user_id);
           totalSent++;
         } else if (ticket.details?.error === 'DeviceNotRegistered') {
           failedTokens.push(user.user_id);
         }
+      }
+
+      if (successIds.length > 0) {
+        await supabase
+          .from('profiles')
+          .update({ last_notification_sent: new Date().toISOString().split('T')[0] })
+          .in('user_id', successIds);
       }
     }
 
