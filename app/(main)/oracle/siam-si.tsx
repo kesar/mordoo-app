@@ -193,30 +193,38 @@ export default function SiamSiScreen() {
             </Animated.View>
 
             <Text style={styles.instruction}>
-              {canDraw
-                ? isShaking
-                  ? t('siamSi.shaking')
-                  : t('siamSi.shakePrompt')
-                : t('siamSi.noDrawsRemaining')}
+              {isLoadingQuota
+                ? t('siamSi.consultingSpirits')
+                : canDraw
+                  ? isShaking
+                    ? t('siamSi.shaking')
+                    : t('siamSi.shakePrompt')
+                  : t('siamSi.noDrawsRemaining')}
             </Text>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.drawBtn,
-                !canDraw && styles.drawBtnDisabled,
-                (pressed || isDrawing) && { opacity: 0.7 },
-              ]}
-              onPress={handleManualDraw}
-              disabled={!canDraw || isDrawing}
-            >
-              <Text style={[styles.drawBtnText, !canDraw && styles.drawBtnTextDisabled]}>
-                {isDrawing
-                  ? t('siamSi.shaking')
-                  : canDraw
-                    ? t('siamSi.drawStick')
-                    : t('siamSi.comeBackTomorrow')}
-              </Text>
-            </Pressable>
+            {isLoadingQuota ? (
+              <View style={styles.loadingBtn}>
+                <ActivityIndicator size="small" color={colors.gold.light} />
+              </View>
+            ) : (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.drawBtn,
+                  !canDraw && styles.drawBtnDisabled,
+                  (pressed || isDrawing) && { opacity: 0.7 },
+                ]}
+                onPress={handleManualDraw}
+                disabled={!canDraw || isDrawing}
+              >
+                <Text style={[styles.drawBtnText, !canDraw && styles.drawBtnTextDisabled]}>
+                  {isDrawing
+                    ? t('siamSi.shaking')
+                    : canDraw
+                      ? t('siamSi.drawStick')
+                      : t('siamSi.comeBackTomorrow')}
+                </Text>
+              </Pressable>
+            )}
           </View>
         )}
       </View>
@@ -313,6 +321,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 9999,
+  },
+  loadingBtn: {
+    backgroundColor: colors.night.card,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 9999,
+    borderWidth: 1,
+    borderColor: colors.gold.border,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   drawBtnDisabled: {
     backgroundColor: colors.night.card,

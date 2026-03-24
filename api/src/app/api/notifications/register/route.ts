@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       .from('profiles')
       .update({ push_token: null })
       .eq('push_token', push_token)
-      .neq('user_id', user.id);
+      .neq('id', user.id);
   }
 
   // 5. Update profile

@@ -56,6 +56,7 @@
     "noDrawsLeft": "หมดสิทธิ์จั่ว",
     "noDrawsRemaining": "หมดสิทธิ์จั่วแล้ว",
     "comeBackTomorrow": "กลับมาใหม่พรุ่งนี้",
+    "consultingSpirits": "กำลังปรึกษาวิญญาณ...",
     "remaining": "เหลือ {{count}} ครั้ง",
     "unlimited": "ไม่จำกัด",
     "fortuneLabels": {
