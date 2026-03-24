@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
         await supabase
           .from('profiles')
           .update({ last_notification_sent: new Date().toISOString().split('T')[0] })
-          .in('user_id', successIds);
+          .in('id', successIds);
       }
     }
 
@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
       await supabase
         .from('profiles')
         .update({ push_token: null, notifications_enabled: false })
-        .in('user_id', failedTokens);
+        .in('id', failedTokens);
     }
 
     console.log(`Sent ${totalSent} notifications, cleared ${failedTokens.length} invalid tokens`);

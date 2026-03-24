@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION get_notification_eligible_users()
 RETURNS TABLE (user_id uuid, push_token text, language text) AS $$
 BEGIN
   RETURN QUERY
-  SELECT p.user_id, p.push_token, COALESCE(p.language, 'th') as language
+  SELECT p.id as user_id, p.push_token, COALESCE(p.language, 'th') as language
   FROM profiles p
   WHERE p.notifications_enabled = true
     AND p.push_token IS NOT NULL
