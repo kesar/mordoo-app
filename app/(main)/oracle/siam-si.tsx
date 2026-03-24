@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Pressable,
   StyleSheet,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text } from '@/src/components/ui/Text';
 import { BambooIcon, ChevronLeftIcon } from '@/src/components/icons/TarotIcons';
@@ -37,11 +38,20 @@ export default function SiamSiScreen() {
     currentStick,
     isRevealing,
     isDrawing,
+    isLoadingQuota,
     drawsRemaining,
     canDraw,
     error,
     performDraw,
+    refreshQuota,
   } = useSiamSi();
+
+  // Refresh quota every time the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      refreshQuota();
+    }, [refreshQuota]),
+  );
 
   // Animations
   const shakeAnim = useRef(new Animated.Value(0)).current;
@@ -100,9 +110,13 @@ export default function SiamSiScreen() {
         </Pressable>
         <Text style={styles.headerTitle}>{t('siamSi.title').toUpperCase()}</Text>
         <View style={styles.quotaBadge}>
-          <Text style={styles.quotaText}>
-            {drawsRemaining === null ? t('siamSi.unlimited') : t('siamSi.remaining', { count: drawsRemaining })}
-          </Text>
+          {isLoadingQuota ? (
+            <ActivityIndicator size="small" color={colors.gold.light} />
+          ) : (
+            <Text style={styles.quotaText}>
+              {drawsRemaining === null ? t('siamSi.unlimited') : t('siamSi.remaining', { count: drawsRemaining })}
+            </Text>
+          )}
         </View>
       </View>
 

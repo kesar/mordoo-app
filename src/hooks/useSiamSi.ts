@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Accelerometer } from 'expo-sensors';
-import { fetchSiamSiDraw, type SiamSiDrawResponse } from '@/src/services/oracle';
+import { fetchSiamSiDraw, fetchSiamSiQuota, type SiamSiDrawResponse } from '@/src/services/oracle';
 import { TIERS } from '@/src/constants/tiers';
 
 const SHAKE_THRESHOLD = 1.8;
@@ -15,8 +15,9 @@ export function useSiamSi() {
   const [currentStick, setCurrentStick] = useState<SiamSiDrawResponse | null>(null);
   const [isRevealing, setIsRevealing] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [drawsRemaining, setDrawsRemaining] = useState<number | null>(FREE_SIAM_SI_LIMIT);
-  const [drawsTotal, setDrawsTotal] = useState<number | null>(FREE_SIAM_SI_LIMIT);
+  const [drawsRemaining, setDrawsRemaining] = useState<number | null>(null);
+  const [drawsTotal, setDrawsTotal] = useState<number | null>(null);
+  const [isLoadingQuota, setIsLoadingQuota] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const shakeStartRef = useRef<number | null>(null);
@@ -24,7 +25,31 @@ export function useSiamSi() {
   const cooldownRef = useRef(false);
   const isDrawingRef = useRef(false);
 
-  const canDraw = drawsRemaining === null || drawsRemaining > 0;
+  const canDraw = !isLoadingQuota && (drawsRemaining === null || drawsRemaining > 0);
+
+  // Fetch quota from API on mount
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoadingQuota(true);
+    fetchSiamSiQuota()
+      .then((quota) => {
+        if (!cancelled) {
+          setDrawsRemaining(quota.drawsRemaining);
+          setDrawsTotal(quota.drawsTotal);
+        }
+      })
+      .catch(() => {
+        // Fallback to free tier default if quota fetch fails
+        if (!cancelled) {
+          setDrawsRemaining(FREE_SIAM_SI_LIMIT);
+          setDrawsTotal(FREE_SIAM_SI_LIMIT);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingQuota(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const performDraw = useCallback(async () => {
     if (!canDraw || cooldownRef.current || isDrawingRef.current) return;
@@ -88,15 +113,27 @@ export function useSiamSi() {
     return () => subscription.remove();
   }, [performDraw]);
 
+  const refreshQuota = useCallback(async () => {
+    try {
+      const quota = await fetchSiamSiQuota();
+      setDrawsRemaining(quota.drawsRemaining);
+      setDrawsTotal(quota.drawsTotal);
+    } catch {
+      // silently fail — keep current state
+    }
+  }, []);
+
   return {
     isShaking,
     currentStick,
     isRevealing,
     isDrawing,
+    isLoadingQuota,
     drawsRemaining,
     drawsTotal,
     canDraw,
     error,
     performDraw,
+    refreshQuota,
   };
 }

@@ -1,0 +1,131 @@
+<h2>Push Notifications — Architecture Overview</h2>
+<p class="subtitle">Review the system design and select your preferred approach</p>
+
+<div class="section">
+  <h3>System Flow</h3>
+  <div class="mockup">
+    <div class="mockup-header">Daily Pulse Reminder — End to End</div>
+    <div class="mockup-body" style="font-family: monospace; font-size: 13px; line-height: 1.8; padding: 24px;">
+      <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+
+        <!-- Column 1: Client -->
+        <div style="flex: 1; min-width: 200px;">
+          <div style="background: #2a2a3a; padding: 16px; border-radius: 8px; border: 1px solid #444;">
+            <div style="color: #c9a84c; font-weight: bold; margin-bottom: 12px;">📱 Mobile App</div>
+            <div style="color: #ccc; font-size: 12px;">
+              <div style="margin-bottom: 8px;">1. Request OS permission</div>
+              <div style="margin-bottom: 8px;">2. Get Expo Push Token</div>
+              <div style="margin-bottom: 8px;">3. Save token to profiles</div>
+              <div style="margin-bottom: 8px;">4. Save time preference</div>
+              <div>5. Receive & display notification</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow -->
+        <div style="display: flex; align-items: center; color: #c9a84c; font-size: 24px;">→</div>
+
+        <!-- Column 2: Supabase -->
+        <div style="flex: 1; min-width: 200px;">
+          <div style="background: #2a2a3a; padding: 16px; border-radius: 8px; border: 1px solid #444;">
+            <div style="color: #3ecf8e; font-weight: bold; margin-bottom: 12px;">🗄 Supabase</div>
+            <div style="color: #ccc; font-size: 12px;">
+              <div style="margin-bottom: 8px;"><strong>profiles table</strong></div>
+              <div style="margin-bottom: 4px; padding-left: 12px;">+ push_token (text)</div>
+              <div style="margin-bottom: 4px; padding-left: 12px;">+ notifications_enabled (bool)</div>
+              <div style="margin-bottom: 4px; padding-left: 12px;">+ notification_time (time)</div>
+              <div style="margin-bottom: 12px; padding-left: 12px;">+ timezone (text)</div>
+              <div style="margin-bottom: 8px;"><strong>pg_cron</strong></div>
+              <div style="padding-left: 12px;">Runs every 15 min, finds users<br/>whose notification_time is now</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow -->
+        <div style="display: flex; align-items: center; color: #c9a84c; font-size: 24px;">→</div>
+
+        <!-- Column 3: Edge Function -->
+        <div style="flex: 1; min-width: 200px;">
+          <div style="background: #2a2a3a; padding: 16px; border-radius: 8px; border: 1px solid #444;">
+            <div style="color: #6366f1; font-weight: bold; margin-bottom: 12px;">⚡ Edge Function</div>
+            <div style="color: #ccc; font-size: 12px;">
+              <div style="margin-bottom: 8px;">1. Query eligible users</div>
+              <div style="margin-bottom: 8px;">2. Batch push tokens</div>
+              <div style="margin-bottom: 8px;">3. Call Expo Push API</div>
+              <div style="margin-bottom: 8px;">4. Handle failures/receipts</div>
+              <div>5. Mark as sent</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Components to Build</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+    <div style="background: #1a1a2e; padding: 16px; border-radius: 8px; border-left: 3px solid #c9a84c;">
+      <h4 style="color: #c9a84c; margin: 0 0 8px;">Mobile App</h4>
+      <ul style="color: #ccc; font-size: 13px; margin: 0; padding-left: 16px;">
+        <li>expo-notifications setup</li>
+        <li>Permission request in Power-Ups</li>
+        <li>Push token registration service</li>
+        <li>Settings: toggle + time picker</li>
+        <li>Notification handler (tap → Pulse)</li>
+      </ul>
+    </div>
+
+    <div style="background: #1a1a2e; padding: 16px; border-radius: 8px; border-left: 3px solid #3ecf8e;">
+      <h4 style="color: #3ecf8e; margin: 0 0 8px;">Database</h4>
+      <ul style="color: #ccc; font-size: 13px; margin: 0; padding-left: 16px;">
+        <li>Migration: add columns to profiles</li>
+        <li>RLS policy for push_token</li>
+        <li>pg_cron job (every 15 min)</li>
+        <li>last_notification_sent tracking</li>
+      </ul>
+    </div>
+
+    <div style="background: #1a1a2e; padding: 16px; border-radius: 8px; border-left: 3px solid #6366f1;">
+      <h4 style="color: #6366f1; margin: 0 0 8px;">Edge Function</h4>
+      <ul style="color: #ccc; font-size: 13px; margin: 0; padding-left: 16px;">
+        <li>send-daily-reminder function</li>
+        <li>Expo Push API integration</li>
+        <li>Batch sending (100 per request)</li>
+        <li>Error handling & token cleanup</li>
+      </ul>
+    </div>
+
+    <div style="background: #1a1a2e; padding: 16px; border-radius: 8px; border-left: 3px solid #e44;">
+      <h4 style="color: #e44; margin: 0 0 8px;">API Endpoint</h4>
+      <ul style="color: #ccc; font-size: 13px; margin: 0; padding-left: 16px;">
+        <li>POST /api/notifications/register</li>
+        <li>Save/update push token</li>
+        <li>Update notification preferences</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <h3>Does this architecture look right?</h3>
+  <div class="options">
+    <div class="option" data-choice="approve" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>Looks good, let's proceed</h3>
+        <p>Architecture makes sense, move on to detailed design</p>
+      </div>
+    </div>
+    <div class="option" data-choice="questions" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>I have questions or changes</h3>
+        <p>Let me share feedback in the terminal</p>
+      </div>
+    </div>
+  </div>
+</div>

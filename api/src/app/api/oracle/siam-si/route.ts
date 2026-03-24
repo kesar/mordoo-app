@@ -5,6 +5,51 @@ import { getTodayString } from '../../../../lib/date';
 import { FREE_SIAM_SI_DRAWS_PER_DAY, PGRST_NOT_FOUND } from '../../../../lib/config';
 import { drawSiamSi } from '@shared/siam-si';
 
+export async function GET(request: NextRequest) {
+  // 1. Validate auth
+  const { user, error: authError } = await authenticateRequest(request);
+  if (authError) return authError;
+
+  const serviceClient = createServiceClient();
+
+  // 2. Get user tier
+  const { data: profile } = await serviceClient
+    .from('profiles')
+    .select('tier')
+    .eq('id', user.id)
+    .single();
+
+  const tier = profile?.tier || 'free';
+  const maxDraws = tier === 'standard' ? Infinity : FREE_SIAM_SI_DRAWS_PER_DAY;
+
+  // 3. Get quota record
+  const today = getTodayString();
+
+  const { data: quota, error: quotaError } = await serviceClient
+    .from('user_quotas')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  if (quotaError && quotaError.code !== PGRST_NOT_FOUND) {
+    return NextResponse.json({ error: 'Failed to check quota' }, { status: 500 });
+  }
+
+  let drawsToday = 0;
+  if (quota && quota.siam_si_last_reset === today) {
+    drawsToday = quota.siam_si_draws_this_month || 0;
+  }
+
+  const drawsTotal = maxDraws === Infinity ? null : maxDraws;
+  const drawsRemaining = maxDraws === Infinity ? null : maxDraws - drawsToday;
+
+  return NextResponse.json({
+    drawsUsed: drawsToday,
+    drawsTotal,
+    drawsRemaining,
+  });
+}
+
 export async function POST(request: NextRequest) {
   // 1. Validate auth
   const { user, error: authError } = await authenticateRequest(request);

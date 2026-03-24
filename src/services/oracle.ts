@@ -158,6 +158,29 @@ export async function fetchConversationHistory(before?: string): Promise<History
   return response.json();
 }
 
+export interface SiamSiQuotaResponse {
+  drawsUsed: number;
+  drawsTotal: number | null;
+  drawsRemaining: number | null;
+}
+
+export async function fetchSiamSiQuota(): Promise<SiamSiQuotaResponse> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('Not authenticated');
+
+  const response = await fetch(`${API_BASE_URL}/api/oracle/siam-si`, {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Siam Si quota error: ${response.status}`);
+  }
+
+  return response.json();
+}
+
 export interface SiamSiDrawResponse {
   number: number;
   fortune: 'excellent' | 'good' | 'fair' | 'caution';
