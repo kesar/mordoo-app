@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "ai.mordoo.app",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -40,6 +40,12 @@
         "expo-sensors",
         {
           "motionPermission": "Allow $(PRODUCT_NAME) to detect shake gestures for Siam Si fortune drawing"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#c9a84c"
         }
       ]
     ],
