@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import type { EventSubscription } from 'expo-modules-core';
 
 // Configure foreground notification behavior
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -13,7 +15,7 @@ Notifications.setNotificationHandler({
 
 export function useNotificationHandler() {
   const router = useRouter();
-  const responseListener = useRef<Notifications.EventSubscription>();
+  const responseListener = useRef<EventSubscription>(null);
 
   useEffect(() => {
     // Listen for notification taps
@@ -22,9 +24,7 @@ export function useNotificationHandler() {
     });
 
     return () => {
-      if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
-      }
+      responseListener.current?.remove();
     };
   }, [router]);
 }
