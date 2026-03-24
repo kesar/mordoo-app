@@ -1,4 +1,5 @@
-import { View, StyleSheet, Switch, Alert, ScrollView, ActivityIndicator, Pressable } from 'react-native';
+import { useState } from 'react';
+import { View, StyleSheet, Switch, Alert, ScrollView, ActivityIndicator, Pressable, Modal, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +12,12 @@ import { useSettingsStore } from '@/src/stores/settingsStore';
 import { signOut } from '@/src/services/auth';
 import { fetchUserProfile } from '@/src/services/profile';
 import { lightHaptic } from '@/src/utils/haptics';
+import {
+  getExpoPushToken,
+  updateNotificationPreferences,
+  registerPushToken,
+  getTimezone,
+} from '@/src/services/notifications';
 
 export default function ProfileScreen() {
   const { t } = useTranslation('settings');
@@ -20,6 +27,8 @@ export default function ProfileScreen() {
   const setLanguage = useSettingsStore((s) => s.setLanguage);
   const notificationsEnabled = useSettingsStore((s) => s.notificationsEnabled);
   const setNotificationsEnabled = useSettingsStore((s) => s.setNotificationsEnabled);
+  const notificationTime = useSettingsStore((s) => s.notificationTime);
+  const setNotificationTime = useSettingsStore((s) => s.setNotificationTime);
 
   const { data: profile, isLoading, error, refetch } = useQuery({
     queryKey: ['profile', userId],
@@ -32,9 +41,56 @@ export default function ProfileScreen() {
     setLanguage(language === 'en' ? 'th' : 'en');
   };
 
-  const handleNotificationsToggle = (value: boolean) => {
+  const handleNotificationsToggle = async (value: boolean) => {
     lightHaptic();
-    setNotificationsEnabled(value);
+    const previousValue = notificationsEnabled;
+    setNotificationsEnabled(value); // optimistic update
+
+    try {
+      if (value) {
+        const token = await getExpoPushToken();
+        if (!token) {
+          setNotificationsEnabled(previousValue); // rollback
+          Alert.alert(
+            t('notifications'),
+            'Please enable notifications in your device settings.',
+          );
+          return;
+        }
+        await registerPushToken(token, getTimezone(), language);
+      } else {
+        await updateNotificationPreferences(false);
+      }
+    } catch {
+      setNotificationsEnabled(previousValue); // rollback on failure
+      Alert.alert(t('common:errors.generic'));
+    }
+  };
+
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const TIMES = Array.from({ length: 96 }, (_, i) => {
+    const h = String(Math.floor(i / 4)).padStart(2, '0');
+    const m = String((i % 4) * 15).padStart(2, '0');
+    return `${h}:${m}`;
+  });
+
+  const handleTimeChange = async (time: string) => {
+    lightHaptic();
+    setNotificationTime(time);
+    setShowTimePicker(false);
+    try {
+      await updateNotificationPreferences(true, time);
+    } catch {
+      // Time update failed silently — will retry on next change
+    }
+  };
+
+  const formatTime = (time: string) => {
+    const [h, m] = time.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
   };
 
   const handleSignOut = () => {
@@ -118,6 +174,21 @@ export default function ProfileScreen() {
               thumbColor="#fff"
             />
           </View>
+          {notificationsEnabled && (
+            <>
+              <View style={styles.separator} />
+              <Pressable
+                style={styles.settingsRow}
+                onPress={() => { lightHaptic(); setShowTimePicker(true); }}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.settingsLabel}>{t('notificationTime')}</Text>
+                  <Text style={styles.settingsDescription}>{t('notificationTimeDescription')}</Text>
+                </View>
+                <Text style={styles.settingsValue}>{formatTime(notificationTime)}</Text>
+              </Pressable>
+            </>
+          )}
         </View>
 
         {/* Account */}
@@ -128,6 +199,41 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <Modal visible={showTimePicker} transparent animationType="slide">
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowTimePicker(false)}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{t('notificationTime')}</Text>
+            <FlatList
+              data={TIMES}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <Pressable
+                  style={[
+                    styles.timeOption,
+                    item === notificationTime && styles.timeOptionActive,
+                  ]}
+                  onPress={() => handleTimeChange(item)}
+                >
+                  <Text
+                    style={[
+                      styles.timeOptionText,
+                      item === notificationTime && styles.timeOptionTextActive,
+                    ]}
+                  >
+                    {formatTime(item)}
+                  </Text>
+                </Pressable>
+              )}
+              initialScrollIndex={TIMES.indexOf(notificationTime)}
+              getItemLayout={(_, index) => ({ length: 48, offset: 48 * index, index })}
+            />
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -227,5 +333,46 @@ const styles = StyleSheet.create({
   signOutText: {
     color: colors.error,
     fontSize: fontSizes.sm,
+  },
+  settingsDescription: {
+    color: colors.outline,
+    fontSize: fontSizes.xs,
+    marginTop: 2,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: colors.night.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '50%',
+    padding: 20,
+  },
+  modalTitle: {
+    color: colors.parchment.DEFAULT,
+    fontSize: fontSizes.lg,
+    fontFamily: fonts.body.semibold,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  timeOption: {
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+  },
+  timeOptionActive: {
+    backgroundColor: colors.gold.muted,
+  },
+  timeOptionText: {
+    color: colors.parchment.DEFAULT,
+    fontSize: fontSizes.base,
+  },
+  timeOptionTextActive: {
+    color: colors.gold.DEFAULT,
+    fontFamily: fonts.body.semibold,
   },
 });

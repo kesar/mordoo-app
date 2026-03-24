@@ -5,6 +5,8 @@
   "languageEnglish": "English",
   "languageThai": "ไทย",
   "notifications": "Notifications",
+  "notificationTime": "Reminder Time",
+  "notificationTimeDescription": "When should we send your daily reading reminder?",
   "account": "Account",
   "signOut": "Sign Out",
   "signOutConfirmTitle": "Sign Out",
