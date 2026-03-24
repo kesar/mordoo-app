@@ -9,11 +9,12 @@ interface PulseShareCardProps {
   pulse: DailyPulseResponse;
   dateStr: string;
   lang: 'en' | 'th';
+  energyScoreLabel: string;
   subScoreLabels: { business: string; heart: string; body: string };
   luckyLabels: { color: string; number: string; direction: string };
 }
 
-export function PulseShareCard({ pulse, dateStr, lang, subScoreLabels, luckyLabels }: PulseShareCardProps) {
+export function PulseShareCard({ pulse, dateStr, lang, energyScoreLabel, subScoreLabels, luckyLabels }: PulseShareCardProps) {
   const bodyFont = lang === 'th' ? fonts.thai.regular : fonts.body.regular;
 
   return (
@@ -22,7 +23,7 @@ export function PulseShareCard({ pulse, dateStr, lang, subScoreLabels, luckyLabe
       <Text style={styles.dateLabel}>{dateStr}</Text>
 
       <Text style={styles.scoreValue}>{pulse.energyScore}</Text>
-      <Text style={styles.scoreLabel}>Energy Score</Text>
+      <Text style={styles.scoreLabel}>{energyScoreLabel}</Text>
 
       <View style={styles.subScoresRow}>
         <SubScoreItem label={subScoreLabels.business} value={pulse.subScores.business} color={colors.elements.fire} bodyFont={bodyFont} />

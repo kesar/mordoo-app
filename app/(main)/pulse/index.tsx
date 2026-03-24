@@ -262,6 +262,7 @@ export default function PulseScreen() {
             pulse={pulse}
             dateStr={dateStr}
             lang={i18n.language as 'en' | 'th'}
+            energyScoreLabel={t('energyScore')}
             subScoreLabels={{
               business: t('subScores.business'),
               heart: t('subScores.heart'),
