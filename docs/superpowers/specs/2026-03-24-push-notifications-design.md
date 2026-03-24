@@ -30,13 +30,21 @@ ALTER TABLE profiles ADD COLUMN notifications_enabled boolean DEFAULT false;
 ALTER TABLE profiles ADD COLUMN notification_time time DEFAULT '07:00';
 ALTER TABLE profiles ADD COLUMN timezone text DEFAULT 'Asia/Bangkok';
 ALTER TABLE profiles ADD COLUMN last_notification_sent date;
+ALTER TABLE profiles ADD COLUMN language text DEFAULT 'th';
 ```
 
 - `push_token` — Expo push token string (`ExponentPushToken[xxx]`)
 - `notification_time` — user's preferred reminder time, defaults to 7:00 AM
-- `timezone` — converts notification_time to UTC for scheduling
-- `last_notification_sent` — prevents duplicate sends within the same day
-- RLS: existing row-level policies already restrict users to their own profile row
+- `timezone` — auto-detected on client via `Intl.DateTimeFormat().resolvedOptions().timeZone`
+- `last_notification_sent` — prevents duplicate sends within the same day; updated per-user based on Expo Push API response tickets (only successful sends)
+- `language` — user's language preference (`'en'` or `'th'`), synced from client settings
+- RLS: existing row-level policies restrict users to their own profile row. The API endpoint uses the service role client (bypassing RLS) to write notification fields, consistent with existing API patterns.
+
+**Push token uniqueness:** When registering a token, clear it from any other profile row first (handles shared devices / re-logins):
+```sql
+UPDATE profiles SET push_token = NULL WHERE push_token = $1 AND id != $user_id;
+UPDATE profiles SET push_token = $1, ... WHERE id = $user_id;
+```
 
 ### pg_cron job
 
@@ -51,12 +59,26 @@ SELECT cron.schedule(
 );
 ```
 
+**Security note:** The service role key is stored in the `cron.job` table. This is acceptable on Supabase since `cron.job` is only accessible to the `postgres` role. For additional security, consider using Supabase Vault to store the key.
+
 ## Mobile App
 
 ### Dependencies
 
 - `expo-notifications` — push notification SDK
-- `expo-device` — physical device detection (notifications don't work on simulators)
+- `expo-device` — physical device detection (push tokens only available on physical devices; check `Device.isDevice` before requesting permissions)
+
+### Expo config (`app.json` / `app.config.js`)
+
+Add `expo-notifications` plugin:
+```json
+["expo-notifications", {
+  "icon": "./assets/notification-icon.png",
+  "color": "#c9a84c"
+}]
+```
+
+iOS requires push notification entitlement (configured via EAS build profile). Android notification channel is set up in code.
 
 ### Notification setup (`app/_layout.tsx`)
 
@@ -69,10 +91,11 @@ SELECT cron.schedule(
 Current state: toggle card exists but doesn't request permissions.
 
 Changes:
+- Guard with `Device.isDevice` check (skip on simulator, show toast)
 - When user enables toggle → call `Notifications.requestPermissionsAsync()`
-- If granted → get Expo push token, call registration API
+- If granted → get Expo push token, call registration API immediately (with auto-detected timezone)
 - If denied → show brief message, let user continue (non-blocking)
-- Save preference to onboarding store for later sync
+- If registration API fails → log error, let user continue (will retry from Settings later)
 - Existing UI and copy ("Daily Oracle Whispers") stays as-is
 
 ### Settings screen — upgrade existing
@@ -80,9 +103,10 @@ Changes:
 Current state: toggle exists but only updates local store.
 
 Changes:
-- Toggle now syncs to server via API
-- When toggling ON: check OS permission, request if needed, register token
+- Toggle syncs to server via API using optimistic update with rollback on failure
+- When toggling ON: check `Device.isDevice`, check OS permission, request if needed, register token
 - When toggling OFF: update `notifications_enabled = false` on server (keep token)
+- If API call fails: revert local toggle state and show error toast
 - Add time picker below toggle (visible only when enabled)
   - Default: 07:00
   - Picker shows hours in 15-min increments
@@ -134,10 +158,11 @@ Location: `api/src/app/api/notifications/register/route.ts`
 
 **Logic:**
 1. Validate bearer token, extract user ID
-2. Update `profiles` row with provided fields
-3. Return 200 on success
+2. If `push_token` provided, clear it from any other profile first (uniqueness)
+3. Update `profiles` row with provided fields (uses service role client, bypasses RLS)
+4. Return 200 on success
 
-All fields optional — client sends only what changed.
+All fields optional — client sends only what changed. Timezone is auto-detected on client via `Intl.DateTimeFormat().resolvedOptions().timeZone`.
 
 ## Supabase Edge Function
 
@@ -152,8 +177,8 @@ FROM profiles
 WHERE notifications_enabled = true
   AND push_token IS NOT NULL
   AND (last_notification_sent IS NULL OR last_notification_sent < CURRENT_DATE)
-  AND notification_time >= (CURRENT_TIME AT TIME ZONE timezone)
-  AND notification_time < (CURRENT_TIME AT TIME ZONE timezone + INTERVAL '15 minutes')
+  AND (CURRENT_TIME AT TIME ZONE timezone) >= notification_time
+  AND (CURRENT_TIME AT TIME ZONE timezone) < notification_time + INTERVAL '15 minutes'
 ```
 
 **Notification content (bilingual):**
@@ -167,8 +192,9 @@ WHERE notifications_enabled = true
 - Update `last_notification_sent = CURRENT_DATE` for successful sends
 
 **Error handling:**
-- Log failures but don't retry immediately (next cron run will catch missed users)
-- Invalid tokens are cleared automatically
+- Log failures; users whose window was missed will not be retried until the next day (acceptable for v1)
+- Invalid tokens (`DeviceNotRegistered`) are cleared automatically
+- `last_notification_sent` updated per-user based on individual Expo ticket success, not in bulk
 - Rate limiting: Expo allows 600 req/min, batching keeps us well under
 
 ## Translations
