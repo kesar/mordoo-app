@@ -12,3 +12,18 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS language text DEFAULT 'th';
 CREATE INDEX IF NOT EXISTS idx_profiles_notification_eligible
   ON profiles (notifications_enabled, last_notification_sent)
   WHERE notifications_enabled = true AND push_token IS NOT NULL;
+
+-- Function to get users eligible for notification in current 15-min window
+CREATE OR REPLACE FUNCTION get_notification_eligible_users()
+RETURNS TABLE (user_id uuid, push_token text, language text) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT p.user_id, p.push_token, COALESCE(p.language, 'th') as language
+  FROM profiles p
+  WHERE p.notifications_enabled = true
+    AND p.push_token IS NOT NULL
+    AND (p.last_notification_sent IS NULL OR p.last_notification_sent < CURRENT_DATE)
+    AND (CURRENT_TIME AT TIME ZONE p.timezone) >= p.notification_time
+    AND (CURRENT_TIME AT TIME ZONE p.timezone) < p.notification_time + INTERVAL '15 minutes';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
