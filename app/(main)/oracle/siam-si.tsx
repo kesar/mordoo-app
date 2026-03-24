@@ -38,7 +38,6 @@ export default function SiamSiScreen() {
     isRevealing,
     isDrawing,
     drawsRemaining,
-    drawsTotal,
     canDraw,
     error,
     performDraw,
@@ -141,7 +140,11 @@ export default function SiamSiScreen() {
             </Text>
 
             <Pressable
-              style={[styles.drawAgainBtn, !canDraw && styles.drawAgainBtnDisabled]}
+              style={({ pressed }) => [
+                styles.drawAgainBtn,
+                !canDraw && styles.drawAgainBtnDisabled,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={handleManualDraw}
               disabled={!canDraw || isRevealing}
             >
@@ -184,12 +187,20 @@ export default function SiamSiScreen() {
             </Text>
 
             <Pressable
-              style={[styles.drawBtn, !canDraw && styles.drawBtnDisabled]}
+              style={({ pressed }) => [
+                styles.drawBtn,
+                !canDraw && styles.drawBtnDisabled,
+                (pressed || isDrawing) && { opacity: 0.7 },
+              ]}
               onPress={handleManualDraw}
-              disabled={!canDraw}
+              disabled={!canDraw || isDrawing}
             >
-              <Text style={styles.drawBtnText}>
-                {canDraw ? t('siamSi.drawStick') : t('siamSi.comeBackTomorrow')}
+              <Text style={[styles.drawBtnText, !canDraw && styles.drawBtnTextDisabled]}>
+                {isDrawing
+                  ? t('siamSi.shaking')
+                  : canDraw
+                    ? t('siamSi.drawStick')
+                    : t('siamSi.comeBackTomorrow')}
               </Text>
             </Pressable>
           </View>
@@ -299,6 +310,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.onPrimary,
     letterSpacing: 3,
+  },
+  drawBtnTextDisabled: {
+    color: colors.gold.light,
   },
 
   // Result card

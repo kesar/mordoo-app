@@ -22,13 +22,15 @@ export function useSiamSi() {
   const shakeStartRef = useRef<number | null>(null);
   const lastAboveRef = useRef<number | null>(null);
   const cooldownRef = useRef(false);
+  const isDrawingRef = useRef(false);
 
   const canDraw = drawsRemaining === null || drawsRemaining > 0;
 
   const performDraw = useCallback(async () => {
-    if (!canDraw || cooldownRef.current || isDrawing) return;
+    if (!canDraw || cooldownRef.current || isDrawingRef.current) return;
 
     cooldownRef.current = true;
+    isDrawingRef.current = true;
     setIsDrawing(true);
     setIsRevealing(true);
     setError(null);
@@ -45,13 +47,14 @@ export function useSiamSi() {
         setDrawsRemaining(0);
       }
     } finally {
+      isDrawingRef.current = false;
       setIsDrawing(false);
       setTimeout(() => {
         cooldownRef.current = false;
         setIsRevealing(false);
       }, COOLDOWN_MS);
     }
-  }, [canDraw, isDrawing]);
+  }, [canDraw]);
 
   useEffect(() => {
     const subscription = Accelerometer.addListener((data) => {
