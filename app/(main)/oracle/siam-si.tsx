@@ -23,7 +23,7 @@ const FORTUNE_COLORS: Record<string, string> = {
 };
 
 export default function SiamSiScreen() {
-  const { t } = useTranslation('oracle');
+  const { t, i18n } = useTranslation('oracle');
 
   const fortuneLabels: Record<string, string> = {
     excellent: t('siamSi.fortuneLabels.excellent'),
@@ -132,11 +132,13 @@ export default function SiamSiScreen() {
                 {fortuneLabels[currentStick.fortune] ?? currentStick.fortune}
               </Text>
             </View>
-            <Text style={styles.titleEn}>{currentStick.titleEn}</Text>
-            <Text style={styles.titleTh}>{currentStick.titleTh}</Text>
+            <Text style={styles.titleEn}>
+              {i18n.language === 'th' ? currentStick.titleTh : currentStick.titleEn}
+            </Text>
             <View style={styles.divider} />
-            <Text style={styles.meaningEn}>{currentStick.meaningEn}</Text>
-            <Text style={styles.meaningTh}>{currentStick.meaningTh}</Text>
+            <Text style={styles.meaningEn}>
+              {i18n.language === 'th' ? currentStick.meaningTh : currentStick.meaningEn}
+            </Text>
 
             <Pressable
               style={[styles.drawAgainBtn, !canDraw && styles.drawAgainBtnDisabled]}

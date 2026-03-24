@@ -46,6 +46,13 @@
       "nonBinary": "อื่นๆ",
       "preferNot": "ไม่ระบุ"
     },
+    "placeholderDD": "วว",
+    "placeholderMM": "ดด",
+    "placeholderYYYY": "ปปปป",
+    "placeholderHH": "ชช",
+    "placeholderMin": "นน",
+    "am": "ก่อนเที่ยง",
+    "pm": "หลังเที่ยง",
     "cta": "สร้างพิมพ์เขียว",
     "footer": "โชคชะตารอการเริ่มต้นของคุณ"
   },

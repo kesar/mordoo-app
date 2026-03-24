@@ -95,7 +95,7 @@ function TwinklingStar({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function PulseScreen() {
-  const { t } = useTranslation('pulse');
+  const { t, i18n } = useTranslation('pulse');
   const { data: pulse, isLoading, error, refetch } = useDailyPulse();
 
   // Slow vertical drift for constellation background
@@ -122,7 +122,8 @@ export default function PulseScreen() {
   }, [driftY]);
 
   const today = new Date();
-  const dateStr = today.toLocaleDateString('en-US', {
+  const locale = i18n.language === 'th' ? 'th-TH' : 'en-US';
+  const dateStr = today.toLocaleDateString(locale, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

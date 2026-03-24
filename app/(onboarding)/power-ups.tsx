@@ -23,13 +23,15 @@ import { useOnboardingStore } from '@/src/stores/onboardingStore';
 export default function PowerUps() {
   const { t } = useTranslation('onboarding');
   const setStep = useOnboardingStore((s) => s.setStep);
+  const completeOnboarding = useOnboardingStore((s) => s.completeOnboarding);
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const handleContinue = () => {
     // For now, just track preference. Actual permissions requested later.
     setStep(6);
-    router.push('/(onboarding)/soul-snapshot');
+    completeOnboarding();
+    router.replace('/(main)/pulse');
   };
 
   return (

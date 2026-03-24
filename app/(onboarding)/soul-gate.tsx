@@ -21,6 +21,7 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { colors } from '@/src/constants/colors';
 import { fonts, fontSizes } from '@/src/constants/typography';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
+import { useSettingsStore } from '@/src/stores/settingsStore';
 import { signInWithApple, signInWithGoogle } from '@/src/services/auth';
 import { features } from '@/src/config/features';
 
@@ -28,6 +29,7 @@ export default function SoulGate() {
   const router = useRouter();
   const { t, i18n } = useTranslation('onboarding');
   const setLanguage = useOnboardingStore((s) => s.setLanguage);
+  const setSettingsLanguage = useSettingsStore((s) => s.setLanguage);
   const [loading, setLoading] = useState(false);
 
   // Diamond pulse animation
@@ -61,6 +63,7 @@ export default function SoulGate() {
   const selectLanguage = (lang: 'en' | 'th') => {
     i18n.changeLanguage(lang);
     setLanguage(lang);
+    setSettingsLanguage(lang);
   };
 
   const handlePhoneAuth = () => {

@@ -5,6 +5,7 @@ import { TIERS } from '@/src/constants/tiers';
 
 const SHAKE_THRESHOLD = 1.8;
 const SHAKE_DURATION_MS = 300;
+const SHAKE_GRACE_MS = 200;
 const COOLDOWN_MS = 2000;
 
 const FREE_SIAM_SI_LIMIT = TIERS.free.entitlements.siamSiPerDay;
@@ -19,6 +20,7 @@ export function useSiamSi() {
   const [error, setError] = useState<string | null>(null);
 
   const shakeStartRef = useRef<number | null>(null);
+  const lastAboveRef = useRef<number | null>(null);
   const cooldownRef = useRef(false);
 
   const canDraw = drawsRemaining === null || drawsRemaining > 0;
@@ -55,17 +57,25 @@ export function useSiamSi() {
     const subscription = Accelerometer.addListener((data) => {
       const magnitude = Math.sqrt(data.x ** 2 + data.y ** 2 + data.z ** 2);
 
+      const now = Date.now();
+
       if (magnitude > SHAKE_THRESHOLD) {
+        lastAboveRef.current = now;
         if (!shakeStartRef.current) {
-          shakeStartRef.current = Date.now();
+          shakeStartRef.current = now;
           setIsShaking(true);
-        } else if (Date.now() - shakeStartRef.current > SHAKE_DURATION_MS) {
+        } else if (now - shakeStartRef.current > SHAKE_DURATION_MS) {
           shakeStartRef.current = null;
+          lastAboveRef.current = null;
           setIsShaking(false);
           performDraw();
         }
-      } else {
+      } else if (
+        lastAboveRef.current &&
+        now - lastAboveRef.current > SHAKE_GRACE_MS
+      ) {
         shakeStartRef.current = null;
+        lastAboveRef.current = null;
         setIsShaking(false);
       }
     });

@@ -155,7 +155,7 @@ export default function BirthDataScreen() {
                     value={value}
                     onChangeText={onChange}
                     keyboardType="number-pad"
-                    placeholder="DD"
+                    placeholder={t('birthData.placeholderDD')}
                     placeholderTextColor="rgba(208, 197, 178, 0.3)"
                     maxLength={2}
                     onFocus={() => setDayFocused(true)}
@@ -180,7 +180,7 @@ export default function BirthDataScreen() {
                     value={value}
                     onChangeText={onChange}
                     keyboardType="number-pad"
-                    placeholder="MM"
+                    placeholder={t('birthData.placeholderMM')}
                     placeholderTextColor="rgba(208, 197, 178, 0.3)"
                     maxLength={2}
                     onFocus={() => setMonthFocused(true)}
@@ -205,7 +205,7 @@ export default function BirthDataScreen() {
                     value={value}
                     onChangeText={onChange}
                     keyboardType="number-pad"
-                    placeholder="YYYY"
+                    placeholder={t('birthData.placeholderYYYY')}
                     placeholderTextColor="rgba(208, 197, 178, 0.3)"
                     maxLength={4}
                     onFocus={() => setYearFocused(true)}
@@ -238,7 +238,7 @@ export default function BirthDataScreen() {
                   value={value}
                   onChangeText={onChange}
                   keyboardType="number-pad"
-                  placeholder="HH"
+                  placeholder={t('birthData.placeholderHH')}
                   placeholderTextColor="rgba(208, 197, 178, 0.3)"
                   maxLength={2}
                   textAlign="center"
@@ -264,7 +264,7 @@ export default function BirthDataScreen() {
                   value={value}
                   onChangeText={onChange}
                   keyboardType="number-pad"
-                  placeholder="MM"
+                  placeholder={t('birthData.placeholderMin')}
                   placeholderTextColor="rgba(208, 197, 178, 0.3)"
                   maxLength={2}
                   textAlign="center"
@@ -290,7 +290,7 @@ export default function BirthDataScreen() {
                     isAM ? styles.ampmTextActive : styles.ampmTextInactive,
                   ]}
                 >
-                  AM
+                  {t('birthData.am')}
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -307,7 +307,7 @@ export default function BirthDataScreen() {
                     !isAM ? styles.ampmTextActive : styles.ampmTextInactive,
                   ]}
                 >
-                  PM
+                  {t('birthData.pm')}
                 </Text>
               </TouchableOpacity>
             </View>

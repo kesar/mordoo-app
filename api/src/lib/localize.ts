@@ -11,13 +11,13 @@ export function localizePulseReading(reading: DailyPulseReading, lang: Lang): Da
   return {
     date: reading.date,
     energyScore: reading.energyScore,
-    insight: lang === 'th' ? reading.insightTh : reading.insightEn,
+    insight: lang === 'th' ? (reading.insightTh || reading.insightEn) : reading.insightEn,
     luckyColor: {
-      name: lang === 'th' ? reading.luckyColor.nameTh : reading.luckyColor.name,
+      name: lang === 'th' ? (reading.luckyColor.nameTh || reading.luckyColor.name) : reading.luckyColor.name,
       hex: reading.luckyColor.hex,
     },
     luckyNumber: reading.luckyNumber,
-    luckyDirection: lang === 'th' ? reading.luckyDirectionTh : reading.luckyDirection,
+    luckyDirection: lang === 'th' ? (reading.luckyDirectionTh || reading.luckyDirection) : reading.luckyDirection,
     subScores: reading.subScores,
   };
 }

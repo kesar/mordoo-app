@@ -46,6 +46,13 @@
       "nonBinary": "Other",
       "preferNot": "Secret"
     },
+    "placeholderDD": "DD",
+    "placeholderMM": "MM",
+    "placeholderYYYY": "YYYY",
+    "placeholderHH": "HH",
+    "placeholderMin": "MM",
+    "am": "AM",
+    "pm": "PM",
     "cta": "CAST THE BLUEPRINT",
     "footer": "Fate awaits your initiation"
   },

@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     .eq('reading_date', date)
     .single();
 
-  if (cached && cached.insight_en && cached.insight_th) {
+  if (cached && cached.insight_en && cached.insight_th && cached.lucky_color_name_th && cached.lucky_direction_th) {
     const reading = {
       date: cached.reading_date,
       energyScore: cached.energy_score,
