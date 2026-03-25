@@ -94,7 +94,7 @@ export async function restorePurchases(): Promise<{
   isPremium: boolean;
   customerInfo: CustomerInfo;
 }> {
-  const customerInfo = await Purchases.restoreTransactions();
+  const customerInfo = await Purchases.restorePurchases();
   const isPremium = customerInfo.entitlements.active[ENTITLEMENT_ID] !== undefined;
   return { isPremium, customerInfo };
 }
