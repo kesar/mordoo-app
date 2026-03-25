@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { mmkvStorage } from '@/src/utils/zustand-mmkv';
 import type { Session } from '@supabase/supabase-js';
+import { logOutPurchases } from '@/src/services/purchases';
 
 /** Clear all user-scoped stores. Imported lazily to avoid circular deps. */
 function clearUserStores() {
@@ -50,6 +51,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         clearUserStores();
+        logOutPurchases(); // Fire-and-forget — don't block logout on this
         set({
           isAuthenticated: false,
           userId: null,
