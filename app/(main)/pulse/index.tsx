@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, View, ScrollView, StyleSheet, ActivityIndicator, Easing, Pressable } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import { PulseShareCard } from '@/src/components/sharing/PulseShareCard';
@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { useDailyPulse } from '@/src/hooks/useDailyPulse';
 import { useRatingPrompt } from '@/src/hooks/useRatingPrompt';
 import { RatingPrompt } from '@/src/components/RatingPrompt';
+import { NotificationPrompt } from '@/src/components/NotificationPrompt';
+import { useSettingsStore } from '@/src/stores/settingsStore';
 import { incrementPulseView } from '@/src/services/rating';
 import { features } from '@/src/config/features';
 import { analytics } from '@/src/services/analytics';
@@ -107,6 +109,9 @@ export default function PulseScreen() {
   const { data: pulse, isLoading, error, refetch } = useDailyPulse();
   const { viewShotRef, shareCard, isSharing } = useShareCard();
   const { ratingPromptVisible, showRatingPrompt, closeRatingPrompt } = useRatingPrompt();
+  const notificationsEnabled = useSettingsStore((s) => s.notificationsEnabled);
+  const notificationPromptShown = useSettingsStore((s) => s.notificationPromptShown);
+  const [showNotifPrompt, setShowNotifPrompt] = useState(false);
 
   // Track pulse views and check rating prompt after data loads
   const hasTrackedRef = useRef(false);
@@ -121,8 +126,12 @@ export default function PulseScreen() {
       if (features.ratingPrompt) {
         showRatingPrompt(1500);
       }
+      // Show notification prompt on first pulse view (if not already enabled/shown)
+      if (!notificationsEnabled && !notificationPromptShown) {
+        setTimeout(() => setShowNotifPrompt(true), 2500);
+      }
     }
-  }, [pulse, showRatingPrompt]);
+  }, [pulse, showRatingPrompt, notificationsEnabled, notificationPromptShown]);
 
   // Slow vertical drift for constellation background
   const driftY = useRef(new Animated.Value(0)).current;
@@ -302,6 +311,10 @@ export default function PulseScreen() {
         </ViewShot>
       )}
       <RatingPrompt visible={ratingPromptVisible} onClose={closeRatingPrompt} />
+      <NotificationPrompt
+        visible={showNotifPrompt}
+        onClose={() => setShowNotifPrompt(false)}
+      />
     </SafeAreaView>
   );
 }
