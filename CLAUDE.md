@@ -94,6 +94,11 @@ cd api && npm run build # Build for production
 
 ## Environment Variables
 
+**When adding a new env var, you MUST do all three steps:**
+1. Add it to `.env.local` (and/or `api/.env.local`)
+2. Add it to EAS secrets: `eas secret:create --name <NAME> --value <VALUE>`
+3. Add it to `scripts/validate-env.js` required array (for mobile vars)
+
 ### Mobile (`.env.local`)
 ```
 EXPO_PUBLIC_SUPABASE_URL=
@@ -104,6 +109,7 @@ EXPO_PUBLIC_POSTHOG_HOST=       # https://us.i.posthog.com (default)
 EXPO_PUBLIC_REVENUECAT_IOS_KEY=     # RevenueCat > Project > API Keys > iOS
 EXPO_PUBLIC_REVENUECAT_ANDROID_KEY= # RevenueCat > Project > API Keys > Android
 EXPO_PUBLIC_SENTRY_DSN=             # Sentry > Project > DSN
+SENTRY_AUTH_TOKEN=                  # Build-time only — for source map uploads
 ```
 
 ### API (`api/.env.local`)
