@@ -22,6 +22,26 @@ export interface DailyPulseReading {
   };
 }
 
+// Zodiac API response — monolingual, returned to app
+export interface ZodiacSignsResponse {
+  western: {
+    sign: string;
+    name: string;
+    element: string;
+    rulingPlanet: string;
+    dateRange: string;
+    traits: string;
+    image: string;
+  };
+  chinese: {
+    animal: string;
+    name: string;
+    element: string;
+    traits: string;
+    image: string;
+  };
+}
+
 // API response type — monolingual, returned to app
 export interface DailyPulseResponse {
   date: string;
