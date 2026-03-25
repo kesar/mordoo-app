@@ -16,7 +16,6 @@ export default function OnboardingLayout() {
       <Stack.Screen name="birth-data" />
       <Stack.Screen name="name-numbers" />
       <Stack.Screen name="life-context" />
-      <Stack.Screen name="power-ups" />
     </Stack>
   );
 }
