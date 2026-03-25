@@ -103,6 +103,7 @@ EXPO_PUBLIC_POSTHOG_KEY=        # PostHog project API key
 EXPO_PUBLIC_POSTHOG_HOST=       # https://us.i.posthog.com (default)
 EXPO_PUBLIC_REVENUECAT_IOS_KEY=     # RevenueCat > Project > API Keys > iOS
 EXPO_PUBLIC_REVENUECAT_ANDROID_KEY= # RevenueCat > Project > API Keys > Android
+EXPO_PUBLIC_SENTRY_DSN=             # Sentry > Project > DSN
 ```
 
 ### API (`api/.env.local`)

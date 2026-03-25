@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFonts } from 'expo-font';
+import * as Sentry from '@sentry/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '@/src/i18n';
@@ -18,6 +19,13 @@ import { PostHogProvider, posthog } from '@/src/services/analytics';
 import { incrementSession } from '@/src/services/rating';
 import { configureRevenueCat, identifyUser } from '@/src/services/purchases';
 import { useAuthStore } from '@/src/stores/authStore';
+
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: 1.0,
+  _experiments: { profilesSampleRate: 1.0 },
+  enabled: !__DEV__,
+});
 
 SplashScreen.preventAutoHideAsync();
 
@@ -71,7 +79,7 @@ function AppContent() {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
   const hydrated = useHydration();
   useAuthListener();
   useSyncBirthData();
@@ -105,3 +113,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default Sentry.wrap(RootLayout);
