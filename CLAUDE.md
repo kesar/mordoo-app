@@ -101,6 +101,8 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 EXPO_PUBLIC_API_BASE_URL=       # https://api.mordoo.app or http://localhost:3001
 EXPO_PUBLIC_POSTHOG_KEY=        # PostHog project API key
 EXPO_PUBLIC_POSTHOG_HOST=       # https://us.i.posthog.com (default)
+EXPO_PUBLIC_REVENUECAT_IOS_KEY=     # RevenueCat > Project > API Keys > iOS
+EXPO_PUBLIC_REVENUECAT_ANDROID_KEY= # RevenueCat > Project > API Keys > Android
 ```
 
 ### API (`api/.env.local`)
@@ -109,6 +111,7 @@ SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ANTHROPIC_API_KEY=
+REVENUECAT_WEBHOOK_KEY=        # Secret for RevenueCat webhook auth (Bearer token)
 ```
 
 ## Architecture Decisions
