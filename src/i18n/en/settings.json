@@ -25,5 +25,7 @@
   "currentPlan": "Current Plan",
   "upgradeToPremium": "Upgrade to Standard",
   "manageSubscription": "Manage Subscription",
-  "premium": "Standard ✦"
+  "premium": "Standard ✦",
+  "westernZodiac": "Western Zodiac",
+  "chineseZodiac": "Chinese Zodiac"
 }
