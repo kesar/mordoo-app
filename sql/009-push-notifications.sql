@@ -15,14 +15,15 @@ CREATE INDEX IF NOT EXISTS idx_profiles_notification_eligible
 
 -- Function to get users eligible for notification in current 15-min window
 CREATE OR REPLACE FUNCTION get_notification_eligible_users()
-RETURNS TABLE (user_id uuid, push_token text, language text) AS $$
+RETURNS TABLE (user_id uuid, push_token text, language text, local_date date) AS $$
 BEGIN
   RETURN QUERY
-  SELECT p.id as user_id, p.push_token, COALESCE(p.language, 'th') as language
+  SELECT p.id as user_id, p.push_token, COALESCE(p.language, 'th') as language,
+         (CURRENT_TIMESTAMP AT TIME ZONE p.timezone)::date as local_date
   FROM profiles p
   WHERE p.notifications_enabled = true
     AND p.push_token IS NOT NULL
-    AND (p.last_notification_sent IS NULL OR p.last_notification_sent < CURRENT_DATE)
+    AND (p.last_notification_sent IS NULL OR p.last_notification_sent < (CURRENT_TIMESTAMP AT TIME ZONE p.timezone)::date)
     AND (CURRENT_TIMESTAMP AT TIME ZONE p.timezone)::time >= p.notification_time
     AND (CURRENT_TIMESTAMP AT TIME ZONE p.timezone)::time < p.notification_time + INTERVAL '15 minutes';
 END;

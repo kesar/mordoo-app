@@ -6,6 +6,7 @@ interface Profile {
   user_id: string;
   push_token: string;
   language: string;
+  local_date: string;
 }
 
 function getNotificationContent(lang: string) {
@@ -53,6 +54,8 @@ Deno.serve(async (req) => {
           to: user.push_token,
           title: content.title,
           body: content.body,
+          sound: 'default',
+          priority: 'high',
           data: { screen: 'pulse' },
           channelId: 'daily-reminders',
         };
@@ -86,10 +89,20 @@ Deno.serve(async (req) => {
       }
 
       if (successIds.length > 0) {
-        await supabase
-          .from('profiles')
-          .update({ last_notification_sent: new Date().toISOString().split('T')[0] })
-          .in('id', successIds);
+        // Update each user with their local date (not UTC) to prevent timezone drift
+        const localDateByUser = new Map(batch.map((u) => [u.user_id, u.local_date]));
+        const dateGroups = new Map<string, string[]>();
+        for (const id of successIds) {
+          const d = localDateByUser.get(id) ?? new Date().toISOString().split('T')[0];
+          if (!dateGroups.has(d)) dateGroups.set(d, []);
+          dateGroups.get(d)!.push(id);
+        }
+        for (const [date, ids] of dateGroups) {
+          await supabase
+            .from('profiles')
+            .update({ last_notification_sent: date })
+            .in('id', ids);
+        }
       }
     }
 
