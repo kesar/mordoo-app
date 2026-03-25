@@ -16,12 +16,44 @@ import { lightHaptic } from '@/src/utils/haptics';
 import { Paywall } from '@/src/components/Paywall';
 import { useSubscription } from '@/src/hooks/useSubscription';
 import { features } from '@/src/config/features';
+import { ZodiacCard } from '@/src/components/ZodiacCard';
+import { fetchZodiacSigns } from '@/src/services/zodiac';
 import {
   getExpoPushToken,
   updateNotificationPreferences,
   registerPushToken,
   getTimezone,
 } from '@/src/services/notifications';
+
+const WESTERN_IMAGES: Record<string, any> = {
+  aries: require('@/assets/images/zodiac/western/aries.webp'),
+  taurus: require('@/assets/images/zodiac/western/taurus.webp'),
+  gemini: require('@/assets/images/zodiac/western/gemini.webp'),
+  cancer: require('@/assets/images/zodiac/western/cancer.webp'),
+  leo: require('@/assets/images/zodiac/western/leo.webp'),
+  virgo: require('@/assets/images/zodiac/western/virgo.webp'),
+  libra: require('@/assets/images/zodiac/western/libra.webp'),
+  scorpio: require('@/assets/images/zodiac/western/scorpio.webp'),
+  sagittarius: require('@/assets/images/zodiac/western/sagittarius.webp'),
+  capricorn: require('@/assets/images/zodiac/western/capricorn.webp'),
+  aquarius: require('@/assets/images/zodiac/western/aquarius.webp'),
+  pisces: require('@/assets/images/zodiac/western/pisces.webp'),
+};
+
+const CHINESE_IMAGES: Record<string, any> = {
+  rat: require('@/assets/images/zodiac/chinese/rat.webp'),
+  ox: require('@/assets/images/zodiac/chinese/ox.webp'),
+  tiger: require('@/assets/images/zodiac/chinese/tiger.webp'),
+  rabbit: require('@/assets/images/zodiac/chinese/rabbit.webp'),
+  dragon: require('@/assets/images/zodiac/chinese/dragon.webp'),
+  snake: require('@/assets/images/zodiac/chinese/snake.webp'),
+  horse: require('@/assets/images/zodiac/chinese/horse.webp'),
+  goat: require('@/assets/images/zodiac/chinese/goat.webp'),
+  monkey: require('@/assets/images/zodiac/chinese/monkey.webp'),
+  rooster: require('@/assets/images/zodiac/chinese/rooster.webp'),
+  dog: require('@/assets/images/zodiac/chinese/dog.webp'),
+  pig: require('@/assets/images/zodiac/chinese/pig.webp'),
+};
 
 const TIMES = Array.from({ length: 96 }, (_, i) => {
   const h = String(Math.floor(i / 4)).padStart(2, '0');
@@ -44,6 +76,13 @@ export default function ProfileScreen() {
     queryKey: ['profile', userId],
     queryFn: fetchUserProfile,
     enabled: !!userId,
+  });
+
+  const { data: zodiac } = useQuery({
+    queryKey: ['zodiac-signs', userId, language],
+    queryFn: () => fetchZodiacSigns(language as 'en' | 'th'),
+    enabled: !!userId && !!profile?.dateOfBirth,
+    staleTime: Infinity,
   });
 
   const handleLanguageToggle = async () => {
@@ -193,6 +232,27 @@ export default function ProfileScreen() {
             </View>
           )}
         </View>
+
+        {/* Zodiac Signs */}
+        {zodiac && (
+          <View style={{ gap: 0, marginBottom: 14 }}>
+            <ZodiacCard
+              systemLabel={t('westernZodiac')}
+              signName={zodiac.western.name}
+              element={zodiac.western.element}
+              rulingPlanet={zodiac.western.rulingPlanet}
+              traits={zodiac.western.traits}
+              image={WESTERN_IMAGES[zodiac.western.image]}
+            />
+            <ZodiacCard
+              systemLabel={t('chineseZodiac')}
+              signName={zodiac.chinese.name}
+              element={zodiac.chinese.element}
+              traits={zodiac.chinese.traits}
+              image={CHINESE_IMAGES[zodiac.chinese.image]}
+            />
+          </View>
+        )}
 
         {/* Subscription */}
         {features.paywall && (
