@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -18,6 +18,8 @@ import { useSiamSi } from '@/src/hooks/useSiamSi';
 import { useRatingPrompt } from '@/src/hooks/useRatingPrompt';
 import { RatingPrompt } from '@/src/components/RatingPrompt';
 import { features } from '@/src/config/features';
+import { Paywall } from '@/src/components/Paywall';
+import { GoldButton } from '@/src/components/ui/GoldButton';
 import { mediumHaptic, successHaptic } from '@/src/utils/haptics';
 import { analytics } from '@/src/services/analytics';
 
@@ -56,6 +58,8 @@ export default function SiamSiScreen() {
     performDraw,
     refreshQuota,
   } = useSiamSi();
+
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const { viewShotRef, shareCard, isSharing } = useShareCard();
   const { ratingPromptVisible, showRatingPrompt, closeRatingPrompt } = useRatingPrompt();
@@ -274,11 +278,28 @@ export default function SiamSiScreen() {
                 </Text>
               </Pressable>
             )}
+
+            {!canDraw && !isLoadingQuota && features.paywall && (
+              <GoldButton
+                title={t('paywall:cta')}
+                onPress={() => setShowPaywall(true)}
+                variant="outlined"
+                rounded
+              />
+            )}
           </View>
         )}
       </View>
 
       <RatingPrompt visible={ratingPromptVisible} onClose={closeRatingPrompt} />
+
+      <Paywall
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onSubscribed={() => {
+          refreshQuota();
+        }}
+      />
 
       {/* Off-screen share card */}
       {currentStick && (
