@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Animated,
+  Image,
   Pressable,
   StyleSheet,
   View,
@@ -10,11 +11,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text } from '@/src/components/ui/Text';
-import { BambooIcon, ChevronLeftIcon } from '@/src/components/icons/TarotIcons';
+import { ChevronLeftIcon } from '@/src/components/icons/TarotIcons';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
 import { useSiamSi } from '@/src/hooks/useSiamSi';
+import { useRatingPrompt } from '@/src/hooks/useRatingPrompt';
+import { RatingPrompt } from '@/src/components/RatingPrompt';
+import { features } from '@/src/config/features';
 import { mediumHaptic, successHaptic } from '@/src/utils/haptics';
+
+const siamSiSticks = require('@/assets/images/siam-si-sticks.png');
+
 import ViewShot from 'react-native-view-shot';
 import { SiamSiShareCard } from '@/src/components/sharing/SiamSiShareCard';
 import { useShareCard } from '@/src/hooks/useShareCard';
@@ -50,6 +57,7 @@ export default function SiamSiScreen() {
   } = useSiamSi();
 
   const { viewShotRef, shareCard, isSharing } = useShareCard();
+  const { ratingPromptVisible, showRatingPrompt, closeRatingPrompt } = useRatingPrompt();
 
   // Refresh quota every time the screen is focused
   useFocusEffect(
@@ -60,22 +68,33 @@ export default function SiamSiScreen() {
 
   // Animations
   const shakeAnim = useRef(new Animated.Value(0)).current;
+  const shakeRotate = useRef(new Animated.Value(0)).current;
   const revealOpacity = useRef(new Animated.Value(0)).current;
   const revealScale = useRef(new Animated.Value(0.8)).current;
 
+  const isAnimating = isShaking || isDrawing;
+
   useEffect(() => {
-    if (isShaking) {
+    if (isAnimating) {
       Animated.loop(
         Animated.sequence([
-          Animated.timing(shakeAnim, { toValue: 1, duration: 50, useNativeDriver: true }),
-          Animated.timing(shakeAnim, { toValue: -1, duration: 100, useNativeDriver: true }),
-          Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+          Animated.timing(shakeAnim, { toValue: 1, duration: 40, useNativeDriver: true }),
+          Animated.timing(shakeAnim, { toValue: -1, duration: 80, useNativeDriver: true }),
+          Animated.timing(shakeAnim, { toValue: 0, duration: 40, useNativeDriver: true }),
+        ]),
+      ).start();
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(shakeRotate, { toValue: 1, duration: 60, useNativeDriver: true }),
+          Animated.timing(shakeRotate, { toValue: -1, duration: 120, useNativeDriver: true }),
+          Animated.timing(shakeRotate, { toValue: 0, duration: 60, useNativeDriver: true }),
         ]),
       ).start();
     } else {
       shakeAnim.setValue(0);
+      shakeRotate.setValue(0);
     }
-  }, [isShaking, shakeAnim]);
+  }, [isAnimating, shakeAnim, shakeRotate]);
 
   useEffect(() => {
     if (currentStick) {
@@ -96,14 +115,24 @@ export default function SiamSiScreen() {
     }
   }, [canDraw, performDraw]);
 
-  // Haptic on reveal
+  // Haptic on reveal + rating prompt for excellent fortunes
   useEffect(() => {
-    if (currentStick) successHaptic();
-  }, [currentStick]);
+    if (currentStick) {
+      successHaptic();
+      if (features.ratingPrompt && currentStick.fortune === 'excellent') {
+        showRatingPrompt(2000);
+      }
+    }
+  }, [currentStick, showRatingPrompt]);
 
   const shakeTranslateX = shakeAnim.interpolate({
     inputRange: [-1, 0, 1],
-    outputRange: [-8, 0, 8],
+    outputRange: [-12, 0, 12],
+  });
+
+  const shakeRotateZ = shakeRotate.interpolate({
+    inputRange: [-1, 0, 1],
+    outputRange: ['-3deg', '0deg', '3deg'],
   });
 
   return (
@@ -191,23 +220,19 @@ export default function SiamSiScreen() {
             <Animated.View
               style={[
                 styles.cupContainer,
-                { transform: [{ translateX: shakeTranslateX }] },
+                {
+                  transform: [
+                    { translateX: shakeTranslateX },
+                    { rotate: shakeRotateZ },
+                  ],
+                },
               ]}
             >
-              <View style={styles.cup}>
-                <BambooIcon size={48} color={colors.gold.DEFAULT} />
-                <View style={styles.sticksContainer}>
-                  {[...Array(5)].map((_, i) => (
-                    <View
-                      key={i}
-                      style={[
-                        styles.stick,
-                        { transform: [{ rotate: `${(i - 2) * 8}deg` }] },
-                      ]}
-                    />
-                  ))}
-                </View>
-              </View>
+              <Image
+                source={siamSiSticks}
+                style={styles.sticksImage}
+                resizeMode="contain"
+              />
             </Animated.View>
 
             <Text style={styles.instruction}>
@@ -246,6 +271,8 @@ export default function SiamSiScreen() {
           </View>
         )}
       </View>
+
+      <RatingPrompt visible={ratingPromptVisible} onClose={closeRatingPrompt} />
 
       {/* Off-screen share card */}
       {currentStick && (
@@ -321,28 +348,9 @@ const styles = StyleSheet.create({
   cupContainer: {
     alignItems: 'center',
   },
-  cup: {
-    width: 120,
-    height: 180,
-    backgroundColor: colors.night.card,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: colors.gold.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  sticksContainer: {
-    position: 'absolute',
-    top: 20,
-    flexDirection: 'row',
-    gap: 4,
-  },
-  stick: {
-    width: 3,
-    height: 80,
-    backgroundColor: colors.gold.DEFAULT,
-    borderRadius: 2,
+  sticksImage: {
+    width: 300,
+    height: 380,
   },
   instruction: {
     fontFamily: fonts.display.regular,

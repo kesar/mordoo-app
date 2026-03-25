@@ -12,6 +12,10 @@ import { EnergyScoreRing } from '@/src/components/ui/EnergyScoreRing';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { useTranslation } from 'react-i18next';
 import { useDailyPulse } from '@/src/hooks/useDailyPulse';
+import { useRatingPrompt } from '@/src/hooks/useRatingPrompt';
+import { RatingPrompt } from '@/src/components/RatingPrompt';
+import { incrementPulseView } from '@/src/services/rating';
+import { features } from '@/src/config/features';
 import {
   SparkleIcon,
   BusinessStarIcon,
@@ -101,6 +105,19 @@ export default function PulseScreen() {
   const { t, i18n } = useTranslation('pulse');
   const { data: pulse, isLoading, error, refetch } = useDailyPulse();
   const { viewShotRef, shareCard, isSharing } = useShareCard();
+  const { ratingPromptVisible, showRatingPrompt, closeRatingPrompt } = useRatingPrompt();
+
+  // Track pulse views and check rating prompt after data loads
+  const hasTrackedRef = useRef(false);
+  useEffect(() => {
+    if (pulse && !hasTrackedRef.current) {
+      hasTrackedRef.current = true;
+      incrementPulseView();
+      if (features.ratingPrompt) {
+        showRatingPrompt(1500);
+      }
+    }
+  }, [pulse, showRatingPrompt]);
 
   // Slow vertical drift for constellation background
   const driftY = useRef(new Animated.Value(0)).current;
@@ -276,6 +293,7 @@ export default function PulseScreen() {
           />
         </ViewShot>
       )}
+      <RatingPrompt visible={ratingPromptVisible} onClose={closeRatingPrompt} />
     </SafeAreaView>
   );
 }

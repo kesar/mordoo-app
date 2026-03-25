@@ -13,8 +13,14 @@ import { useAuthListener } from '@/src/hooks/useAuthListener';
 import { useSyncBirthData } from '@/src/hooks/useSyncBirthData';
 import { useDayChangeRefresh } from '@/src/hooks/useDayChangeRefresh';
 import { useNotificationHandler } from '@/src/hooks/useNotificationHandler';
+import { useAnalytics } from '@/src/hooks/useAnalytics';
+import { PostHogProvider, posthog } from '@/src/services/analytics';
+import { incrementSession } from '@/src/services/rating';
 
 SplashScreen.preventAutoHideAsync();
+
+// Track app session on cold start
+incrementSession();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +35,7 @@ const queryClient = new QueryClient({
 function AppContent() {
   useDayChangeRefresh();
   useNotificationHandler();
+  useAnalytics();
 
   return (
     <>
@@ -75,11 +82,13 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.night.DEFAULT }}>
-      <QueryClientProvider client={queryClient}>
-        <I18nextProvider i18n={i18n}>
-          <AppContent />
-        </I18nextProvider>
-      </QueryClientProvider>
+      <PostHogProvider client={posthog} autocapture>
+        <QueryClientProvider client={queryClient}>
+          <I18nextProvider i18n={i18n}>
+            <AppContent />
+          </I18nextProvider>
+        </QueryClientProvider>
+      </PostHogProvider>
     </GestureHandlerRootView>
   );
 }

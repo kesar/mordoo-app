@@ -22,6 +22,12 @@
     "upgrade": "Upgrade to Standard",
     "price": "฿149/month"
   },
+  "rating": {
+    "title": "Are you enjoying Mor Doo?",
+    "subtitle": "Your feedback helps us improve your cosmic journey.",
+    "positive": "Yes, I am!",
+    "negative": "Not really"
+  },
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "network": "No internet connection.",
