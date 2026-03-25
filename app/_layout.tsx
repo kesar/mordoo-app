@@ -16,11 +16,16 @@ import { useNotificationHandler } from '@/src/hooks/useNotificationHandler';
 import { useAnalytics } from '@/src/hooks/useAnalytics';
 import { PostHogProvider, posthog } from '@/src/services/analytics';
 import { incrementSession } from '@/src/services/rating';
+import { configureRevenueCat, identifyUser } from '@/src/services/purchases';
+import { useAuthStore } from '@/src/stores/authStore';
 
 SplashScreen.preventAutoHideAsync();
 
 // Track app session on cold start
 incrementSession();
+
+// Initialize RevenueCat for in-app purchases
+configureRevenueCat();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +38,14 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
+  const userId = useAuthStore((s) => s.supabaseUserId);
+
+  useEffect(() => {
+    if (userId) {
+      identifyUser(userId);
+    }
+  }, [userId]);
+
   useDayChangeRefresh();
   useNotificationHandler();
   useAnalytics();
