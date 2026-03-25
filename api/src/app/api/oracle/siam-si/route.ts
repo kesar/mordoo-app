@@ -3,6 +3,7 @@ import { createServiceClient } from '../../../../lib/supabase';
 import { authenticateRequest } from '../../../../lib/auth';
 import { getTodayString } from '../../../../lib/date';
 import { FREE_SIAM_SI_DRAWS_PER_DAY, PGRST_NOT_FOUND } from '../../../../lib/config';
+import { checkRateLimit } from '../../../../lib/rate-limit';
 import { drawSiamSi } from '@shared/siam-si';
 
 export async function GET(request: NextRequest) {
@@ -54,6 +55,18 @@ export async function POST(request: NextRequest) {
   // 1. Validate auth
   const { user, error: authError } = await authenticateRequest(request);
   if (authError) return authError;
+
+  // Rate limit — max 10 draws per minute per user
+  const rateCheck = checkRateLimit(`siamsi:${user.id}`, 10, 60_000);
+  if (rateCheck.limited) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please slow down.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil(rateCheck.retryAfterMs / 1000)) },
+      },
+    );
+  }
 
   const serviceClient = createServiceClient();
 

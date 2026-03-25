@@ -10,6 +10,7 @@ import {
   FREE_ORACLE_QUESTIONS_PER_DAY,
   PGRST_NOT_FOUND,
 } from '../../../../lib/config';
+import { checkRateLimit } from '../../../../lib/rate-limit';
 import {
   findOrCreateConversation,
   saveMessage,
@@ -98,7 +99,19 @@ export async function POST(request: NextRequest) {
   const { user, error: authError } = await authenticateRequest(request);
   if (authError) return authError;
 
-  // 2. Parse request
+  // 2. Rate limit — max 10 requests per minute per user
+  const rateCheck = checkRateLimit(`oracle:${user.id}`, 10, 60_000);
+  if (rateCheck.limited) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please slow down.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(Math.ceil(rateCheck.retryAfterMs / 1000)) },
+      },
+    );
+  }
+
+  // 3. Parse request
   let body: unknown;
   try {
     body = await request.json();
@@ -127,7 +140,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 3. Check quota
+  // 4. Check quota
   const serviceClient = createServiceClient();
   const today = getBangkokDateString();
 
@@ -184,7 +197,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // 4. Conversation persistence
+  // 5. Conversation persistence
   let conversation: { id: string; conversationDate: string };
   try {
     conversation = await findOrCreateConversation(serviceClient, user.id);
@@ -198,7 +211,7 @@ export async function POST(request: NextRequest) {
   // Fire async summarization (non-blocking)
   summarizeConversation(serviceClient, user.id);
 
-  // 5. Build context with history
+  // 6. Build context with history
   const [recentMessages, summaries] = await Promise.all([
     getRecentMessages(serviceClient, conversation.id),
     getPastSummaries(serviceClient, user.id, conversation.conversationDate),
@@ -216,7 +229,7 @@ export async function POST(request: NextRequest) {
     content: m.content,
   }));
 
-  // 6. Call Claude API with streaming
+  // 7. Call Claude API with streaming
   const stream = anthropic.messages.stream({
     model: ORACLE_MODEL,
     max_tokens: ORACLE_MAX_TOKENS,
@@ -225,7 +238,7 @@ export async function POST(request: NextRequest) {
     messages: claudeMessages,
   });
 
-  // 7. Return SSE stream, saving assistant response on completion
+  // 8. Return SSE stream, saving assistant response on completion
   const encoder = new TextEncoder();
   let fullResponse = '';
 

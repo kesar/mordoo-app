@@ -19,6 +19,8 @@ import { PostHogProvider, posthog } from '@/src/services/analytics';
 import { incrementSession } from '@/src/services/rating';
 import { configureRevenueCat, identifyUser } from '@/src/services/purchases';
 import { useAuthStore } from '@/src/stores/authStore';
+import { useNetworkStatus } from '@/src/hooks/useNetworkStatus';
+import { OfflineBanner } from '@/src/components/OfflineBanner';
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
@@ -40,6 +42,7 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const userId = useAuthStore((s) => s.supabaseUserId);
+  const isOffline = useNetworkStatus();
 
   useEffect(() => {
     if (userId) {
@@ -54,6 +57,7 @@ function AppContent() {
   return (
     <>
       <StatusBar style="light" />
+      <OfflineBanner visible={isOffline} />
       <Stack
         screenOptions={{
           headerShown: false,
