@@ -13,5 +13,10 @@
   "signOutConfirmTitle": "ออกจากระบบ",
   "signOutConfirmMessage": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?",
   "signOutConfirmCancel": "ยกเลิก",
-  "signOutConfirmOk": "ออกจากระบบ"
+  "signOutConfirmOk": "ออกจากระบบ",
+  "subscription": "การสมัครสมาชิก",
+  "currentPlan": "แพ็กเกจปัจจุบัน",
+  "upgradeToPremium": "อัปเกรดเป็นมาตรฐาน",
+  "manageSubscription": "จัดการการสมัคร",
+  "premium": "มาตรฐาน ✦"
 }

@@ -12,6 +12,9 @@ import { useSettingsStore } from '@/src/stores/settingsStore';
 import { signOut } from '@/src/services/auth';
 import { fetchUserProfile } from '@/src/services/profile';
 import { lightHaptic } from '@/src/utils/haptics';
+import { Paywall } from '@/src/components/Paywall';
+import { useSubscription } from '@/src/hooks/useSubscription';
+import { features } from '@/src/config/features';
 import {
   getExpoPushToken,
   updateNotificationPreferences,
@@ -80,6 +83,9 @@ export default function ProfileScreen() {
       Alert.alert(t('common:errors.generic'));
     }
   };
+
+  const [showPaywall, setShowPaywall] = useState(false);
+  const { isPremium, refreshStatus } = useSubscription();
 
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -163,6 +169,35 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* Subscription */}
+        {features.paywall && (
+          <>
+            <Text style={styles.sectionLabel}>{t('subscription')}</Text>
+            <View style={styles.settingsGroup}>
+              <View style={styles.settingsRow}>
+                <Text style={styles.settingsLabel}>{t('currentPlan')}</Text>
+                <Text style={[styles.settingsValue, isPremium && { color: colors.gold.DEFAULT }]}>
+                  {isPremium ? t('premium') : t('common:subscription.free')}
+                </Text>
+              </View>
+              {!isPremium && (
+                <>
+                  <View style={styles.separator} />
+                  <Pressable
+                    style={styles.settingsRow}
+                    onPress={() => { lightHaptic(); setShowPaywall(true); }}
+                  >
+                    <Text style={[styles.settingsLabel, { color: colors.gold.DEFAULT }]}>
+                      {t('upgradeToPremium')}
+                    </Text>
+                    <Text style={{ color: colors.gold.DEFAULT, fontSize: fontSizes.sm }}>→</Text>
+                  </Pressable>
+                </>
+              )}
+            </View>
+          </>
+        )}
+
         {/* Preferences */}
         <Text style={styles.sectionLabel}>{t('preferences')}</Text>
         <View style={styles.settingsGroup}>
@@ -207,6 +242,15 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <Paywall
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onSubscribed={() => {
+          refreshStatus();
+          refetch();
+        }}
+      />
 
       <Modal visible={showTimePicker} transparent animationType="slide">
         <Pressable
