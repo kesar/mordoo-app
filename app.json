@@ -49,8 +49,7 @@
         }
       ],
       "expo-sharing",
-      "expo-splash-screen",
-      "react-native-purchases"
+      "expo-splash-screen"
     ],
     "extra": {
       "eas": {
