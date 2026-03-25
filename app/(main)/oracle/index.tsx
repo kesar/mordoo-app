@@ -241,8 +241,8 @@ export default function OracleScreen() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   type ListItem =
-    | (ChatMessage & { type: 'message' })
-    | { type: 'date-divider'; id: string; date: string };
+    | (ChatMessage & { type: 'message'; key: string })
+    | { type: 'date-divider'; id: string; date: string; key: string };
 
   const flatListRef = useRef<FlatList<ListItem>>(null);
 
@@ -394,22 +394,31 @@ export default function OracleScreen() {
     // Past conversations (oldest first since they're loaded in desc order)
     // Filter out today's conversation to prevent duplicate keys
     const pastReversed = [...pastConversations].reverse();
+    const seenKeys = new Set<string>();
     for (const conv of pastReversed) {
       if (conv.conversationDate === conversationDate) continue;
-      items.push({ type: 'date-divider', id: `div-${conv.conversationDate}`, date: conv.conversationDate });
+      const divKey = `div-${conv.id}`;
+      if (!seenKeys.has(divKey)) {
+        seenKeys.add(divKey);
+        items.push({ type: 'date-divider', id: divKey, date: conv.conversationDate, key: divKey });
+      }
       for (const msg of conv.messages) {
-        if (todayMessageIds.has(msg.id)) continue;
-        items.push({ ...msg, type: 'message' });
+        if (todayMessageIds.has(msg.id) || seenKeys.has(msg.id)) continue;
+        seenKeys.add(msg.id);
+        items.push({ ...msg, type: 'message', key: msg.id });
       }
     }
 
     // Today's messages
     const todayMsgs = messages.length === 0 ? [welcomeMessage] : messages;
     if (conversationDate && items.length > 0) {
-      items.push({ type: 'date-divider', id: `div-${conversationDate}`, date: conversationDate });
+      const todayDivKey = `div-today-${conversationDate}`;
+      items.push({ type: 'date-divider', id: todayDivKey, date: conversationDate, key: todayDivKey });
     }
     for (const msg of todayMsgs) {
-      items.push({ ...msg, type: 'message' });
+      const msgKey = seenKeys.has(msg.id) ? `today-${msg.id}` : msg.id;
+      seenKeys.add(msgKey);
+      items.push({ ...msg, type: 'message', key: msgKey });
     }
 
     return items;
@@ -546,6 +555,7 @@ export default function OracleScreen() {
           <BambooIcon size={18} />
         </Pressable>
       </View>
+      <Text style={styles.disclaimer}>{t('disclaimer')}</Text>
 
       <KeyboardAvoidingView
         style={styles.flex}
@@ -555,7 +565,7 @@ export default function OracleScreen() {
         <FlatList
           ref={flatListRef}
           data={invertedItems}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.key}
           renderItem={renderItem}
           inverted={true}
           keyboardDismissMode="on-drag"
@@ -570,33 +580,45 @@ export default function OracleScreen() {
 
         {/* Input bar — inside KAV so it moves with keyboard */}
         <View style={styles.inputBar}>
-          {quotaTotal !== null && quotaRemaining !== null && (
-            <Text style={styles.quotaIndicator}>
-              {t('chat.remaining', { count: quotaRemaining, total: quotaTotal })}
-            </Text>
-          )}
-          <View style={styles.inputBarInner}>
-            <TextInput
-              style={styles.textInput}
-              value={input}
-              onChangeText={setInput}
-              placeholder={t('chat.placeholder')}
-              placeholderTextColor="rgba(228,225,240,0.35)"
-              onSubmitEditing={sendMessage}
-              returnKeyType="send"
-              multiline={true}
-              maxLength={500}
-              editable={!isStreaming}
-            />
-
+          {quotaRemaining !== null && quotaRemaining <= 0 && features.paywall ? (
             <Pressable
-              style={[styles.sendBtn, (!input.trim() || isStreaming) && styles.sendBtnDisabled]}
-              onPress={sendMessage}
-              disabled={isStreaming || !input.trim()}
+              style={styles.upgradeBar}
+              onPress={() => { lightHaptic(); setShowPaywall(true); }}
             >
-              <SendArrowIcon size={16} color={colors.onPrimary} />
+              <StarIcon size={14} color={colors.gold.DEFAULT} />
+              <Text style={styles.upgradeBarText}>{t('chat.upgradePrompt')}</Text>
             </Pressable>
-          </View>
+          ) : (
+            <>
+              {quotaTotal !== null && quotaRemaining !== null && (
+                <Text style={styles.quotaIndicator}>
+                  {t('chat.remaining', { count: quotaRemaining, total: quotaTotal })}
+                </Text>
+              )}
+              <View style={styles.inputBarInner}>
+                <TextInput
+                  style={styles.textInput}
+                  value={input}
+                  onChangeText={setInput}
+                  placeholder={t('chat.placeholder')}
+                  placeholderTextColor="rgba(228,225,240,0.35)"
+                  onSubmitEditing={sendMessage}
+                  returnKeyType="send"
+                  multiline={true}
+                  maxLength={500}
+                  editable={!isStreaming}
+                />
+
+                <Pressable
+                  style={[styles.sendBtn, (!input.trim() || isStreaming) && styles.sendBtnDisabled]}
+                  onPress={sendMessage}
+                  disabled={isStreaming || !input.trim()}
+                >
+                  <SendArrowIcon size={16} color={colors.onPrimary} />
+                </Pressable>
+              </View>
+            </>
+          )}
         </View>
       </KeyboardAvoidingView>
       <Paywall
@@ -643,6 +665,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(201,168,76,0.1)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  disclaimer: {
+    fontFamily: fonts.body.regular,
+    fontSize: 10,
+    color: 'rgba(228,225,240,0.35)',
+    textAlign: 'center',
+    paddingVertical: 4,
   },
 
   // ---- Message list ----
@@ -875,5 +904,25 @@ const styles = StyleSheet.create({
   sendBtnText: {
     fontSize: 16,
     color: colors.onPrimary,
+  },
+
+  // ---- Upgrade Bar ----
+  upgradeBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(201,168,76,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(201,168,76,0.3)',
+    borderRadius: 22,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+  },
+  upgradeBarText: {
+    fontFamily: fonts.display.bold,
+    fontSize: 14,
+    color: colors.gold.light,
+    letterSpacing: 0.5,
   },
 });

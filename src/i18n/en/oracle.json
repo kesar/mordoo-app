@@ -1,11 +1,12 @@
 {
   "title": "The Oracle",
+  "disclaimer": "The stars illuminate, but do not dictate.",
   "chat": {
     "welcomeMessage": "The constellations shift in your favor, seeker. What shall we decode from the stars?",
     "placeholder": "Ask the stars...",
     "send": "Send",
     "dailyLimit": "You've used your free question today",
-    "upgradePrompt": "Unlock unlimited readings with Standard — ฿149/month",
+    "upgradePrompt": "Unlock unlimited readings",
     "errorDisrupted": "\n\n_The astral connection was disrupted. Please try again._",
     "remaining": "{{count}} of {{total}} questions left today",
     "quotaTitle": "DAILY LIMIT REACHED",

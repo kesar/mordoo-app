@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, ScrollView, Pressable, StyleSheet, Platform, Alert, ActivityIndicator, Image } from 'react-native';
+import { View, ScrollView, Pressable, StyleSheet, Platform, Alert, ActivityIndicator, Image, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -235,6 +235,15 @@ export default function SoulGate() {
         >
           <SparkleIcon size={12} color="rgba(201, 168, 76, 0.6)" />
           <Text style={styles.footerText}>{t('soulGate.footer')}</Text>
+          <View style={styles.legalRow}>
+            <Pressable onPress={() => Linking.openURL('https://www.mordoo.app/terms.html')}>
+              <Text style={styles.legalLink}>{t('soulGate.terms')}</Text>
+            </Pressable>
+            <Text style={styles.legalSeparator}>|</Text>
+            <Pressable onPress={() => Linking.openURL('https://www.mordoo.app/privacy.html')}>
+              <Text style={styles.legalLink}>{t('soulGate.privacy')}</Text>
+            </Pressable>
+          </View>
         </Animated.View>
       </ScrollView>
     </SafeAreaView>
@@ -405,5 +414,21 @@ const styles = StyleSheet.create({
     color: 'rgba(201, 168, 76, 0.6)',
     letterSpacing: 2,
     fontStyle: 'italic',
+  },
+  legalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+  },
+  legalLink: {
+    fontFamily: fonts.body.regular,
+    fontSize: 12,
+    color: 'rgba(201, 168, 76, 0.5)',
+    textDecorationLine: 'underline',
+  },
+  legalSeparator: {
+    color: 'rgba(201, 168, 76, 0.3)',
+    fontSize: 12,
   },
 });

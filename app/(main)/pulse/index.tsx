@@ -252,7 +252,7 @@ export default function PulseScreen() {
                   <View style={styles.luckyCardContent}>
                     <ArrowRightIcon size={28} color={colors.gold.DEFAULT} />
                   </View>
-                  <Text style={styles.luckyCardValue}>{pulse.luckyDirection}</Text>
+                  <Text style={styles.luckyCardValue} numberOfLines={1} adjustsFontSizeToFit>{pulse.luckyDirection}</Text>
                 </View>
               </View>
             </View>
@@ -493,17 +493,19 @@ const styles = StyleSheet.create({
   },
   luckyGrid: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 10,
   },
   luckyCard: {
     flex: 1,
     backgroundColor: colors.surface.containerLow,
-    padding: 16,
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 10,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(77, 70, 55, 0.3)',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
   },
   luckyCardLabel: {
     fontFamily: fonts.body.regular,
@@ -511,17 +513,19 @@ const styles = StyleSheet.create({
     color: colors.gold.DEFAULT,
     letterSpacing: 2,
     textTransform: 'uppercase',
+    textAlign: 'center',
+    height: 22,
   },
   luckyCardContent: {
     width: '100%',
-    aspectRatio: 1,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
   luckyColorCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
   luckyNumber: {
     fontFamily: fonts.display.regular,
@@ -530,9 +534,10 @@ const styles = StyleSheet.create({
   },
   luckyCardValue: {
     fontFamily: fonts.display.regular,
-    fontSize: 11,
+    fontSize: 10,
     color: colors.onSurface,
     textAlign: 'center',
+    marginTop: 'auto',
   },
 
   // Sub-Scores

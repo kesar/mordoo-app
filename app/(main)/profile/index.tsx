@@ -10,6 +10,7 @@ import { Text } from '@/src/components/ui/Text';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useSettingsStore } from '@/src/stores/settingsStore';
 import { signOut } from '@/src/services/auth';
+import { deleteAccount } from '@/src/services/account';
 import { fetchUserProfile } from '@/src/services/profile';
 import { lightHaptic } from '@/src/utils/haptics';
 import { Paywall } from '@/src/components/Paywall';
@@ -105,6 +106,30 @@ export default function ProfileScreen() {
     const period = h >= 12 ? 'PM' : 'AM';
     const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
     return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      t('deleteConfirmTitle'),
+      t('deleteConfirmMessage'),
+      [
+        { text: t('deleteConfirmCancel'), style: 'cancel' },
+        {
+          text: t('deleteConfirmOk'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAccount();
+              useAuthStore.getState().logout();
+              router.replace('/');
+              Alert.alert(t('deleteSuccess'));
+            } catch {
+              Alert.alert(t('deleteError'));
+            }
+          },
+        },
+      ],
+    );
   };
 
   const handleSignOut = () => {
@@ -241,6 +266,11 @@ export default function ProfileScreen() {
             <Text style={styles.signOutText}>{t('signOut')}</Text>
           </Pressable>
         </View>
+
+        {/* Delete account — intentionally subtle and separated */}
+        <Pressable style={styles.deleteRow} onPress={handleDeleteAccount}>
+          <Text style={styles.deleteText}>{t('deleteAccount')}</Text>
+        </Pressable>
       </ScrollView>
 
       <Paywall
@@ -386,6 +416,16 @@ const styles = StyleSheet.create({
   signOutText: {
     color: colors.error,
     fontSize: fontSizes.sm,
+  },
+  deleteRow: {
+    alignSelf: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginTop: 8,
+  },
+  deleteText: {
+    color: colors.outline,
+    fontSize: fontSizes.xs,
   },
   settingsDescription: {
     color: colors.outline,

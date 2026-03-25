@@ -9,17 +9,16 @@
   },
   "annual": {
     "label": "Annual",
-    "price": "฿1,190/yr",
-    "perMonth": "฿99/mo",
     "badge": "SAVE 33%"
   },
   "monthly": {
-    "label": "Monthly",
-    "price": "฿149/mo"
+    "label": "Monthly"
   },
   "cta": "Start 7-Day Free Trial",
+  "autoRenewDisclosure": "After the free trial, subscription automatically renews at {{price}} unless cancelled at least 24 hours before the end of the current period. You can manage or cancel anytime in Settings > Subscriptions.",
   "restore": "Restore Purchases",
-  "terms": "Terms & Privacy",
+  "terms": "Terms",
+  "privacy": "Privacy",
   "notNow": "Not now",
   "quotaExceeded": {
     "title": "You've used your daily reading",

@@ -6,7 +6,9 @@
     "continueWithApple": "Continue with Apple",
     "continueWithGoogle": "Continue with Google",
     "step": "Step 1: Initiation",
-    "footer": "The Soul Gate"
+    "footer": "The Soul Gate",
+    "terms": "Terms",
+    "privacy": "Privacy Policy"
   },
   "phoneAuth": {
     "titlePhone": "ENTER YOUR NUMBER",

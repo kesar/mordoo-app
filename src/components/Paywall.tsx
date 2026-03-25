@@ -145,8 +145,7 @@ export function Paywall({ visible, onClose, onSubscribed, source }: PaywallProps
                 <Text style={styles.badgeText}>{t('annual.badge')}</Text>
               </View>
               <Text style={styles.planLabel}>{t('annual.label')}</Text>
-              <Text style={styles.planPrice}>{t('annual.price')}</Text>
-              <Text style={styles.planPerMonth}>{t('annual.perMonth')}</Text>
+              <Text style={styles.planPrice}>{annualPkg?.product.priceString ?? '—'}</Text>
             </Pressable>
 
             {/* Monthly */}
@@ -158,7 +157,7 @@ export function Paywall({ visible, onClose, onSubscribed, source }: PaywallProps
               onPress={() => { lightHaptic(); setSelectedPlan('monthly'); analytics.track('paywall_plan_selected', { plan: 'monthly' }); }}
             >
               <Text style={styles.planLabel}>{t('monthly.label')}</Text>
-              <Text style={styles.planPrice}>{t('monthly.price')}</Text>
+              <Text style={styles.planPrice}>{monthlyPkg?.product.priceString ?? '—'}</Text>
             </Pressable>
           </View>
 
@@ -177,13 +176,23 @@ export function Paywall({ visible, onClose, onSubscribed, source }: PaywallProps
             />
           )}
 
+          {/* Auto-renewal disclosure */}
+          <Text style={styles.disclosureText}>
+            {t('autoRenewDisclosure', {
+              price: selectedPkg?.product.priceString ?? '',
+            })}
+          </Text>
+
           {/* Footer links */}
           <View style={styles.footer}>
             <Pressable onPress={handleRestore} disabled={busy}>
               <Text style={styles.footerLink}>{t('restore')}</Text>
             </Pressable>
-            <Pressable onPress={() => Linking.openURL('https://mordoo.app/terms')}>
+            <Pressable onPress={() => Linking.openURL('https://www.mordoo.app/terms.html')}>
               <Text style={styles.footerLink}>{t('terms')}</Text>
+            </Pressable>
+            <Pressable onPress={() => Linking.openURL('https://www.mordoo.app/privacy.html')}>
+              <Text style={styles.footerLink}>{t('privacy')}</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -315,6 +324,15 @@ const styles = StyleSheet.create({
   },
   spinner: {
     marginTop: scale(12),
+  },
+  disclosureText: {
+    fontFamily: fonts.body.regular,
+    fontSize: 11,
+    color: colors.parchment.muted,
+    textAlign: 'center',
+    lineHeight: 16,
+    marginTop: scale(16),
+    paddingHorizontal: scale(8),
   },
   footer: {
     flexDirection: 'row',

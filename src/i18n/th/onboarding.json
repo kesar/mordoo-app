@@ -6,7 +6,9 @@
     "continueWithApple": "เข้าสู่ระบบด้วย Apple",
     "continueWithGoogle": "เข้าสู่ระบบด้วย Google",
     "step": "ขั้นตอนที่ 1: เริ่มต้น",
-    "footer": "ประตูจิตวิญญาณ"
+    "footer": "ประตูจิตวิญญาณ",
+    "terms": "ข้อกำหนด",
+    "privacy": "นโยบายความเป็นส่วนตัว"
   },
   "phoneAuth": {
     "titlePhone": "กรอกเบอร์โทรศัพท์",
