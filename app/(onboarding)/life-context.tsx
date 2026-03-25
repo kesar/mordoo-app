@@ -18,6 +18,7 @@ import { SacredCard } from '@/src/components/ui/SacredCard';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, Concern } from '@/src/stores/onboardingStore';
+import { analytics } from '@/src/services/analytics';
 
 const CONCERNS: { concern: Concern; image: number }[] = [
   { concern: 'love', image: require('@/assets/images/tarot/concern-love.webp') },
@@ -33,6 +34,7 @@ export default function LifeContext() {
   const setConcerns = useOnboardingStore((s) => s.setConcerns);
   const setUrgencyContext = useOnboardingStore((s) => s.setUrgencyContext);
   const setStep = useOnboardingStore((s) => s.setStep);
+  const completeOnboarding = useOnboardingStore((s) => s.completeOnboarding);
 
   const [selectedConcerns, setSelectedConcerns] = useState<Concern[]>([]);
   const [urgency, setUrgency] = useState('');
@@ -48,8 +50,10 @@ export default function LifeContext() {
   const handleContinue = () => {
     setConcerns(selectedConcerns);
     setUrgencyContext(urgency || null);
+    analytics.track('onboarding_completed');
     setStep(5);
-    router.push('/(onboarding)/power-ups');
+    completeOnboarding();
+    router.replace('/(main)/pulse');
   };
 
   return (
@@ -65,7 +69,7 @@ export default function LifeContext() {
         <View style={styles.progressWrapper}>
           <ProgressIndicator
             currentStep={4}
-            totalSteps={6}
+            totalSteps={4}
             label={t('lifeContext.step')}
           />
         </View>
