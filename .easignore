@@ -30,6 +30,14 @@ yarn-error.*
 
 # --- Additional exclusions for smaller builds ---
 
+# Git history (not needed for build)
+.git/
+
+# iOS (EAS runs pod install and generates these)
+ios/Pods/
+ios/build/
+ios/.xcode.env.local
+
 # Backend API (not needed for mobile build)
 api/
 
@@ -58,6 +66,17 @@ __tests__/
 CLAUDE.md
 skills-lock.json
 .claude/
+.superpowers/
+.mcp.json
+.env.example
+
+# Nanobanana output (dev/design artifacts)
+nanobanana-output/
 
 # Vercel config
 vercel.json
+
+# Android build cache
+android/.gradle/
+android/build/
+android/app/build/
