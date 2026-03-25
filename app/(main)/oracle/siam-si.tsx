@@ -214,6 +214,7 @@ export default function SiamSiScreen() {
             <Pressable
               style={({ pressed }) => [styles.shareBtn, pressed && { opacity: 0.7 }]}
               onPress={() => {
+                analytics.track('share_tapped', { content_type: 'siam_si' });
                 const fortuneLabel = fortuneLabels[currentStick.fortune] ?? currentStick.fortune;
                 shareCard(t('siamSi.share.message', { number: currentStick.number, fortune: fortuneLabel }));
               }}

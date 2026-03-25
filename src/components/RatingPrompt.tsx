@@ -14,6 +14,7 @@ import {
   triggerNativeReviewPrompt,
   markPromptDismissed,
 } from '@/src/services/rating';
+import { analytics } from '@/src/services/analytics';
 
 interface RatingPromptProps {
   visible: boolean;
@@ -25,12 +26,14 @@ export function RatingPrompt({ visible, onClose }: RatingPromptProps) {
 
   const handlePositive = useCallback(async () => {
     lightHaptic();
+    analytics.track('rating_survey_positive');
     onClose();
     await triggerNativeReviewPrompt();
   }, [onClose]);
 
   const handleNegative = useCallback(() => {
     lightHaptic();
+    analytics.track('rating_survey_negative');
     markPromptDismissed();
     onClose();
   }, [onClose]);

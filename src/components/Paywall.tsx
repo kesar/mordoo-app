@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -19,6 +19,7 @@ import { scale } from '@/src/utils/scale';
 import { useSubscription } from '@/src/hooks/useSubscription';
 import { useTranslation } from 'react-i18next';
 import { lightHaptic } from '@/src/utils/haptics';
+import { analytics } from '@/src/services/analytics';
 
 interface PaywallProps {
   visible: boolean;
@@ -30,6 +31,12 @@ export function Paywall({ visible, onClose, onSubscribed }: PaywallProps) {
   const { t } = useTranslation('paywall');
   const { offering, subscribe, restore, isPurchasing, isRestoring } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
+
+  useEffect(() => {
+    if (visible) {
+      analytics.track('paywall_shown');
+    }
+  }, [visible]);
 
   const annualPkg = offering?.availablePackages.find(
     (p) => p.packageType === PACKAGE_TYPE.ANNUAL,
@@ -44,29 +51,36 @@ export function Paywall({ visible, onClose, onSubscribed }: PaywallProps) {
   const handlePurchase = async () => {
     if (!selectedPkg) return;
     lightHaptic();
+    analytics.track('paywall_purchase_initiated', { plan: selectedPlan });
     try {
       const result = await subscribe(selectedPkg);
       if (result.isPremium) {
+        analytics.track('subscription_started', { plan: selectedPlan });
         onSubscribed?.();
         onClose();
       }
     } catch {
+      analytics.track('paywall_purchase_failed', { plan: selectedPlan });
       Alert.alert(t('purchaseError'));
     }
   };
 
   const handleRestore = async () => {
     lightHaptic();
+    analytics.track('restore_purchases_tapped');
     try {
       const restored = await restore();
       if (restored) {
+        analytics.track('restore_purchases_result', { found: true });
         Alert.alert(t('restoreSuccess'));
         onSubscribed?.();
         onClose();
       } else {
+        analytics.track('restore_purchases_result', { found: false });
         Alert.alert(t('restoreNotFound'));
       }
     } catch {
+      analytics.track('restore_purchases_result', { found: false });
       Alert.alert(t('restoreNotFound'));
     }
   };
@@ -89,7 +103,7 @@ export function Paywall({ visible, onClose, onSubscribed }: PaywallProps) {
     >
       <View style={styles.container}>
         {/* Close button */}
-        <Pressable style={styles.closeBtn} onPress={onClose} hitSlop={16}>
+        <Pressable style={styles.closeBtn} onPress={() => { analytics.track('paywall_dismissed'); onClose(); }} hitSlop={16}>
           <Text style={styles.closeText}>✕</Text>
         </Pressable>
 
@@ -124,7 +138,7 @@ export function Paywall({ visible, onClose, onSubscribed }: PaywallProps) {
                 styles.planCard,
                 selectedPlan === 'annual' && styles.planCardSelected,
               ]}
-              onPress={() => { lightHaptic(); setSelectedPlan('annual'); }}
+              onPress={() => { lightHaptic(); setSelectedPlan('annual'); analytics.track('paywall_plan_selected', { plan: 'annual' }); }}
             >
               <View style={styles.badgeContainer}>
                 <Text style={styles.badgeText}>{t('annual.badge')}</Text>
@@ -140,7 +154,7 @@ export function Paywall({ visible, onClose, onSubscribed }: PaywallProps) {
                 styles.planCard,
                 selectedPlan === 'monthly' && styles.planCardSelected,
               ]}
-              onPress={() => { lightHaptic(); setSelectedPlan('monthly'); }}
+              onPress={() => { lightHaptic(); setSelectedPlan('monthly'); analytics.track('paywall_plan_selected', { plan: 'monthly' }); }}
             >
               <Text style={styles.planLabel}>{t('monthly.label')}</Text>
               <Text style={styles.planPrice}>{t('monthly.price')}</Text>

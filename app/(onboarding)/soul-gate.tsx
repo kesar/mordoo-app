@@ -82,9 +82,11 @@ export default function SoulGate() {
     setLoading(true);
     try {
       await signInWithApple();
+      analytics.track('onboarding_otp_verified'); // auth success (Apple)
       router.push('/(onboarding)/birth-data');
     } catch (error: any) {
       if (error.code !== 'ERR_REQUEST_CANCELED') {
+        analytics.track('auth_error', { step: 'apple_sign_in', error: error.message });
         Alert.alert('Error', error.message || 'Apple Sign-In failed.');
       }
     } finally {
@@ -97,9 +99,11 @@ export default function SoulGate() {
     setLoading(true);
     try {
       await signInWithGoogle();
+      analytics.track('onboarding_otp_verified'); // auth success (Google)
       router.push('/(onboarding)/birth-data');
     } catch (error: any) {
       if (error.message !== 'Google sign-in was cancelled') {
+        analytics.track('auth_error', { step: 'google_sign_in', error: error.message });
         Alert.alert('Error', error.message || 'Google Sign-In failed.');
       }
     } finally {
