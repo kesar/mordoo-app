@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { signInWithPhone, verifyOTP } from '@/src/services/auth';
 import { fetchExistingBirthData } from '@/src/services/birth-data';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
+import { analytics } from '@/src/services/analytics';
 
 type Step = 'phone' | 'otp';
 
@@ -46,6 +47,7 @@ export default function PhoneAuth() {
     setLoading(true);
     try {
       await signInWithPhone(normalizePhone(phone));
+      analytics.track('onboarding_otp_sent');
       setStep('otp');
       if (phone === '+66000000') {
         setOtpCode('000000');
@@ -53,6 +55,7 @@ export default function PhoneAuth() {
         setTimeout(() => otpInputRef.current?.focus(), 300);
       }
     } catch (error: any) {
+      analytics.track('onboarding_otp_failed', { error: error.message });
       Alert.alert(t('phoneAuth.errorTitle'), error.message || t('phoneAuth.errorSendCode'));
     } finally {
       setLoading(false);
@@ -67,6 +70,7 @@ export default function PhoneAuth() {
     setLoading(true);
     try {
       await verifyOTP(normalizePhone(phone), otpCode);
+      analytics.track('onboarding_otp_verified');
 
       // Check if user already has birth data in the database
       const existing = await fetchExistingBirthData();

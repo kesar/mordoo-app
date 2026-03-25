@@ -21,6 +21,7 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, NameData } from '@/src/stores/onboardingStore';
 import { SparkleIcon } from '@/src/components/icons/TarotIcons';
+import { analytics } from '@/src/services/analytics';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -65,6 +66,10 @@ export default function NameNumbersScreen() {
     };
     setNameData(nameData);
     setStep(4);
+    analytics.track('onboarding_name_completed', {
+      has_phone: !!data.phoneNumber,
+      has_car_plate: !!data.carPlate,
+    });
     router.push('/(onboarding)/life-context');
   };
 

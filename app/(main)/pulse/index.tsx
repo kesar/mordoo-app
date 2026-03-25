@@ -16,6 +16,7 @@ import { useRatingPrompt } from '@/src/hooks/useRatingPrompt';
 import { RatingPrompt } from '@/src/components/RatingPrompt';
 import { incrementPulseView } from '@/src/services/rating';
 import { features } from '@/src/config/features';
+import { analytics } from '@/src/services/analytics';
 import {
   SparkleIcon,
   BusinessStarIcon,
@@ -113,6 +114,10 @@ export default function PulseScreen() {
     if (pulse && !hasTrackedRef.current) {
       hasTrackedRef.current = true;
       incrementPulseView();
+      analytics.track('pulse_viewed', {
+        energy_score: pulse.energyScore,
+        date: pulse.date,
+      });
       if (features.ratingPrompt) {
         showRatingPrompt(1500);
       }
@@ -254,7 +259,10 @@ export default function PulseScreen() {
             <View style={styles.shareSection}>
               <Pressable
                 style={({ pressed }) => [styles.shareBtn, pressed && { opacity: 0.7 }]}
-                onPress={() => shareCard(t('share.message', { score: pulse.energyScore }))}
+                onPress={() => {
+                  analytics.track('share_tapped', { content_type: 'pulse' });
+                  shareCard(t('share.message', { score: pulse.energyScore }));
+                }}
                 disabled={isSharing}
               >
                 <Text style={styles.shareBtnText}>

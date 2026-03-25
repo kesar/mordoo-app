@@ -24,6 +24,7 @@ import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import { useSettingsStore } from '@/src/stores/settingsStore';
 import { signInWithApple, signInWithGoogle } from '@/src/services/auth';
 import { features } from '@/src/config/features';
+import { analytics } from '@/src/services/analytics';
 
 export default function SoulGate() {
   const router = useRouter();
@@ -35,6 +36,10 @@ export default function SoulGate() {
   // Diamond pulse animation
   const diamondScale = useSharedValue(1);
   const diamondGlow = useSharedValue(0.4);
+
+  useEffect(() => {
+    analytics.track('onboarding_started', { language: i18n.language });
+  }, []);
 
   useEffect(() => {
     diamondScale.value = withRepeat(
@@ -64,13 +69,16 @@ export default function SoulGate() {
     i18n.changeLanguage(lang);
     setLanguage(lang);
     setSettingsLanguage(lang);
+    analytics.track('onboarding_language_selected', { language: lang });
   };
 
   const handlePhoneAuth = () => {
+    analytics.track('onboarding_auth_method_selected', { method: 'phone' });
     router.push('/(onboarding)/phone-auth');
   };
 
   const handleAppleAuth = async () => {
+    analytics.track('onboarding_auth_method_selected', { method: 'apple' });
     setLoading(true);
     try {
       await signInWithApple();
@@ -85,6 +93,7 @@ export default function SoulGate() {
   };
 
   const handleGoogleAuth = async () => {
+    analytics.track('onboarding_auth_method_selected', { method: 'google' });
     setLoading(true);
     try {
       await signInWithGoogle();

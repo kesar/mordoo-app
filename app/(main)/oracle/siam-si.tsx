@@ -19,6 +19,7 @@ import { useRatingPrompt } from '@/src/hooks/useRatingPrompt';
 import { RatingPrompt } from '@/src/components/RatingPrompt';
 import { features } from '@/src/config/features';
 import { mediumHaptic, successHaptic } from '@/src/utils/haptics';
+import { analytics } from '@/src/services/analytics';
 
 const siamSiSticks = require('@/assets/images/siam-si-sticks.png');
 
@@ -110,6 +111,7 @@ export default function SiamSiScreen() {
 
   const handleManualDraw = useCallback(() => {
     if (canDraw) {
+      analytics.track('siam_si_draw_started');
       mediumHaptic();
       performDraw();
     }
@@ -119,6 +121,10 @@ export default function SiamSiScreen() {
   useEffect(() => {
     if (currentStick) {
       successHaptic();
+      analytics.track('siam_si_draw_completed', {
+        stick_number: currentStick.number,
+        fortune_level: currentStick.fortune,
+      });
       if (features.ratingPrompt && currentStick.fortune === 'excellent') {
         showRatingPrompt(2000);
       }

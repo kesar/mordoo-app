@@ -99,6 +99,8 @@ cd api && npm run build # Build for production
 EXPO_PUBLIC_SUPABASE_URL=
 EXPO_PUBLIC_SUPABASE_ANON_KEY=
 EXPO_PUBLIC_API_BASE_URL=       # https://api.mordoo.app or http://localhost:3001
+EXPO_PUBLIC_POSTHOG_KEY=        # PostHog project API key
+EXPO_PUBLIC_POSTHOG_HOST=       # https://us.i.posthog.com (default)
 ```
 
 ### API (`api/.env.local`)

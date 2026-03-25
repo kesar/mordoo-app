@@ -22,6 +22,7 @@ import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { CheckIcon } from '@/src/components/icons/TarotIcons';
 import { useTranslation } from 'react-i18next';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
+import { analytics } from '@/src/services/analytics';
 
 export default function PowerUps() {
   const { t } = useTranslation('onboarding');
@@ -34,7 +35,7 @@ export default function PowerUps() {
   const [isRequesting, setIsRequesting] = useState(false);
 
   const handleContinue = () => {
-    // For now, just track preference. Actual permissions requested later.
+    analytics.track('onboarding_completed');
     setStep(6);
     completeOnboarding();
     router.replace('/(main)/pulse');
@@ -128,6 +129,7 @@ export default function PowerUps() {
                   try {
                     const token = await getExpoPushToken();
                     if (!token) {
+                      analytics.track('notification_permission_result', { granted: false });
                       Alert.alert(
                         t('powerUps.notifications.denied'),
                         t('powerUps.notifications.deniedMessage'),
@@ -137,6 +139,7 @@ export default function PowerUps() {
                     }
                     setNotifToggle(true);
                     storeSetNotifications(true);
+                    analytics.track('notification_permission_result', { granted: true });
                     await registerPushToken(token, getTimezone(), language);
                   } catch (error) {
                     console.error('Failed to register push token:', error);

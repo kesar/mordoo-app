@@ -22,6 +22,7 @@ import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, BirthData } from '@/src/stores/onboardingStore';
 import { CalendarIcon, LocationPinIcon, SearchIcon, InfoCircleIcon } from '@/src/components/icons/TarotIcons';
 import { useTranslation } from 'react-i18next';
+import { analytics } from '@/src/services/analytics';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -91,6 +92,10 @@ export default function BirthDataScreen() {
 
     setBirthData(birthData);
     setStep(3);
+    analytics.track('onboarding_birth_data_completed', {
+      has_time: !!data.hour,
+      has_gender: !!data.gender,
+    });
     router.push('/(onboarding)/name-numbers');
   };
 

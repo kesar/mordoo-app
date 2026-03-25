@@ -30,6 +30,7 @@ import {
 } from '@/src/services/oracle';
 import { lightHaptic } from '@/src/utils/haptics';
 import { useTranslation } from 'react-i18next';
+import { analytics } from '@/src/services/analytics';
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -414,6 +415,7 @@ export default function OracleScreen() {
     lightHaptic();
     setInput('');
     setQuotaExceeded(false);
+    analytics.track('oracle_question_sent', { question_length: text.length, language: lang });
 
     // Add user message
     const userMsg: ChatMessage = {
@@ -460,6 +462,7 @@ export default function OracleScreen() {
       onDone: () => {
         setStreaming(false);
         sendingRef.current = false;
+        analytics.track('oracle_response_received');
         // Optimistically decrement remaining quota
         if (quotaRemaining !== null) {
           setQuota(
@@ -475,7 +478,9 @@ export default function OracleScreen() {
         if (error.message === 'QUOTA_EXCEEDED') {
           removeLastMessage(); // Remove empty assistant placeholder
           setQuotaExceeded(true);
+          analytics.track('quota_exceeded', { feature: 'oracle' });
         } else {
+          analytics.track('oracle_response_error', { error: error.message });
           appendToLastMessage(
             t('chat.errorDisrupted'),
           );

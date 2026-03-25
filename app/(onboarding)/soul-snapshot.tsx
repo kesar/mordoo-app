@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   View,
@@ -23,6 +23,7 @@ import {
 import { EnergyScoreRing } from '@/src/components/ui/EnergyScoreRing';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
+import { analytics } from '@/src/services/analytics';
 
 const SUB_SCORES = [
   { Icon: BusinessStarIcon, key: 'business', value: 78 },
@@ -36,7 +37,12 @@ export default function SoulSnapshot() {
   const completeOnboarding = useOnboardingStore((s) => s.completeOnboarding);
   const { width } = useWindowDimensions();
 
+  useEffect(() => {
+    analytics.track('onboarding_snapshot_viewed', { energy_score: 73 });
+  }, []);
+
   const handleEnterRealms = () => {
+    analytics.track('onboarding_completed');
     completeOnboarding();
     router.replace('/(main)/pulse');
   };
