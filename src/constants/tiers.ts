@@ -8,7 +8,7 @@ export const TIERS = {
       dailyEnergyScore: true,
       oracleQuestionsPerDay: 1,
       tarotSpreads: ['single', 'three_card'] as const,
-      siamSiPerDay: 2,
+      siamSiPerDay: 1,
       soulSnapshot: true,
       luckyElements: true,
       persistentMemory: false,
