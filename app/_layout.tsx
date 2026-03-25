@@ -23,17 +23,10 @@ import { useAuthStore } from '@/src/stores/authStore';
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
   tracesSampleRate: 1.0,
-  _experiments: { profilesSampleRate: 1.0 },
   enabled: !__DEV__,
 });
 
 SplashScreen.preventAutoHideAsync();
-
-// Track app session on cold start
-incrementSession();
-
-// Initialize RevenueCat for in-app purchases
-configureRevenueCat();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +76,13 @@ function RootLayout() {
   const hydrated = useHydration();
   useAuthListener();
   useSyncBirthData();
+
+  // Defer native SDK init to avoid TurboModule threading race at startup
+  useEffect(() => {
+    incrementSession();
+    configureRevenueCat();
+  }, []);
+
   const [fontsLoaded, fontError] = useFonts({
     'CinzelDecorative-Regular': require('@/assets/fonts/CinzelDecorative-Regular.ttf'),
     'CinzelDecorative-Bold': require('@/assets/fonts/CinzelDecorative-Bold.ttf'),
