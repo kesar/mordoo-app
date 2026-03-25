@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import type { EventSubscription } from 'expo-modules-core';
+import { analytics } from '@/src/services/analytics';
 
 // Configure foreground notification behavior
 Notifications.setNotificationHandler({
@@ -20,6 +21,7 @@ export function useNotificationHandler() {
   useEffect(() => {
     // Listen for notification taps
     responseListener.current = Notifications.addNotificationResponseReceivedListener(() => {
+      analytics.track('notification_tapped');
       router.push('/(main)/pulse');
     });
 

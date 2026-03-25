@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Switch, Alert, ScrollView, ActivityIndicator, Pressable, Modal, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -24,6 +24,7 @@ import {
   registerPushToken,
   getTimezone,
 } from '@/src/services/notifications';
+import { analytics } from '@/src/services/analytics';
 
 const WESTERN_IMAGES: Record<string, any> = {
   aries: require('@/assets/images/zodiac/western/aries.webp'),
@@ -85,9 +86,25 @@ export default function ProfileScreen() {
     staleTime: Infinity,
   });
 
+  useEffect(() => {
+    analytics.screen('profile');
+  }, []);
+
+  const zodiacTracked = useRef(false);
+  useEffect(() => {
+    if (zodiac && !zodiacTracked.current) {
+      zodiacTracked.current = true;
+      analytics.track('zodiac_viewed', {
+        western_sign: zodiac.western.name,
+        chinese_sign: zodiac.chinese.name,
+      });
+    }
+  }, [zodiac]);
+
   const handleLanguageToggle = async () => {
     lightHaptic();
     const newLang = language === 'en' ? 'th' : 'en';
+    analytics.track('language_changed', { from: language, to: newLang });
     setLanguage(newLang);
     if (notificationsEnabled) {
       try {
@@ -100,6 +117,7 @@ export default function ProfileScreen() {
 
   const handleNotificationsToggle = async (value: boolean) => {
     lightHaptic();
+    analytics.track('notifications_toggled', { enabled: value });
     const previousValue = notificationsEnabled;
     setNotificationsEnabled(value); // optimistic update
 
@@ -131,6 +149,7 @@ export default function ProfileScreen() {
 
   const handleTimeChange = async (time: string) => {
     lightHaptic();
+    analytics.track('notification_time_changed', { time });
     setNotificationTime(time);
     setShowTimePicker(false);
     try {
@@ -157,6 +176,7 @@ export default function ProfileScreen() {
           text: t('deleteConfirmOk'),
           style: 'destructive',
           onPress: async () => {
+            analytics.track('account_deleted');
             try {
               await deleteAccount();
               useAuthStore.getState().logout();
@@ -181,6 +201,7 @@ export default function ProfileScreen() {
           text: t('signOutConfirmOk'),
           style: 'destructive',
           onPress: async () => {
+            analytics.track('signed_out');
             try {
               await signOut();
               useAuthStore.getState().logout();
@@ -270,7 +291,7 @@ export default function ProfileScreen() {
                   <View style={styles.separator} />
                   <Pressable
                     style={styles.settingsRow}
-                    onPress={() => { lightHaptic(); setShowPaywall(true); }}
+                    onPress={() => { lightHaptic(); analytics.track('upgrade_tapped', { source: 'profile' }); setShowPaywall(true); }}
                   >
                     <Text style={[styles.settingsLabel, { color: colors.gold.DEFAULT }]}>
                       {t('upgradeToPremium')}
