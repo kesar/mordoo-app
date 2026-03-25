@@ -1,0 +1,63 @@
+# ===========================================
+# .easignore — replaces .gitignore for EAS Build
+# Keep mobile build uploads small
+# ===========================================
+
+# --- Inherited from .gitignore ---
+
+node_modules/
+.expo/
+dist/
+web-build/
+.next/
+expo-env.d.ts
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+.DS_Store
+*.pem
+.env*.local
+*.tsbuildinfo
+.vercel
+
+# --- Additional exclusions for smaller builds ---
+
+# Backend API (not needed for mobile build)
+api/
+
+# Documentation & specs
+docs/
+*.md
+
+# Database migrations
+sql/
+
+# Supabase config
+supabase/
+
+# Fastlane (not used during EAS build)
+fastlane/
+
+# Test files
+vitest.config.ts
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Dev tooling
+CLAUDE.md
+skills-lock.json
+.claude/
+
+# Vercel config
+vercel.json

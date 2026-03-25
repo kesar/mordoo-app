@@ -24,7 +24,7 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { mediumHaptic, successHaptic } from '@/src/utils/haptics';
 import { analytics } from '@/src/services/analytics';
 
-const siamSiSticks = require('@/assets/images/siam-si-sticks.png');
+const siamSiSticks = require('@/assets/images/siam-si-sticks.webp');
 
 import ViewShot from 'react-native-view-shot';
 import { SiamSiShareCard } from '@/src/components/sharing/SiamSiShareCard';

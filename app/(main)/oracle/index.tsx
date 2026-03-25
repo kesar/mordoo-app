@@ -78,7 +78,7 @@ function ModeToggle({
 
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const mordooAvatar = require('@/assets/images/mordoo-avatar.png');
+const mordooAvatar = require('@/assets/images/mordoo-avatar.webp');
 
 const markdownStyles = {
   body: {
