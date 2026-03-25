@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
+  AppState,
   Image,
   Pressable,
   StyleSheet,
@@ -70,6 +71,14 @@ export default function SiamSiScreen() {
       refreshQuota();
     }, [refreshQuota]),
   );
+
+  // Refresh quota when app returns to foreground (handles day rollover)
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') refreshQuota();
+    });
+    return () => subscription.remove();
+  }, [refreshQuota]);
 
   // Animations
   const shakeAnim = useRef(new Animated.Value(0)).current;
@@ -260,34 +269,27 @@ export default function SiamSiScreen() {
               <View style={styles.loadingBtn}>
                 <ActivityIndicator size="small" color={colors.gold.light} />
               </View>
-            ) : (
+            ) : canDraw ? (
               <Pressable
                 style={({ pressed }) => [
                   styles.drawBtn,
-                  !canDraw && styles.drawBtnDisabled,
                   (pressed || isDrawing) && { opacity: 0.7 },
                 ]}
                 onPress={handleManualDraw}
-                disabled={!canDraw || isDrawing}
+                disabled={isDrawing}
               >
-                <Text style={[styles.drawBtnText, !canDraw && styles.drawBtnTextDisabled]}>
-                  {isDrawing
-                    ? t('siamSi.shaking')
-                    : canDraw
-                      ? t('siamSi.drawStick')
-                      : t('siamSi.comeBackTomorrow')}
+                <Text style={styles.drawBtnText}>
+                  {isDrawing ? t('siamSi.shaking') : t('siamSi.drawStick')}
                 </Text>
               </Pressable>
-            )}
-
-            {!canDraw && !isLoadingQuota && features.paywall && (
+            ) : features.paywall ? (
               <GoldButton
                 title={t('paywall:cta')}
                 onPress={() => setShowPaywall(true)}
                 variant="outlined"
                 rounded
               />
-            )}
+            ) : null}
           </View>
         )}
       </View>

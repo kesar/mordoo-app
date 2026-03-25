@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '../../../../lib/supabase';
 import { authenticateRequest } from '../../../../lib/auth';
-import { getTodayString } from '../../../../lib/date';
+import { getBangkokDateString } from '../../../../lib/date';
 import { FREE_SIAM_SI_DRAWS_PER_DAY, PGRST_NOT_FOUND } from '../../../../lib/config';
 import { checkRateLimit } from '../../../../lib/rate-limit';
 import { drawSiamSi } from '@shared/siam-si';
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   const maxDraws = tier === 'standard' ? Infinity : FREE_SIAM_SI_DRAWS_PER_DAY;
 
   // 3. Get quota record
-  const today = getTodayString();
+  const today = getBangkokDateString();
 
   const { data: quota, error: quotaError } = await serviceClient
     .from('user_quotas')
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   const maxDraws = tier === 'standard' ? Infinity : FREE_SIAM_SI_DRAWS_PER_DAY;
 
   // 3. Get/create quota record
-  const today = getTodayString();
+  const today = getBangkokDateString();
 
   const { data: quota, error: quotaError } = await serviceClient
     .from('user_quotas')

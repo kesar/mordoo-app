@@ -1,0 +1,138 @@
+<h2>Zodiac Card Layout Approaches</h2>
+<p class="subtitle">How should the zodiac cards appear on the profile page?</p>
+
+<div class="cards">
+  <!-- Approach A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #0a0a14;">
+      <!-- Mockup: Two separate cards -->
+      <div style="font-size: 10px; color: #99907e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Profile Layout Preview</div>
+
+      <!-- Profile card mini -->
+      <div style="background: #12121d; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+        <div style="width: 28px; height: 28px; border-radius: 14px; background: rgba(201,168,76,0.15); border: 1.5px solid #c9a84c; display: flex; align-items: center; justify-content: center; color: #c9a84c; font-size: 12px; font-weight: bold;">K</div>
+        <div>
+          <div style="color: #f4e8c1; font-size: 11px; font-weight: 600;">Kesar</div>
+          <div style="color: #99907e; font-size: 9px;">March 25, 1990</div>
+        </div>
+      </div>
+
+      <!-- Western zodiac card -->
+      <div style="background: #1b1b25; border-radius: 10px; border: 1px solid rgba(201,168,76,0.2); padding: 10px 12px; margin-bottom: 6px; display: flex; gap: 10px; align-items: center;">
+        <div style="width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #1a1a2e, #2a1a3e); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">♈</div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="color: #c9a84c; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Western Zodiac</div>
+          <div style="color: #f4e8c1; font-size: 13px; font-weight: 600;">Aries</div>
+          <div style="color: #99907e; font-size: 9px; margin-top: 2px;">🔥 Fire · Mars · Bold & Courageous</div>
+        </div>
+      </div>
+
+      <!-- Chinese zodiac card -->
+      <div style="background: #1b1b25; border-radius: 10px; border: 1px solid rgba(201,168,76,0.2); padding: 10px 12px; display: flex; gap: 10px; align-items: center;">
+        <div style="width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #1a1a2e, #2a1a3e); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">🐴</div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="color: #c9a84c; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Chinese Zodiac</div>
+          <div style="color: #f4e8c1; font-size: 13px; font-weight: 600;">Horse</div>
+          <div style="color: #99907e; font-size: 9px; margin-top: 2px;">🔥 Fire · Energetic & Free-spirited</div>
+        </div>
+      </div>
+
+      <!-- Subscription section hint -->
+      <div style="margin-top: 8px; color: #99907e; font-size: 9px; text-transform: uppercase; letter-spacing: 1px;">Subscription</div>
+      <div style="background: #12121d; border-radius: 10px; padding: 8px 12px; margin-top: 4px;">
+        <div style="color: #99907e; font-size: 9px;">Current Plan: Free</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Two Separate Cards ⭐</h3>
+      <p>Each zodiac system gets its own SacredCard with illustration, name, element, and traits. Clean, spacious, matches existing card pattern.</p>
+    </div>
+  </div>
+
+  <!-- Approach B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #0a0a14;">
+      <div style="font-size: 10px; color: #99907e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Profile Layout Preview</div>
+
+      <!-- Profile card mini -->
+      <div style="background: #12121d; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+        <div style="width: 28px; height: 28px; border-radius: 14px; background: rgba(201,168,76,0.15); border: 1.5px solid #c9a84c; display: flex; align-items: center; justify-content: center; color: #c9a84c; font-size: 12px; font-weight: bold;">K</div>
+        <div>
+          <div style="color: #f4e8c1; font-size: 11px; font-weight: 600;">Kesar</div>
+          <div style="color: #99907e; font-size: 9px;">March 25, 1990</div>
+        </div>
+      </div>
+
+      <!-- Combined card -->
+      <div style="background: #1b1b25; border-radius: 10px; border: 1px solid rgba(201,168,76,0.2); padding: 10px 12px; display: flex; gap: 6px;">
+        <!-- Western side -->
+        <div style="flex: 1; text-align: center; padding-right: 6px; border-right: 1px solid rgba(201,168,76,0.15);">
+          <div style="font-size: 22px; margin-bottom: 4px;">♈</div>
+          <div style="color: #c9a84c; font-size: 8px; text-transform: uppercase;">Western</div>
+          <div style="color: #f4e8c1; font-size: 11px; font-weight: 600;">Aries</div>
+          <div style="color: #99907e; font-size: 8px;">🔥 Fire · Mars</div>
+        </div>
+        <!-- Chinese side -->
+        <div style="flex: 1; text-align: center; padding-left: 6px;">
+          <div style="font-size: 22px; margin-bottom: 4px;">🐴</div>
+          <div style="color: #c9a84c; font-size: 8px; text-transform: uppercase;">Chinese</div>
+          <div style="color: #f4e8c1; font-size: 11px; font-weight: 600;">Horse</div>
+          <div style="color: #99907e; font-size: 8px;">🔥 Fire · Energetic</div>
+        </div>
+      </div>
+
+      <!-- Subscription section hint -->
+      <div style="margin-top: 8px; color: #99907e; font-size: 9px; text-transform: uppercase; letter-spacing: 1px;">Subscription</div>
+      <div style="background: #12121d; border-radius: 10px; padding: 8px 12px; margin-top: 4px;">
+        <div style="color: #99907e; font-size: 9px;">Current Plan: Free</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Single Combined Card</h3>
+      <p>Both signs side-by-side in one card with a gold divider. Compact but cramped — less room for traits and illustrations.</p>
+    </div>
+  </div>
+
+  <!-- Approach C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 16px; background: #0a0a14;">
+      <div style="font-size: 10px; color: #99907e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Profile Layout Preview</div>
+
+      <!-- Profile card mini -->
+      <div style="background: #12121d; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+        <div style="width: 28px; height: 28px; border-radius: 14px; background: rgba(201,168,76,0.15); border: 1.5px solid #c9a84c; display: flex; align-items: center; justify-content: center; color: #c9a84c; font-size: 12px; font-weight: bold;">K</div>
+        <div>
+          <div style="color: #f4e8c1; font-size: 11px; font-weight: 600;">Kesar</div>
+          <div style="color: #99907e; font-size: 9px;">March 25, 1990</div>
+        </div>
+      </div>
+
+      <!-- Tabbed card -->
+      <div style="background: #1b1b25; border-radius: 10px; border: 1px solid rgba(201,168,76,0.2); overflow: hidden;">
+        <!-- Tabs -->
+        <div style="display: flex; border-bottom: 1px solid rgba(201,168,76,0.15);">
+          <div style="flex: 1; padding: 8px; text-align: center; color: #c9a84c; font-size: 9px; font-weight: 600; border-bottom: 2px solid #c9a84c;">WESTERN</div>
+          <div style="flex: 1; padding: 8px; text-align: center; color: #99907e; font-size: 9px;">CHINESE</div>
+        </div>
+        <!-- Content -->
+        <div style="padding: 10px 12px; display: flex; gap: 10px; align-items: center;">
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, #1a1a2e, #2a1a3e); display: flex; align-items: center; justify-content: center; font-size: 22px;">♈</div>
+          <div>
+            <div style="color: #f4e8c1; font-size: 12px; font-weight: 600;">Aries</div>
+            <div style="color: #99907e; font-size: 9px;">🔥 Fire · Mars · Bold & Courageous</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscription section hint -->
+      <div style="margin-top: 8px; color: #99907e; font-size: 9px; text-transform: uppercase; letter-spacing: 1px;">Subscription</div>
+      <div style="background: #12121d; border-radius: 10px; padding: 8px 12px; margin-top: 4px;">
+        <div style="color: #99907e; font-size: 9px;">Current Plan: Free</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Tabbed Card</h3>
+      <p>One card with Western/Chinese tabs. Most compact, but hides info behind a tap — user might miss the second tab.</p>
+    </div>
+  </div>
+</div>
