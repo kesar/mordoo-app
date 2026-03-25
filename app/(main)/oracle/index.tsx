@@ -31,6 +31,8 @@ import {
 import { lightHaptic } from '@/src/utils/haptics';
 import { useTranslation } from 'react-i18next';
 import { analytics } from '@/src/services/analytics';
+import { Paywall } from '@/src/components/Paywall';
+import { features } from '@/src/config/features';
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -197,14 +199,17 @@ function UserMessageBubble({ message }: { message: ChatMessage }) {
   );
 }
 
-function QuotaExceeded() {
-  const { t } = useTranslation('oracle');
+function QuotaExceeded({ onUpgrade }: { onUpgrade?: () => void }) {
+  const { t } = useTranslation('paywall');
   return (
     <View style={styles.quotaCard}>
-      <Text style={styles.quotaTitle}>{t('chat.quotaTitle')}</Text>
-      <Text style={styles.quotaBody}>
-        {t('chat.quotaBody')}
-      </Text>
+      <Text style={styles.quotaTitle}>{t('quotaExceeded.title')}</Text>
+      <Text style={styles.quotaBody}>{t('quotaExceeded.body')}</Text>
+      {features.paywall && onUpgrade && (
+        <Pressable onPress={onUpgrade} style={styles.quotaUpgradeBtn}>
+          <Text style={styles.quotaUpgradeText}>{t('cta')}</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -233,6 +238,7 @@ export default function OracleScreen() {
   const [mode, setMode] = useState<'mordoo' | 'strategist'>('mordoo');
   const [input, setInput] = useState('');
   const [quotaExceeded, setQuotaExceeded] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   type ListItem =
     | (ChatMessage & { type: 'message' })
@@ -478,6 +484,9 @@ export default function OracleScreen() {
         if (error.message === 'QUOTA_EXCEEDED') {
           removeLastMessage(); // Remove empty assistant placeholder
           setQuotaExceeded(true);
+          if (features.paywall) {
+            setShowPaywall(true);
+          }
           analytics.track('quota_exceeded', { feature: 'oracle' });
         } else {
           analytics.track('oracle_response_error', { error: error.message });
@@ -549,7 +558,7 @@ export default function OracleScreen() {
           onEndReached={loadMoreHistory}
           onEndReachedThreshold={0.5}
           ListHeaderComponent={
-            quotaExceeded ? <QuotaExceeded /> : null
+            quotaExceeded ? <QuotaExceeded onUpgrade={() => setShowPaywall(true)} /> : null
           }
         />
 
@@ -584,6 +593,16 @@ export default function OracleScreen() {
           </View>
         </View>
       </KeyboardAvoidingView>
+      <Paywall
+        visible={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onSubscribed={() => {
+          setQuotaExceeded(false);
+          fetchTodayConversation().then((data) => {
+            setQuota(data.quota.used, data.quota.total, data.quota.remaining);
+          });
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -762,6 +781,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.onSurfaceVariant,
     lineHeight: 20,
+  },
+  quotaUpgradeBtn: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: colors.gold.muted,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  quotaUpgradeText: {
+    fontFamily: fonts.display.bold,
+    fontSize: 11,
+    color: colors.gold.light,
+    letterSpacing: 1,
   },
 
   // ---- Date Divider ----
