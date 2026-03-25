@@ -1,0 +1,4 @@
+app_identifier("ai.mordoo.app")
+
+# App Store Connect API Key authentication
+json_key_file(ENV["APP_STORE_CONNECT_API_KEY_PATH"]) if ENV["APP_STORE_CONNECT_API_KEY_PATH"]

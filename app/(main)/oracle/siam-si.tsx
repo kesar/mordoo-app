@@ -216,7 +216,7 @@ export default function SiamSiScreen() {
               onPress={() => {
                 analytics.track('share_tapped', { content_type: 'siam_si' });
                 const fortuneLabel = fortuneLabels[currentStick.fortune] ?? currentStick.fortune;
-                shareCard(t('siamSi.share.message', { number: currentStick.number, fortune: fortuneLabel }));
+                shareCard(t('siamSi.share.message', { number: currentStick.number, fortune: fortuneLabel }), 'siam_si');
               }}
               disabled={isSharing}
             >
@@ -297,6 +297,7 @@ export default function SiamSiScreen() {
       <Paywall
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
+        source="siam_si_quota"
         onSubscribed={() => {
           refreshQuota();
         }}

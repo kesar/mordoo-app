@@ -270,7 +270,7 @@ export default function PulseScreen() {
                 style={({ pressed }) => [styles.shareBtn, pressed && { opacity: 0.7 }]}
                 onPress={() => {
                   analytics.track('share_tapped', { content_type: 'pulse' });
-                  shareCard(t('share.message', { score: pulse.energyScore }));
+                  shareCard(t('share.message', { score: pulse.energyScore }), 'pulse');
                 }}
                 disabled={isSharing}
               >

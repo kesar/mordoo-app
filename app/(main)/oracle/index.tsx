@@ -596,6 +596,7 @@ export default function OracleScreen() {
       <Paywall
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
+        source="oracle_quota"
         onSubscribed={() => {
           setQuotaExceeded(false);
           fetchTodayConversation().then((data) => {

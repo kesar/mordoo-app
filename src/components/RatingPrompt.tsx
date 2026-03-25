@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
   Modal,
   Pressable,
@@ -23,6 +23,12 @@ interface RatingPromptProps {
 
 export function RatingPrompt({ visible, onClose }: RatingPromptProps) {
   const { t } = useTranslation('common');
+
+  useEffect(() => {
+    if (visible) {
+      analytics.track('rating_prompt_shown');
+    }
+  }, [visible]);
 
   const handlePositive = useCallback(async () => {
     lightHaptic();

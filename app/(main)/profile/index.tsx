@@ -246,6 +246,7 @@ export default function ProfileScreen() {
       <Paywall
         visible={showPaywall}
         onClose={() => setShowPaywall(false)}
+        source="profile"
         onSubscribed={() => {
           refreshStatus();
           refetch();

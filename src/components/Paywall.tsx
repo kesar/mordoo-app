@@ -25,18 +25,19 @@ interface PaywallProps {
   visible: boolean;
   onClose: () => void;
   onSubscribed?: () => void;
+  source?: string;
 }
 
-export function Paywall({ visible, onClose, onSubscribed }: PaywallProps) {
+export function Paywall({ visible, onClose, onSubscribed, source }: PaywallProps) {
   const { t } = useTranslation('paywall');
   const { offering, subscribe, restore, isPurchasing, isRestoring } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
 
   useEffect(() => {
     if (visible) {
-      analytics.track('paywall_shown');
+      analytics.track('paywall_shown', { source: source ?? 'unknown' });
     }
-  }, [visible]);
+  }, [visible, source]);
 
   const annualPkg = offering?.availablePackages.find(
     (p) => p.packageType === PACKAGE_TYPE.ANNUAL,
@@ -51,16 +52,16 @@ export function Paywall({ visible, onClose, onSubscribed }: PaywallProps) {
   const handlePurchase = async () => {
     if (!selectedPkg) return;
     lightHaptic();
-    analytics.track('paywall_purchase_initiated', { plan: selectedPlan });
+    analytics.track('paywall_purchase_initiated', { plan: selectedPlan, source: source ?? 'unknown' });
     try {
       const result = await subscribe(selectedPkg);
       if (result.isPremium) {
-        analytics.track('subscription_started', { plan: selectedPlan });
+        analytics.track('subscription_started', { plan: selectedPlan, source: source ?? 'unknown' });
         onSubscribed?.();
         onClose();
       }
     } catch {
-      analytics.track('paywall_purchase_failed', { plan: selectedPlan });
+      analytics.track('paywall_purchase_failed', { plan: selectedPlan, source: source ?? 'unknown' });
       Alert.alert(t('purchaseError'));
     }
   };
@@ -103,7 +104,7 @@ export function Paywall({ visible, onClose, onSubscribed }: PaywallProps) {
     >
       <View style={styles.container}>
         {/* Close button */}
-        <Pressable style={styles.closeBtn} onPress={() => { analytics.track('paywall_dismissed'); onClose(); }} hitSlop={16}>
+        <Pressable style={styles.closeBtn} onPress={() => { analytics.track('paywall_dismissed', { source: source ?? 'unknown' }); onClose(); }} hitSlop={16}>
           <Text style={styles.closeText}>✕</Text>
         </Pressable>
 

@@ -1,0 +1,192 @@
+default_platform(:ios)
+
+# App Store Connect API Key
+API_KEY = app_store_connect_api_key(
+  key_id: "8522GN55AR",
+  issuer_id: "69a6de84-0d5e-47e3-e053-5b8c7c11a4d1",
+  key_filepath: File.expand_path("~/.appstoreconnect/private_keys/AuthKey_8522GN55AR.p8"),
+  in_house: false
+)
+
+platform :ios do
+  # ─── Metadata ───────────────────────────────────────────────
+  desc "Download existing metadata from App Store Connect"
+  lane :download_metadata do
+    deliver(
+      api_key: API_KEY,
+      app_identifier: "ai.mordoo.app",
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      run_precheck_before_submit: false,
+      force: true
+    )
+  end
+
+  desc "Upload metadata to App Store Connect"
+  lane :upload_metadata do
+    deliver(
+      api_key: API_KEY,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      force: true,
+      precheck_include_in_app_purchases: false,
+      run_precheck_before_submit: false,
+      skip_app_version_update: false
+    )
+  end
+
+  # ─── Screenshots ────────────────────────────────────────────
+  desc "Upload screenshots to App Store Connect"
+  lane :upload_screenshots do
+    deliver(
+      api_key: API_KEY,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      force: true,
+      overwrite_screenshots: true
+    )
+  end
+
+  # ─── Full Deliver ───────────────────────────────────────────
+  desc "Upload everything (metadata + screenshots) to App Store Connect"
+  lane :deliver_all do
+    deliver(
+      api_key: API_KEY,
+      skip_binary_upload: true,
+      force: true,
+      overwrite_screenshots: true,
+      precheck_include_in_app_purchases: false
+    )
+  end
+
+  # ─── Sync from ASC ─────────────────────────────────────────
+  desc "Download all metadata from App Store Connect"
+  lane :sync do
+    require 'spaceship'
+    require 'fileutils'
+
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**{
+      key_id: API_KEY[:key_id],
+      issuer_id: API_KEY[:issuer_id],
+      key: API_KEY[:key]
+    })
+
+    app = Spaceship::ConnectAPI::App.find("ai.mordoo.app")
+    UI.user_error!("App not found!") unless app
+
+    # Get version (edit or live)
+    version = app.get_edit_app_store_version || app.get_live_app_store_version
+    UI.user_error!("No app version found!") unless version
+
+    UI.message("Found version: #{version.version_string}")
+
+    # Download version-level localizations
+    localizations = version.get_app_store_version_localizations
+    localizations.each do |loc|
+      locale = loc.locale
+      dir = File.join("metadata", locale)
+      FileUtils.mkdir_p(dir)
+
+      {
+        "description.txt" => loc.description,
+        "keywords.txt" => loc.keywords,
+        "promotional_text.txt" => loc.promotional_text,
+        "support_url.txt" => loc.support_url,
+        "marketing_url.txt" => loc.marketing_url,
+        "release_notes.txt" => loc.whats_new
+      }.each do |filename, content|
+        next if content.nil?
+        File.write(File.join(dir, filename), content.to_s)
+        UI.message("Saved #{locale}/#{filename}")
+      end
+    end
+
+    # Download app-level info (name, subtitle, privacy URL)
+    app_info = app.fetch_latest_app_info
+    if app_info
+      info_locs = app_info.get_app_info_localizations
+      info_locs.each do |loc|
+        locale = loc.locale
+        dir = File.join("metadata", locale)
+        FileUtils.mkdir_p(dir)
+
+        File.write(File.join(dir, "name.txt"), loc.name.to_s)
+        File.write(File.join(dir, "subtitle.txt"), loc.subtitle.to_s)
+        File.write(File.join(dir, "privacy_url.txt"), loc.privacy_policy_url.to_s)
+        UI.message("Saved #{locale}/name.txt, subtitle.txt, privacy_url.txt")
+      end
+    end
+
+    UI.success("Metadata downloaded to fastlane/metadata/")
+  end
+
+  # ─── Build Assignment ──────────────────────────────────────
+  desc "Assign latest build to the app store version"
+  lane :assign_build do
+    require 'spaceship'
+
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**{
+      key_id: API_KEY[:key_id],
+      issuer_id: API_KEY[:issuer_id],
+      key: API_KEY[:key]
+    })
+
+    app = Spaceship::ConnectAPI::App.find("ai.mordoo.app")
+    version = app.get_edit_app_store_version
+    UI.user_error!("No editable version found!") unless version
+
+    builds = app.get_builds(filter: {}, limit: 10)
+    latest = builds.first
+    UI.user_error!("No builds found!") unless latest
+
+    UI.message("Assigning build #{latest.version} to version #{version.version_string}...")
+    version.select_build(build_id: latest.id)
+    UI.success("Build #{latest.version} assigned to version #{version.version_string}!")
+  end
+
+  # ─── Prepare for Submission ────────────────────────────────
+  desc "Set age rating for the app"
+  lane :set_age_rating do
+    require 'spaceship'
+
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**{
+      key_id: API_KEY[:key_id],
+      issuer_id: API_KEY[:issuer_id],
+      key: API_KEY[:key]
+    })
+
+    app = Spaceship::ConnectAPI::App.find("ai.mordoo.app")
+    app_info = app.fetch_latest_app_info
+    age_rating = app_info.fetch_age_rating_declaration
+
+    if age_rating
+      age_rating.update(attributes: {
+        "alcoholTobaccoOrDrugUseOrReferences" => "NONE",
+        "contests" => "NONE",
+        "gamblingSimulated" => "NONE",
+        "gambling" => false,
+        "gunsOrOtherWeapons" => "NONE",
+        "horrorOrFearThemes" => "NONE",
+        "matureOrSuggestiveThemes" => "INFREQUENT_OR_MILD",
+        "medicalOrTreatmentInformation" => "NONE",
+        "profanityOrCrudeHumor" => "NONE",
+        "sexualContentOrNudity" => "NONE",
+        "sexualContentGraphicAndNudity" => "NONE",
+        "violenceCartoonOrFantasy" => "NONE",
+        "violenceRealistic" => "NONE",
+        "violenceRealisticProlongedGraphicOrSadistic" => "NONE",
+        "lootBox" => false,
+        "unrestrictedWebAccess" => false,
+        "ageAssurance" => false,
+        "advertising" => false,
+        "healthOrWellnessTopics" => false,
+        "userGeneratedContent" => false,
+        "messagingAndChat" => false,
+        "parentalControls" => false
+      })
+      UI.success("Age rating updated!")
+    else
+      UI.user_error!("No age rating declaration found")
+    end
+  end
+end
