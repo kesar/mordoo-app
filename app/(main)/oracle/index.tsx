@@ -388,18 +388,24 @@ export default function OracleScreen() {
   const allItems = useMemo<ListItem[]>(() => {
     const items: ListItem[] = [];
 
+    // Collect today's message IDs to avoid duplicates from history
+    const todayMessageIds = new Set(messages.map((m) => m.id));
+
     // Past conversations (oldest first since they're loaded in desc order)
+    // Filter out today's conversation to prevent duplicate keys
     const pastReversed = [...pastConversations].reverse();
     for (const conv of pastReversed) {
+      if (conv.conversationDate === conversationDate) continue;
       items.push({ type: 'date-divider', id: `div-${conv.conversationDate}`, date: conv.conversationDate });
       for (const msg of conv.messages) {
+        if (todayMessageIds.has(msg.id)) continue;
         items.push({ ...msg, type: 'message' });
       }
     }
 
     // Today's messages
     const todayMsgs = messages.length === 0 ? [welcomeMessage] : messages;
-    if (conversationDate && pastConversations.length > 0) {
+    if (conversationDate && items.length > 0) {
       items.push({ type: 'date-divider', id: `div-${conversationDate}`, date: conversationDate });
     }
     for (const msg of todayMsgs) {
