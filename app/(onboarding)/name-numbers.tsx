@@ -86,7 +86,7 @@ export default function NameNumbersScreen() {
         {/* Progress */}
         <ProgressIndicator
           currentStep={3}
-          totalSteps={6}
+          totalSteps={4}
           label={t('nameNumbers.step')}
         />
 

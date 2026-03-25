@@ -27,7 +27,7 @@
     "errorVerifyCode": "Invalid verification code."
   },
   "birthData": {
-    "step": "Phase 2 of 6 — The Blueprint",
+    "step": "Phase 2 of 4 — The Blueprint",
     "title": "Your Celestial Foundation",
     "subtitle": "This data is sacred — it defines your cosmic blueprint.",
     "dateLabel": "Solar Alignment (Date of Birth)",
@@ -57,7 +57,7 @@
     "footer": "Fate awaits your initiation"
   },
   "nameNumbers": {
-    "step": "Phase 3 of 6 — The Vibration",
+    "step": "Phase 3 of 4 — The Vibration",
     "title": "Your Cosmic Signature",
     "subtitle": "Names and numbers carry vibrational frequencies that shape your destiny.",
     "fullNameLabel": "Name Vibration (Full Name)",
@@ -71,7 +71,7 @@
     "footer": "Your name echoes in the cosmic ledger"
   },
   "lifeContext": {
-    "step": "Phase 4 of 6 — The Intent",
+    "step": "Phase 4 of 4 — The Intent",
     "title": "What Brings You Here?",
     "subtitle": "Select the forces stirring within your soul.",
     "forcesLabel": "Life Forces",

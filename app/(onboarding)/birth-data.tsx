@@ -119,7 +119,7 @@ export default function BirthDataScreen() {
         {/* Progress */}
         <ProgressIndicator
           currentStep={2}
-          totalSteps={6}
+          totalSteps={4}
           label={t('birthData.step')}
         />
 

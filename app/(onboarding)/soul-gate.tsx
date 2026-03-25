@@ -124,7 +124,7 @@ export default function SoulGate() {
         <View style={styles.progressWrapper}>
           <ProgressIndicator
             currentStep={1}
-            totalSteps={3}
+            totalSteps={4}
             label={t('soulGate.step')}
           />
         </View>
