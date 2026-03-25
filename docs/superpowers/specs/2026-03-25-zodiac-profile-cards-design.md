@@ -69,7 +69,7 @@ Returns the animal key (e.g., `"rat"`, `"ox"`) using year modulo 12.
 
 ### `getChineseElement(dateOfBirth: string): string`
 
-Returns the element key (e.g., `"wood"`, `"fire"`) using the heavenly stem cycle: `year % 10` mapped to Wood (0-1), Fire (2-3), Earth (4-5), Metal (6-7), Water (8-9).
+Returns the element key (e.g., `"wood"`, `"fire"`) using the heavenly stem cycle: `year % 10` mapped to Metal (0-1), Water (2-3), Wood (4-5), Fire (6-7), Earth (8-9).
 
 ### Content Maps (API-side only)
 

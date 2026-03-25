@@ -35,7 +35,7 @@ const WESTERN_SIGNS = [
   { sign: 'libra',       startMonth: 9,  startDay: 23, endMonth: 10, endDay: 22 },
   { sign: 'scorpio',     startMonth: 10, startDay: 23, endMonth: 11, endDay: 21 },
   { sign: 'sagittarius', startMonth: 11, startDay: 22, endMonth: 12, endDay: 21 },
-  { sign: 'capricorn2',  startMonth: 12, startDay: 22, endMonth: 12, endDay: 31 },
+  { sign: 'capricorn',   startMonth: 12, startDay: 22, endMonth: 12, endDay: 31 },
 ] as const;
 
 export function getWesternZodiacSign(dateOfBirth: string): string {
@@ -45,11 +45,12 @@ export function getWesternZodiacSign(dateOfBirth: string): string {
   const day = parseInt(dayStr, 10);
 
   for (const entry of WESTERN_SIGNS) {
-    if (
-      (month === entry.startMonth && day >= entry.startDay) ||
-      (month === entry.endMonth && day <= entry.endDay)
-    ) {
-      return entry.sign.replace('2', ''); // capricorn2 -> capricorn
+    const afterStart = month > entry.startMonth ||
+                       (month === entry.startMonth && day >= entry.startDay);
+    const beforeEnd = month < entry.endMonth ||
+                      (month === entry.endMonth && day <= entry.endDay);
+    if (afterStart && beforeEnd) {
+      return entry.sign;
     }
   }
   return 'capricorn'; // fallback (should not happen)
@@ -89,11 +90,18 @@ export function getChineseElement(dateOfBirth: string): string {
 }
 ```
 
-- [ ] **Step 4: Verify manually**
+- [ ] **Step 4: Verify manually with boundary cases**
 
-Run: `npx ts-node -e "const z = require('./shared/zodiac'); console.log(z.getWesternZodiacSign('1990-03-25')); console.log(z.getChineseZodiacAnimal('1990-03-25')); console.log(z.getChineseElement('1990-03-25'));"`
+Run: `npx ts-node -e "const z = require('./shared/zodiac'); console.log('Mar 25:', z.getWesternZodiacSign('1990-03-25')); console.log('Jan 20:', z.getWesternZodiacSign('1990-01-20')); console.log('Jan 19:', z.getWesternZodiacSign('1990-01-19')); console.log('Dec 22:', z.getWesternZodiacSign('1990-12-22')); console.log('Dec 21:', z.getWesternZodiacSign('1990-12-21')); console.log('Animal:', z.getChineseZodiacAnimal('1990-03-25')); console.log('Element:', z.getChineseElement('1990-03-25'));"`
 
-Expected: `aries`, `horse`, `metal`
+Expected:
+- Mar 25 → `aries`
+- Jan 20 → `aquarius`
+- Jan 19 → `capricorn`
+- Dec 22 → `capricorn`
+- Dec 21 → `sagittarius`
+- Animal → `horse`
+- Element → `metal`
 
 - [ ] **Step 5: Commit**
 
