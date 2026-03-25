@@ -20,7 +20,8 @@
     "free": "Freemium",
     "standard": "Standard",
     "upgrade": "Upgrade to Standard",
-    "price": "฿149/month"
+    "price": "฿149/month",
+    "annualPrice": "฿1,190/year"
   },
   "rating": {
     "title": "Are you enjoying Mor Doo?",

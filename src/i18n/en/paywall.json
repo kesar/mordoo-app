@@ -1,0 +1,32 @@
+{
+  "title": "Unlock Your Full Potential",
+  "subtitle": "The Oracle has more to share with you. Unlimited questions, unlimited Siam Si, and a memory that grows with your journey.",
+  "benefits": {
+    "unlimitedOracle": "Unlimited Oracle questions",
+    "unlimitedSiamSi": "Unlimited Siam Si draws",
+    "memory": "Oracle remembers your journey",
+    "tarot": "All tarot spreads unlocked"
+  },
+  "annual": {
+    "label": "Annual",
+    "price": "฿1,190/yr",
+    "perMonth": "฿99/mo",
+    "badge": "SAVE 33%"
+  },
+  "monthly": {
+    "label": "Monthly",
+    "price": "฿149/mo"
+  },
+  "cta": "Start 7-Day Free Trial",
+  "restore": "Restore Purchases",
+  "terms": "Terms & Privacy",
+  "notNow": "Not now",
+  "quotaExceeded": {
+    "title": "You've used your daily reading",
+    "body": "Unlock unlimited access or come back tomorrow.",
+    "comeBack": "Your next free reading is available tomorrow."
+  },
+  "restoreSuccess": "Subscription restored!",
+  "restoreNotFound": "No active subscription found.",
+  "purchaseError": "Purchase failed. Please try again."
+}
