@@ -58,6 +58,14 @@ npx expo run:android   # Run on Android emulator
 # API backend
 cd api && npm run dev   # Start API dev server (localhost:3001)
 cd api && npm run build # Build for production
+
+# Tests
+npm test               # Run all shared tests (vitest)
+npm run test:watch     # Run tests in watch mode
+
+# OTA Updates
+eas update --channel production --message "description"   # Push OTA update manually
+eas workflow:run .eas/workflows/send-updates.yml           # Trigger OTA workflow manually
 ```
 
 ## Key Conventions
@@ -120,6 +128,33 @@ SUPABASE_SERVICE_ROLE_KEY=
 ANTHROPIC_API_KEY=
 REVENUECAT_WEBHOOK_KEY=        # Secret for RevenueCat webhook auth (Bearer token)
 ```
+
+## Testing
+
+- **Runner:** Vitest (config in `vitest.config.ts`)
+- **Test location:** `shared/__tests__/*.test.ts`
+- **Scope:** All shared pure logic — compute-reading, siam-si, zodiac, hash, insight-templates
+- Tests run in CI on every PR and push to `main`
+
+## CI/CD
+
+### GitHub Actions (`.github/workflows/ci.yml`)
+Runs on every PR and push to `main` — 4 parallel jobs:
+- **Typecheck (Mobile)** — `tsc --noEmit` on the RN app
+- **Typecheck (API)** — `tsc --noEmit` on the Next.js API
+- **Tests** — `vitest run` (shared tests)
+- **Build (API)** — `next build` verification
+
+### OTA Updates (EAS Update)
+- **Package:** `expo-updates` handles checking/downloading updates on app launch
+- **Config:** `runtimeVersion` in `app.json` + `channel` per build profile in `eas.json`
+- **Channels:** `development`, `preview`, `production` (set per build profile in `eas.json`)
+- **Automated:** `.eas/workflows/send-updates.yml` pushes OTA to `production` channel on push to `main` (only when mobile-relevant files change — `app/`, `src/`, `shared/`, `assets/`)
+- **IMPORTANT:** `runtimeVersion` in `app.json` must be a hardcoded string (e.g., `"1.0.0"`), NOT a policy object — bare workflow doesn't support policies. Bump this value whenever native code changes (new native modules, SDK upgrades, etc.) so OTA updates only target compatible builds.
+
+### Vercel (API)
+- Auto-deploys `api/` on push to `main`
+- Deployed at `api.mordoo.app`
 
 ## Architecture Decisions
 - Guest auth was removed — sign-in is required (phone OTP or email)
