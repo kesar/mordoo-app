@@ -6,45 +6,44 @@ import {
   purchasePackage,
   restorePurchases,
 } from '@/src/services/purchases';
+import { useSubscriptionStore } from '@/src/stores/subscriptionStore';
 import { features } from '@/src/config/features';
 
 export function useSubscription() {
-  const [isPremium, setIsPremium] = useState(false);
+  const isPremium = useSubscriptionStore((s) => s.isPremium);
+  const isLoaded = useSubscriptionStore((s) => s.isLoaded);
   const [offering, setOffering] = useState<PurchasesOffering | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingOfferings, setIsLoadingOfferings] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
 
   useEffect(() => {
     if (!features.paywall) {
-      setIsLoading(false);
+      setIsLoadingOfferings(false);
       return;
     }
 
     let cancelled = false;
 
     async function init() {
-      const [status, currentOffering] = await Promise.all([
-        checkSubscriptionStatus(),
+      const [, currentOffering] = await Promise.all([
+        // Only check status if not yet loaded (avoids redundant calls)
+        isLoaded ? Promise.resolve() : checkSubscriptionStatus(),
         getOfferings(),
       ]);
       if (cancelled) return;
-      setIsPremium(status.isPremium);
       setOffering(currentOffering);
-      setIsLoading(false);
+      setIsLoadingOfferings(false);
     }
 
     init();
     return () => { cancelled = true; };
-  }, []);
+  }, [isLoaded]);
 
   const subscribe = useCallback(async (pkg: PurchasesPackage) => {
     setIsPurchasing(true);
     try {
       const result = await purchasePackage(pkg);
-      if (result.isPremium) {
-        setIsPremium(true);
-      }
       return result;
     } finally {
       setIsPurchasing(false);
@@ -55,7 +54,6 @@ export function useSubscription() {
     setIsRestoring(true);
     try {
       const result = await restorePurchases();
-      setIsPremium(result.isPremium);
       return result.isPremium;
     } finally {
       setIsRestoring(false);
@@ -64,14 +62,13 @@ export function useSubscription() {
 
   const refreshStatus = useCallback(async () => {
     const status = await checkSubscriptionStatus();
-    setIsPremium(status.isPremium);
     return status.isPremium;
   }, []);
 
   return {
     isPremium,
     offering,
-    isLoading,
+    isLoading: isLoadingOfferings || !isLoaded,
     isPurchasing,
     isRestoring,
     subscribe,

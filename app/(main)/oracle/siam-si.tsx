@@ -23,6 +23,7 @@ import { Paywall } from '@/src/components/Paywall';
 import { GoldButton } from '@/src/components/ui/GoldButton';
 import { mediumHaptic, successHaptic } from '@/src/utils/haptics';
 import { analytics } from '@/src/services/analytics';
+import { onSubscriptionChange } from '@/src/services/purchases';
 
 const siamSiSticks = require('@/assets/images/siam-si-sticks.webp');
 
@@ -78,6 +79,13 @@ export default function SiamSiScreen() {
       if (state === 'active') refreshQuota();
     });
     return () => subscription.remove();
+  }, [refreshQuota]);
+
+  // Refresh quota when subscription status changes (purchase, restore, renewal)
+  useEffect(() => {
+    return onSubscriptionChange((isPremium) => {
+      if (isPremium) refreshQuota();
+    });
   }, [refreshQuota]);
 
   // Animations

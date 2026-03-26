@@ -17,7 +17,7 @@ import { useNotificationHandler } from '@/src/hooks/useNotificationHandler';
 import { useAnalytics } from '@/src/hooks/useAnalytics';
 import { PostHogProvider, posthog } from '@/src/services/analytics';
 import { incrementSession } from '@/src/services/rating';
-import { configureRevenueCat, identifyUser } from '@/src/services/purchases';
+import { configureRevenueCat, identifyUser, checkSubscriptionStatus } from '@/src/services/purchases';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useNetworkStatus } from '@/src/hooks/useNetworkStatus';
 import { OfflineBanner } from '@/src/components/OfflineBanner';
@@ -46,7 +46,7 @@ function AppContent() {
 
   useEffect(() => {
     if (userId) {
-      identifyUser(userId);
+      identifyUser(userId).then(() => checkSubscriptionStatus());
     }
   }, [userId]);
 

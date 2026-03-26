@@ -5,6 +5,7 @@ import Purchases, {
   type PurchasesOffering,
   type PurchasesPackage,
 } from 'react-native-purchases';
+import { useSubscriptionStore } from '@/src/stores/subscriptionStore';
 
 const REVENUECAT_IOS_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY!;
 const REVENUECAT_ANDROID_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY!;
@@ -12,6 +13,20 @@ const REVENUECAT_ANDROID_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY!;
 const ENTITLEMENT_ID = 'standard';
 
 let isConfigured = false;
+
+// Event listeners for subscription changes (screens subscribe to refresh quotas)
+type SubscriptionChangeListener = (isPremium: boolean) => void;
+const subscriptionChangeListeners = new Set<SubscriptionChangeListener>();
+
+export function onSubscriptionChange(listener: SubscriptionChangeListener): () => void {
+  subscriptionChangeListeners.add(listener);
+  return () => { subscriptionChangeListeners.delete(listener); };
+}
+
+function notifySubscriptionChange(isPremium: boolean) {
+  useSubscriptionStore.getState().setPremium(isPremium);
+  subscriptionChangeListeners.forEach((listener) => listener(isPremium));
+}
 
 /** Initialize RevenueCat SDK. Call once at app start. */
 export function configureRevenueCat(): void {
@@ -29,6 +44,12 @@ export function configureRevenueCat(): void {
 
   Purchases.configure({ apiKey });
   isConfigured = true;
+
+  // Listen for any customer info changes (purchases, renewals, expirations)
+  Purchases.addCustomerInfoUpdateListener((customerInfo: CustomerInfo) => {
+    const isPremium = customerInfo.entitlements.active[ENTITLEMENT_ID] !== undefined;
+    notifySubscriptionChange(isPremium);
+  });
 }
 
 /** Identify the RevenueCat user (call after auth). */
@@ -45,18 +66,23 @@ export async function logOutPurchases(): Promise<void> {
   await Purchases.logOut();
 }
 
-/** Check if user has active 'standard' entitlement. */
+/** Check if user has active 'standard' entitlement. Also updates global store. */
 export async function checkSubscriptionStatus(): Promise<{
   isPremium: boolean;
   customerInfo: CustomerInfo | null;
 }> {
-  if (!isConfigured) return { isPremium: false, customerInfo: null };
+  if (!isConfigured) {
+    useSubscriptionStore.getState().setLoaded();
+    return { isPremium: false, customerInfo: null };
+  }
 
   try {
     const customerInfo = await Purchases.getCustomerInfo();
     const isPremium = customerInfo.entitlements.active[ENTITLEMENT_ID] !== undefined;
+    useSubscriptionStore.getState().setPremium(isPremium);
     return { isPremium, customerInfo };
   } catch {
+    useSubscriptionStore.getState().setLoaded();
     return { isPremium: false, customerInfo: null };
   }
 }
@@ -82,6 +108,9 @@ export async function purchasePackage(pkg: PurchasesPackage): Promise<{
   try {
     const { customerInfo } = await Purchases.purchasePackage(pkg);
     const isPremium = customerInfo.entitlements.active[ENTITLEMENT_ID] !== undefined;
+    if (isPremium) {
+      notifySubscriptionChange(isPremium);
+    }
     return { success: isPremium, isPremium, cancelled: false };
   } catch (error: any) {
     if (error.userCancelled) {
@@ -98,5 +127,6 @@ export async function restorePurchases(): Promise<{
 }> {
   const customerInfo = await Purchases.restorePurchases();
   const isPremium = customerInfo.entitlements.active[ENTITLEMENT_ID] !== undefined;
+  notifySubscriptionChange(isPremium);
   return { isPremium, customerInfo };
 }

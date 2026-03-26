@@ -33,6 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { analytics } from '@/src/services/analytics';
 import { Paywall } from '@/src/components/Paywall';
 import { features } from '@/src/config/features';
+import { onSubscriptionChange } from '@/src/services/purchases';
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -348,6 +349,20 @@ export default function OracleScreen() {
         .catch(() => {});
     }, [isAuthenticated, currentUserId, conversationDate, setTodayConversation, setQuota]),
   );
+
+  // Refresh quota when subscription status changes (purchase, restore, renewal)
+  useEffect(() => {
+    return onSubscriptionChange((isPremium) => {
+      if (isPremium) {
+        setQuotaExceeded(false);
+        fetchTodayConversation()
+          .then((data) => {
+            setQuota(data.quota.used, data.quota.total, data.quota.remaining);
+          })
+          .catch(() => {});
+      }
+    });
+  }, [setQuota]);
 
   const welcomeMessage = useMemo<ChatMessage>(() => ({
     id: 'welcome',
