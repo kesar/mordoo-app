@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '../../../../lib/supabase';
 import { authenticateRequest } from '../../../../lib/auth';
-import { getBangkokDateString } from '../../../../lib/date';
+import { getDateStringForTimezone } from '../../../../lib/date';
 import { FREE_ORACLE_QUESTIONS_PER_DAY } from '../../../../lib/config';
 
 export async function GET(request: NextRequest) {
@@ -9,10 +9,19 @@ export async function GET(request: NextRequest) {
   if (authError) return authError;
 
   const serviceClient = createServiceClient();
-  const today = getBangkokDateString();
+
+  // Fetch profile first (need timezone)
+  const { data: profileData } = await serviceClient
+    .from('profiles')
+    .select('tier, timezone')
+    .eq('id', user.id)
+    .single();
+
+  const timezone = profileData?.timezone ?? 'Asia/Bangkok';
+  const today = getDateStringForTimezone(timezone);
 
   // Fetch conversation and quota in parallel
-  const [conversationResult, quotaResult, profileResult] = await Promise.all([
+  const [conversationResult, quotaResult] = await Promise.all([
     serviceClient
       .from('oracle_conversations')
       .select('id, conversation_date')
@@ -24,14 +33,9 @@ export async function GET(request: NextRequest) {
       .select('oracle_questions_today, oracle_last_reset')
       .eq('user_id', user.id)
       .single(),
-    serviceClient
-      .from('profiles')
-      .select('tier')
-      .eq('id', user.id)
-      .single(),
   ]);
 
-  const tier = profileResult.data?.tier || 'free';
+  const tier = profileData?.tier || 'free';
   const normalizedPhone = (user.phone || '').replace(/\D/g, '');
   const isTestUser = normalizedPhone === '66000000' || user.phone === '+66000000';
   const isUnlimited = tier === 'standard' || isTestUser;
