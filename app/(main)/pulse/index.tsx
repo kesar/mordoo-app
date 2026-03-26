@@ -477,13 +477,13 @@ const styles = StyleSheet.create({
   },
   insightText: {
     fontFamily: fonts.body.regular,
-    fontSize: fontSizes.base,
+    fontSize: fontSizes.sm,
     fontStyle: 'italic',
     color: colors.onSurface,
     textAlign: 'center',
     marginTop: 20,
     maxWidth: 260,
-    lineHeight: 22,
+    lineHeight: 20,
   },
 
   // Lucky Elements
