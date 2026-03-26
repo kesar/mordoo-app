@@ -6,6 +6,7 @@ interface SubscriptionState {
 
   setPremium: (isPremium: boolean) => void;
   setLoaded: () => void;
+  reset: () => void;
 }
 
 export const useSubscriptionStore = create<SubscriptionState>()((set) => ({
@@ -14,4 +15,5 @@ export const useSubscriptionStore = create<SubscriptionState>()((set) => ({
 
   setPremium: (isPremium) => set({ isPremium, isLoaded: true }),
   setLoaded: () => set({ isLoaded: true }),
+  reset: () => set({ isPremium: false, isLoaded: false }),
 }));

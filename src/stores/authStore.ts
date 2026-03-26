@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { mmkvStorage } from '@/src/utils/zustand-mmkv';
 import type { Session } from '@supabase/supabase-js';
 import { logOutPurchases } from '@/src/services/purchases';
+import { useSubscriptionStore } from './subscriptionStore';
 
 /** Clear all user-scoped stores. Imported lazily to avoid circular deps. */
 function clearUserStores() {
@@ -12,6 +13,7 @@ function clearUserStores() {
   const { useOnboardingStore } = require('./onboardingStore');
   useOracleStore.getState().clearConversation();
   useOnboardingStore.getState().resetStore();
+  useSubscriptionStore.getState().reset();
 }
 
 interface AuthState {

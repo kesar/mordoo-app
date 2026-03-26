@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   }
 
   const appUserId = event.app_user_id;
-  const eventType = body.type;
+  const eventType = event.type;
 
   if (!appUserId) {
     return NextResponse.json({ error: 'No app_user_id' }, { status: 400 });

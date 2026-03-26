@@ -6,6 +6,7 @@ import Purchases, {
   type PurchasesPackage,
 } from 'react-native-purchases';
 import { useSubscriptionStore } from '@/src/stores/subscriptionStore';
+import { syncSubscriptionTier } from '@/src/services/account';
 
 const REVENUECAT_IOS_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY!;
 const REVENUECAT_ANDROID_KEY = process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY!;
@@ -26,6 +27,8 @@ export function onSubscriptionChange(listener: SubscriptionChangeListener): () =
 function notifySubscriptionChange(isPremium: boolean) {
   useSubscriptionStore.getState().setPremium(isPremium);
   subscriptionChangeListeners.forEach((listener) => listener(isPremium));
+  // Sync tier to server (fire-and-forget) — safety net for webhook failures
+  syncSubscriptionTier(isPremium);
 }
 
 /** Initialize RevenueCat SDK. Call once at app start. */
@@ -80,6 +83,8 @@ export async function checkSubscriptionStatus(): Promise<{
     const customerInfo = await Purchases.getCustomerInfo();
     const isPremium = customerInfo.entitlements.active[ENTITLEMENT_ID] !== undefined;
     useSubscriptionStore.getState().setPremium(isPremium);
+    // Sync to server on every status check (login, app foreground) — catches webhook gaps
+    syncSubscriptionTier(isPremium);
     return { isPremium, customerInfo };
   } catch {
     useSubscriptionStore.getState().setLoaded();
