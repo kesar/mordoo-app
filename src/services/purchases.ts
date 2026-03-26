@@ -40,8 +40,8 @@ export async function identifyUser(userId: string): Promise<void> {
 /** Log out RevenueCat user (call on sign-out). */
 export async function logOutPurchases(): Promise<void> {
   if (!isConfigured) return;
-  const { isAnonymous } = await Purchases.getCustomerInfo();
-  if (isAnonymous) return;
+  const customerInfo = await Purchases.getCustomerInfo();
+  if ((customerInfo as any).isAnonymous) return;
   await Purchases.logOut();
 }
 
