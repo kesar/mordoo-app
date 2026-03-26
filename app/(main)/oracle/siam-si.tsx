@@ -369,12 +369,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
+    paddingBottom: 100,
   },
 
   // Idle state
   idleContainer: {
     alignItems: 'center',
-    gap: 32,
+    gap: 20,
   },
   cupContainer: {
     alignItems: 'center',

@@ -8,10 +8,12 @@ interface SettingsState {
   notificationsEnabled: boolean;
   notificationTime: string;
   notificationPromptShown: boolean;
+  profilePrivate: boolean;
   setLanguage: (lang: 'en' | 'th') => void;
   setNotificationsEnabled: (enabled: boolean) => void;
   setNotificationTime: (time: string) => void;
   setNotificationPromptShown: (shown: boolean) => void;
+  toggleProfilePrivacy: () => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -21,6 +23,7 @@ export const useSettingsStore = create<SettingsState>()(
       notificationsEnabled: false,
       notificationTime: '07:00',
       notificationPromptShown: false,
+      profilePrivate: false,
 
       setLanguage: (language) => {
         i18n.changeLanguage(language);
@@ -29,6 +32,7 @@ export const useSettingsStore = create<SettingsState>()(
       setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
       setNotificationTime: (notificationTime) => set({ notificationTime }),
       setNotificationPromptShown: (notificationPromptShown) => set({ notificationPromptShown }),
+      toggleProfilePrivacy: () => set((state) => ({ profilePrivate: !state.profilePrivate })),
     }),
     {
       name: 'mordoo-settings',
@@ -38,6 +42,7 @@ export const useSettingsStore = create<SettingsState>()(
         notificationsEnabled: state.notificationsEnabled,
         notificationTime: state.notificationTime,
         notificationPromptShown: state.notificationPromptShown,
+        profilePrivate: state.profilePrivate,
       }),
     },
   ),

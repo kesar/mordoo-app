@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Switch, Alert, ScrollView, ActivityIndicator, Pressable, Modal, FlatList } from 'react-native';
+import { View, StyleSheet, Switch, Alert, ScrollView, Pressable, Modal, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -62,6 +62,65 @@ const TIMES = Array.from({ length: 96 }, (_, i) => {
   return `${h}:${m}`;
 });
 
+function ZodiacCardSkeleton() {
+  return (
+    <View style={skeletonStyles.card}>
+      <View style={skeletonStyles.row}>
+        <View style={skeletonStyles.image} />
+        <View style={skeletonStyles.info}>
+          <View style={skeletonStyles.labelLine} />
+          <View style={skeletonStyles.nameLine} />
+          <View style={skeletonStyles.detailLine} />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const skeletonStyles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.night.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: colors.night.elevated,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  image: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: colors.night.elevated,
+  },
+  info: {
+    flex: 1,
+    gap: 6,
+  },
+  labelLine: {
+    width: 80,
+    height: 10,
+    borderRadius: 4,
+    backgroundColor: colors.night.elevated,
+  },
+  nameLine: {
+    width: 120,
+    height: 16,
+    borderRadius: 4,
+    backgroundColor: colors.night.elevated,
+  },
+  detailLine: {
+    width: 160,
+    height: 10,
+    borderRadius: 4,
+    backgroundColor: colors.night.elevated,
+  },
+});
+
 export default function ProfileScreen() {
   const { t } = useTranslation('settings');
   const router = useRouter();
@@ -72,6 +131,8 @@ export default function ProfileScreen() {
   const setNotificationsEnabled = useSettingsStore((s) => s.setNotificationsEnabled);
   const notificationTime = useSettingsStore((s) => s.notificationTime);
   const setNotificationTime = useSettingsStore((s) => s.setNotificationTime);
+  const profilePrivate = useSettingsStore((s) => s.profilePrivate);
+  const toggleProfilePrivacy = useSettingsStore((s) => s.toggleProfilePrivacy);
 
   const { data: profile, isLoading, error, refetch } = useQuery({
     queryKey: ['profile', userId],
@@ -79,7 +140,7 @@ export default function ProfileScreen() {
     enabled: !!userId,
   });
 
-  const { data: zodiac } = useQuery({
+  const { data: zodiac, isLoading: zodiacLoading } = useQuery({
     queryKey: ['zodiac-signs', userId, language],
     queryFn: () => fetchZodiacSigns(language as 'en' | 'th'),
     enabled: !!userId && !!profile?.dateOfBirth,
@@ -220,8 +281,8 @@ export default function ProfileScreen() {
   };
 
   const initial = profile?.fullName?.charAt(0)?.toUpperCase() ?? '?';
-  const displayName = profile?.fullName ?? '—';
-  const birthDate = profile?.dateOfBirth
+  const fullName = profile?.fullName ?? '—';
+  const birthDateFormatted = profile?.dateOfBirth
     ? new Date(profile.dateOfBirth).toLocaleDateString(language === 'th' ? 'th-TH' : 'en-US', {
         year: 'numeric',
         month: 'long',
@@ -229,33 +290,47 @@ export default function ProfileScreen() {
       })
     : null;
 
+  const displayName = profilePrivate ? '••••••' : fullName;
+  const birthDate = profilePrivate && birthDateFormatted ? '••••••' : birthDateFormatted;
+
+  const handleProfileTap = () => {
+    lightHaptic();
+    toggleProfilePrivacy();
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Profile Card */}
         <View style={styles.profileCard}>
           {isLoading ? (
-            <ActivityIndicator color={colors.gold.DEFAULT} />
+            <View style={styles.profileRow}>
+              <View style={[styles.avatar, { backgroundColor: colors.night.elevated, borderColor: colors.night.elevated }]} />
+              <View style={styles.profileInfo}>
+                <View style={{ width: 120, height: 18, borderRadius: 4, backgroundColor: colors.night.elevated }} />
+                <View style={{ width: 160, height: 14, borderRadius: 4, backgroundColor: colors.night.elevated, marginTop: 4 }} />
+              </View>
+            </View>
           ) : error ? (
             <Pressable onPress={() => refetch()}>
               <Text style={styles.errorText}>{t('common:errors.generic')}</Text>
               <Text style={styles.retryText}>{t('common:actions.retry')}</Text>
             </Pressable>
           ) : (
-            <View style={styles.profileRow}>
+            <Pressable style={styles.profileRow} onPress={handleProfileTap}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{initial}</Text>
+                <Text style={styles.avatarText}>{profilePrivate ? '•' : initial}</Text>
               </View>
               <View style={styles.profileInfo}>
                 <Text style={styles.displayName}>{displayName}</Text>
                 {birthDate && <Text style={styles.birthDate}>{birthDate}</Text>}
               </View>
-            </View>
+            </Pressable>
           )}
         </View>
 
         {/* Zodiac Signs */}
-        {zodiac && (
+        {zodiac ? (
           <View style={{ gap: 0, marginBottom: 14 }}>
             <ZodiacCard
               systemLabel={t('westernZodiac')}
@@ -273,7 +348,12 @@ export default function ProfileScreen() {
               image={CHINESE_IMAGES[zodiac.chinese.image]}
             />
           </View>
-        )}
+        ) : (isLoading || zodiacLoading) ? (
+          <View style={{ gap: 0, marginBottom: 14 }}>
+            <ZodiacCardSkeleton />
+            <ZodiacCardSkeleton />
+          </View>
+        ) : null}
 
         {/* Subscription */}
         {features.paywall && (
