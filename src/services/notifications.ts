@@ -85,6 +85,4 @@ export async function getExpoPushToken(): Promise<string | null> {
   return tokenData.data;
 }
 
-export function getTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
+export { getTimezone } from '@/src/utils/timezone';

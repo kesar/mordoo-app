@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { supabase } from '@/src/lib/supabase';
 import { useAuthStore } from '@/src/stores/authStore';
+import { getTimezone } from '@/src/utils/timezone';
 
 export function useAuthListener() {
   const setSupabaseSession = useAuthStore((s) => s.setSupabaseSession);
@@ -11,6 +12,8 @@ export function useAuthListener() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setSupabaseSession(session);
+        // Sync device timezone to profile (fire-and-forget)
+        supabase.from('profiles').update({ timezone: getTimezone() }).eq('id', session.user.id);
       } else if (useAuthStore.getState().isAuthenticated) {
         logout();
       }
