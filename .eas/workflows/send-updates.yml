@@ -3,14 +3,6 @@ name: Send OTA update
 on:
   push:
     branches: ['main']
-    paths:
-      - app/**
-      - src/**
-      - shared/**
-      - assets/**
-      - app.json
-      - package.json
-      - '!api/**'
 
 jobs:
   send_update:
