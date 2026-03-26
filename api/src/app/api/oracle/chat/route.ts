@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '../../../../lib/supabase';
 import { anthropic } from '../../../../lib/anthropic';
 import { authenticateRequest } from '../../../../lib/auth';
-import { getBangkokDateString } from '../../../../lib/date';
+import { getDateStringForTimezone } from '../../../../lib/date';
 import {
   ORACLE_MODEL,
   ORACLE_MAX_TOKENS,
@@ -23,6 +23,7 @@ function buildSystemPrompt(
   birthData?: { dateOfBirth: string; fullName?: string; concerns: string[] },
   lang?: string,
   summaries?: Array<{ date: string; summary: string }>,
+  today?: string,
 ) {
   let context = '';
   if (birthData) {
@@ -60,7 +61,7 @@ Your personality:
 - Use mystical but clear language — no generic fortune cookie responses
 - Never use emojis — use words and markdown formatting (bold, italic) instead
 - When appropriate, give specific actionable advice tied to astrological timing
-- Today's date: ${getBangkokDateString()}
+- Today's date: ${today ?? new Date().toISOString().slice(0, 10)}
 ${context}${summaryContext}
 ${lang === 'th'
     ? 'ตอบเป็นภาษาไทยเสมอ ใช้ภาษาที่สุภาพและเข้าใจง่าย'
@@ -142,7 +143,15 @@ export async function POST(request: NextRequest) {
 
   // 4. Check quota
   const serviceClient = createServiceClient();
-  const today = getBangkokDateString();
+
+  const { data: profile } = await serviceClient
+    .from('profiles')
+    .select('tier, timezone')
+    .eq('id', user.id)
+    .single();
+
+  const timezone = profile?.timezone ?? 'Asia/Bangkok';
+  const today = getDateStringForTimezone(timezone);
 
   const { data: quota, error: quotaError } = await serviceClient
     .from('user_quotas')
@@ -153,12 +162,6 @@ export async function POST(request: NextRequest) {
   if (quotaError && quotaError.code !== PGRST_NOT_FOUND) {
     return NextResponse.json({ error: 'Failed to check quota' }, { status: 500 });
   }
-
-  const { data: profile } = await serviceClient
-    .from('profiles')
-    .select('tier')
-    .eq('id', user.id)
-    .single();
 
   const tier = profile?.tier || 'free';
   const normalizedPhone = (user.phone || '').replace(/\D/g, '');
@@ -200,7 +203,7 @@ export async function POST(request: NextRequest) {
   // 5. Conversation persistence
   let conversation: { id: string; conversationDate: string };
   try {
-    conversation = await findOrCreateConversation(serviceClient, user.id);
+    conversation = await findOrCreateConversation(serviceClient, user.id, timezone);
   } catch {
     return NextResponse.json({ error: 'Failed to create conversation' }, { status: 500 });
   }
@@ -209,7 +212,7 @@ export async function POST(request: NextRequest) {
   await saveMessage(serviceClient, conversation.id, user.id, 'user', message);
 
   // Fire async summarization (non-blocking)
-  summarizeConversation(serviceClient, user.id);
+  summarizeConversation(serviceClient, user.id, timezone);
 
   // 6. Build context with history
   const [recentMessages, summaries] = await Promise.all([
@@ -221,6 +224,7 @@ export async function POST(request: NextRequest) {
     birthData ?? undefined,
     rawLang ?? undefined,
     summaries,
+    today,
   );
 
   // Build messages array: recent history + new message (already saved, included in recentMessages)
