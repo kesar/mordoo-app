@@ -7,14 +7,15 @@ import {
   MAX_CONTEXT_MESSAGES,
   MAX_SUMMARY_DAYS,
 } from './config';
-import { getBangkokDateString } from './date';
+import { getDateStringForTimezone } from './date';
 
 /** Find or create today's conversation for a user. Uses upsert to avoid race conditions. */
 export async function findOrCreateConversation(
   client: SupabaseClient,
   userId: string,
+  timezone: string,
 ): Promise<{ id: string; conversationDate: string }> {
-  const today = getBangkokDateString();
+  const today = getDateStringForTimezone(timezone);
 
   // Try to find existing
   const { data: existing } = await client
@@ -129,10 +130,11 @@ export async function getPastSummaries(
 export async function summarizeConversation(
   client: SupabaseClient,
   userId: string,
+  timezone: string,
 ): Promise<void> {
   try {
     // Find the most recent unsummarized conversation (before today)
-    const today = getBangkokDateString();
+    const today = getDateStringForTimezone(timezone);
 
     const { data: conv } = await client
       .from('oracle_conversations')
