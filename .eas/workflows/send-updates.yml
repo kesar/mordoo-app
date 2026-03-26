@@ -17,4 +17,5 @@ jobs:
     name: Send OTA update to production
     type: update
     params:
+      platform: ios
       channel: production
