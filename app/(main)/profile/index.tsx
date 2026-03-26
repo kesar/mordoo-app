@@ -99,25 +99,26 @@ const skeletonStyles = StyleSheet.create({
   },
   info: {
     flex: 1,
-    gap: 6,
   },
   labelLine: {
     width: 80,
-    height: 10,
+    height: 14,
     borderRadius: 4,
     backgroundColor: colors.night.elevated,
+    marginBottom: 2,
   },
   nameLine: {
     width: 120,
-    height: 16,
+    height: 22,
     borderRadius: 4,
     backgroundColor: colors.night.elevated,
   },
   detailLine: {
     width: 160,
-    height: 10,
+    height: 14,
     borderRadius: 4,
     backgroundColor: colors.night.elevated,
+    marginTop: 2,
   },
 });
 

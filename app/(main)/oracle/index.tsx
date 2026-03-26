@@ -590,11 +590,9 @@ export default function OracleScreen() {
             </Pressable>
           ) : (
             <>
-              {quotaTotal !== null && quotaRemaining !== null && (
-                <Text style={styles.quotaIndicator}>
-                  {t('chat.remaining', { count: quotaRemaining, total: quotaTotal })}
-                </Text>
-              )}
+              <Text style={[styles.quotaIndicator, (quotaTotal === null || quotaRemaining === null) && { opacity: 0 }]}>
+                {t('chat.remaining', { count: quotaRemaining ?? 1, total: quotaTotal ?? 1 })}
+              </Text>
               <View style={styles.inputBarInner}>
                 <TextInput
                   style={styles.textInput}
