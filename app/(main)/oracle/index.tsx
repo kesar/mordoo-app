@@ -34,6 +34,7 @@ import { analytics } from '@/src/services/analytics';
 import { Paywall } from '@/src/components/Paywall';
 import { features } from '@/src/config/features';
 import { onSubscriptionChange } from '@/src/services/purchases';
+import { donateOracleShortcut } from '@/src/utils/siri-shortcuts';
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -499,6 +500,7 @@ export default function OracleScreen() {
         setStreaming(false);
         sendingRef.current = false;
         analytics.track('oracle_response_received');
+        donateOracleShortcut();
         // Optimistically decrement remaining quota
         if (quotaRemaining !== null) {
           setQuota(

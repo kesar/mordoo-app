@@ -30,6 +30,8 @@ const siamSiSticks = require('@/assets/images/siam-si-sticks.webp');
 import ViewShot from 'react-native-view-shot';
 import { SiamSiShareCard } from '@/src/components/sharing/SiamSiShareCard';
 import { useShareCard } from '@/src/hooks/useShareCard';
+import SiamSiWidget from '@/src/widgets/SiamSiWidget';
+import { donateSiamSiShortcut } from '@/src/utils/siri-shortcuts';
 
 const FORTUNE_COLORS: Record<string, string> = {
   excellent: colors.energy.high,
@@ -151,6 +153,24 @@ export default function SiamSiScreen() {
       }
     }
   }, [currentStick, showRatingPrompt]);
+
+  // Push latest Siam Si result to the home screen widget
+  useEffect(() => {
+    if (currentStick) {
+      const lang = i18n.language as 'en' | 'th';
+      SiamSiWidget.updateSnapshot({
+        stickNumber: currentStick.number,
+        title: lang === 'th' ? currentStick.titleTh : currentStick.titleEn,
+        fortune: currentStick.fortune,
+        fortuneColor: FORTUNE_COLORS[currentStick.fortune] ?? '#f4e8c1',
+      });
+    }
+  }, [currentStick, i18n.language]);
+
+  // Donate Siri Shortcut when a stick is drawn
+  useEffect(() => {
+    if (currentStick) donateSiamSiShortcut();
+  }, [currentStick]);
 
   const shakeTranslateX = shakeAnim.interpolate({
     inputRange: [-1, 0, 1],

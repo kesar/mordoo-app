@@ -26,6 +26,8 @@ import {
   BodyDiamondIcon,
   ArrowRightIcon,
 } from '@/src/components/icons/TarotIcons';
+import DailyPulseWidget from '@/src/widgets/DailyPulseWidget';
+import { donatePulseShortcut } from '@/src/utils/siri-shortcuts';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -132,6 +134,25 @@ export default function PulseScreen() {
       }
     }
   }, [pulse, showRatingPrompt, notificationsEnabled, notificationPromptShown]);
+
+  // Push latest pulse data to the home screen widget
+  useEffect(() => {
+    if (pulse) {
+      DailyPulseWidget.updateSnapshot({
+        energyScore: pulse.energyScore,
+        luckyNumber: pulse.luckyNumber,
+        luckyColorName: pulse.luckyColor.name,
+        luckyColorHex: pulse.luckyColor.hex,
+        insight: pulse.insight,
+        direction: pulse.luckyDirection,
+      });
+    }
+  }, [pulse]);
+
+  // Donate Siri Shortcut when pulse data is available
+  useEffect(() => {
+    if (pulse) donatePulseShortcut();
+  }, [pulse]);
 
   // Slow vertical drift for constellation background
   const driftY = useRef(new Animated.Value(0)).current;
