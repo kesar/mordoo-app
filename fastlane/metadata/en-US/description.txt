@@ -1,35 +1,44 @@
-Discover your cosmic path with Mor Doo — the first app to blend authentic Thai Siam Si fortune sticks with AI-powered astrology and personalized numerology readings.
+Discover your personal path with Mor Doo — an AI-powered self-discovery companion rooted in centuries-old Thai wisdom traditions.
+
+Unlike generic zodiac apps, Mor Doo brings three culturally distinct systems together in one deeply personalized experience:
 
 YOUR DAILY PULSE
-Start each morning with your Prana Index — a personalized energy score based on your birth chart. Get your lucky color, number, and direction for the day.
+Start each morning with your Prana Index — a personalized energy score computed from your birth data using Thai numerology. See your lucky color, number, and direction for the day, plus sub-scores for business, heart, and body. Add the home screen widget to see your daily energy at a glance.
 
-ASK THE ORACLE
-Chat with an AI oracle that knows your birth data, your life path number, and your deepest concerns. Get guidance on love, career, money, health, and spiritual growth — in Thai or English.
+THE AI ORACLE
+Have a real conversation with an AI guide who knows your birth chart, life path number, and personal concerns. Ask about any aspect of life — relationships, career, finances, well-being — and receive personalized insight that blends Thai, Chinese, and Western traditions. The Oracle remembers your past conversations, building a meaningful relationship over time.
 
-SIAM SI FORTUNE STICKS
-Draw from 28 traditional Thai fortune sticks — each with poetic, actionable wisdom rooted in centuries of Buddhist tradition. Your daily draw, your daily insight.
+SIAM SI — 28 TRADITIONAL THAI FORTUNE STICKS
+Experience เซียมซี (Siam Si), a sacred Thai temple practice of drawing numbered bamboo sticks for guidance. Each of the 28 sticks carries poetic wisdom rooted in Buddhist tradition — from "Rising Dragon" (มังกรทะยาน) to "Royal Elephant" (ช้างราชพาหนะ). Shake your phone to draw, just like shaking the bamboo cylinder at the temple.
 
 PERSONALIZED NUMEROLOGY
-Your life path number, name vibration, and lucky elements — calculated from your exact birth data, not generic zodiac signs.
+Your life path number, name vibration, and lucky elements — all computed from your exact birth data using Thai numerological methods, not generic sun-sign categories.
 
 BILINGUAL BY DESIGN
-Full Thai (ไทย) and English experience — not a translation, but a culturally native app for both languages.
+Full Thai (ไทย) and English experience — culturally native in both languages, not a translation.
+
+HOME SCREEN WIDGETS
+Daily Pulse and Siam Si widgets bring your personalized insights directly to your home screen and lock screen.
+
+SIRI SHORTCUTS
+Ask Siri to show your daily reading, draw a fortune stick, or open the Oracle.
 
 HOW IT WORKS
-1. Enter your birth details to unlock your cosmic profile
-2. Check your daily Pulse for energy, luck, and guidance
+1. Enter your birth details to unlock your personal profile
+2. Check your daily Pulse for energy, guidance, and lucky elements
 3. Ask the Oracle anything — AI responds with personalized insight
 
 WHAT'S INCLUDED FREE
-• 1 Daily Pulse reading
-• 1 Oracle question per day
+• 1 Daily Pulse reading per day
+• 1 Oracle conversation per day
 • 2 Siam Si draws per day
+• Home screen widgets
 • Full bilingual interface
 
 UPGRADE TO STANDARD (฿149/month)
-• Unlimited Oracle questions
+• Unlimited Oracle conversations
 • Unlimited Siam Si draws
-• Persistent Oracle memory
+• Persistent Oracle memory across sessions
 • Priority AI responses
 
-Download Mor Doo and start your daily cosmic ritual today.
+For entertainment and cultural exploration purposes.
