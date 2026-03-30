@@ -33,10 +33,8 @@ yarn-error.*
 # Git history (not needed for build)
 .git/
 
-# iOS (EAS runs pod install and generates these)
-ios/Pods/
-ios/build/
-ios/.xcode.env.local
+# iOS (EAS runs prebuild + pod install, generates everything)
+ios/
 
 # Backend API (not needed for mobile build)
 api/
