@@ -1,9 +1,9 @@
-Welcome to Mor Doo
+What's New in Mor Doo 1.0
 
-Your AI-powered Thai astrology companion is here:
-• Daily Pulse — your personalized energy score & lucky elements
-• The Oracle — AI chat that knows your birth chart
-• Siam Si — 28 traditional Thai fortune sticks
+• Home Screen Widgets — see your Daily Pulse energy score and Siam Si fortune stick right on your home screen
+• Lock Screen Widgets — quick glance at your Siam Si reading on the lock screen
+• Siri Shortcuts — ask Siri to show your daily reading or draw a fortune stick
+• Daily Pulse — personalized energy score, lucky color, number, and direction
+• AI Oracle — conversational AI guide blending Thai, Chinese, and Western traditions
+• Siam Si — 28 traditional Thai fortune sticks with shake-to-draw
 • Full Thai & English experience
-
-Start your cosmic journey today.
