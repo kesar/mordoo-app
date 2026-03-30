@@ -17,7 +17,7 @@
  */
 
 import sharp from "sharp";
-import { readdir, mkdir, access } from "fs/promises";
+import { readdir, mkdir, access, readFile } from "fs/promises";
 import { join, basename } from "path";
 
 // ─── Config ──────────────────────────────────────────────────
@@ -32,7 +32,6 @@ const SIZES = {
 const COLORS = {
   bg: { r: 10, g: 10, b: 20 },
   gold: { r: 201, g: 168, b: 76 },
-  parchment: { r: 244, g: 232, b: 193 },
 };
 
 const CAPTIONS = {
@@ -40,63 +39,78 @@ const CAPTIONS = {
     "1": "Your Daily Cosmic Energy",
     "2": "Ask the AI Oracle Anything",
     "3": "28 Sacred Fortune Sticks",
-    "4": "Lucky Color, Number & Direction",
-    "5": "Personalized to Your Birth Chart",
-    "6": "Thai & English — Your Choice",
-    "7": "Start Every Morning Guided",
-    "8": "Tell Us What Matters to You",
-    "9": "Crafted with Cosmic Care",
-    "10": "Free to Start",
+    "4": "Start Every Morning Guided",
+    "5": "Your Cosmic Profile",
+    "6": "Crafted with Cosmic Care",
   },
   th: {
     "1": "พลังจักรวาลประจำวันของคุณ",
     "2": "ถามหมอดู AI ได้ทุกเรื่อง",
     "3": "เซียมซี 28 กอ ศักดิ์สิทธิ์",
-    "4": "สีนำโชค เลขนำโชค ทิศนำโชค",
-    "5": "เฉพาะตัวจากวันเกิดของคุณ",
-    "6": "ไทยและอังกฤษ — เลือกได้เลย",
-    "7": "เริ่มทุกเช้าอย่างมีทิศทาง",
-    "8": "บอกเราว่าอะไรสำคัญสำหรับคุณ",
-    "9": "ออกแบบด้วยใจแห่งจักรวาล",
-    "10": "เริ่มฟรี อัปเกรด ฿149/เดือน",
+    "4": "ปลดล็อกศักยภาพเต็มที่",
+    "5": "โปรไฟล์จักรวาลของคุณ",
+    "6": "ออกแบบด้วยใจแห่งจักรวาล",
   },
 };
 
 const LOCALE_MAP = { en: "en-US", th: "th" };
 
+// ─── Font Loading ────────────────────────────────────────────
+const FONTS_DIR = join(ROOT, "assets", "fonts");
+let fontCache = {};
+
+async function loadFontBase64(filename) {
+  if (fontCache[filename]) return fontCache[filename];
+  const fontPath = join(FONTS_DIR, filename);
+  const fontData = await readFile(fontPath);
+  fontCache[filename] = fontData.toString("base64");
+  return fontCache[filename];
+}
+
 // ─── SVG Text Rendering ─────────────────────────────────────
-function createCaptionSVG(text, width, height) {
-  // Caption takes top 15% of the image
-  const captionHeight = Math.round(height * 0.15);
-  const fontSize = Math.round(captionHeight * 0.35);
-  const yCenter = Math.round(captionHeight * 0.55);
-
-  // Detect Thai text
+async function createCaptionSVG(text, width, totalHeight) {
+  const captionHeight = Math.round(totalHeight * 0.15);
   const isThai = /[\u0E00-\u0E7F]/.test(text);
-  const fontFamily = isThai
-    ? "'Noto Sans Thai', 'Sarabun', sans-serif"
-    : "'Cinzel Decorative', 'Georgia', serif";
 
-  const letterSpacing = isThai ? "0" : "3";
+  // Load the right font
+  const fontFile = isThai ? "NotoSansThai-Medium.ttf" : "CinzelDecorative-Bold.ttf";
+  const fontBase64 = await loadFontBase64(fontFile);
+  const fontFamily = isThai ? "NotoSansThai" : "CinzelDecorative";
+  const fontWeight = isThai ? 500 : 700;
 
-  return Buffer.from(`
-    <svg width="${width}" height="${captionHeight}" xmlns="http://www.w3.org/2000/svg">
-      <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&amp;family=Noto+Sans+Thai:wght@500&amp;display=swap');
-      </style>
-      <text
-        x="50%"
-        y="${yCenter}"
-        text-anchor="middle"
-        dominant-baseline="middle"
-        font-family="${fontFamily}"
-        font-size="${fontSize}px"
-        font-weight="${isThai ? 500 : 700}"
-        fill="rgb(${COLORS.gold.r},${COLORS.gold.g},${COLORS.gold.b})"
-        letter-spacing="${letterSpacing}"
-      >${escapeXml(text)}</text>
-    </svg>
-  `);
+  // Calculate font size to fit within caption width with padding
+  const maxWidth = width * 0.9;
+  // Estimate: avg char width ~= fontSize * 0.6 for latin, ~0.9 for Thai
+  const charWidthRatio = isThai ? 0.85 : 0.55;
+  const estimatedFontSize = Math.floor(maxWidth / (text.length * charWidthRatio));
+  const fontSize = Math.min(estimatedFontSize, Math.round(captionHeight * 0.35));
+  const yCenter = Math.round(captionHeight * 0.55);
+  const letterSpacing = isThai ? 0 : 2;
+
+  const svg = `<svg width="${width}" height="${captionHeight}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @font-face {
+        font-family: '${fontFamily}';
+        src: url('data:font/truetype;base64,${fontBase64}') format('truetype');
+        font-weight: ${fontWeight};
+      }
+    </style>
+  </defs>
+  <text
+    x="50%"
+    y="${yCenter}"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    font-family="'${fontFamily}'"
+    font-size="${fontSize}px"
+    font-weight="${fontWeight}"
+    fill="rgb(${COLORS.gold.r},${COLORS.gold.g},${COLORS.gold.b})"
+    letter-spacing="${letterSpacing}"
+  >${escapeXml(text)}</text>
+</svg>`;
+
+  return { svg: Buffer.from(svg), height: captionHeight };
 }
 
 function escapeXml(str) {
@@ -111,57 +125,50 @@ function escapeXml(str) {
 // ─── Screenshot Generator ───────────────────────────────────
 async function generateScreenshot(rawPath, caption, size, outputPath) {
   const { w, h } = size;
-  const captionHeight = Math.round(h * 0.15);
-  const screenHeight = h - captionHeight;
-  const screenPadding = Math.round(w * 0.04);
+  const { svg: captionSVG, height: captionHeight } = await createCaptionSVG(caption, w, h);
+  const screenPadding = Math.round(w * 0.03);
   const screenWidth = w - screenPadding * 2;
-  const screenInnerHeight = screenHeight - Math.round(screenPadding * 0.5);
-
-  // Create caption SVG
-  const captionSVG = createCaptionSVG(caption, w, h);
+  const screenInnerHeight = h - captionHeight - Math.round(screenPadding * 0.5);
 
   // Resize raw screenshot to fit
-  const rawImage = sharp(rawPath).resize(screenWidth, screenInnerHeight, {
-    fit: "contain",
-    background: COLORS.bg,
-  });
+  const rawBuf = await sharp(rawPath)
+    .resize(screenWidth, screenInnerHeight, {
+      fit: "contain",
+      background: COLORS.bg,
+    })
+    .png()
+    .toBuffer();
 
-  // Create dark background
-  const background = sharp({
+  // Render caption SVG to PNG
+  const captionBuf = await sharp(captionSVG)
+    .resize(w, captionHeight)
+    .png()
+    .toBuffer();
+
+  // Gold glow overlay
+  const glowSVG = Buffer.from(`<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="8%" r="50%">
+      <stop offset="0%" stop-color="rgb(${COLORS.gold.r},${COLORS.gold.g},${COLORS.gold.b})" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="rgb(${COLORS.bg.r},${COLORS.bg.g},${COLORS.bg.b})" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="url(#glow)"/>
+</svg>`);
+
+  // Compose: background → glow → caption → app screenshot
+  await sharp({
     create: {
       width: w,
       height: h,
       channels: 4,
       background: { ...COLORS.bg, alpha: 1 },
     },
-  });
-
-  // Add subtle gold gradient glow at top
-  const glowSVG = Buffer.from(`
-    <svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="glow" cx="50%" cy="10%" r="60%">
-          <stop offset="0%" stop-color="rgb(${COLORS.gold.r},${COLORS.gold.g},${COLORS.gold.b})" stop-opacity="0.08"/>
-          <stop offset="100%" stop-color="rgb(${COLORS.bg.r},${COLORS.bg.g},${COLORS.bg.b})" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <rect width="${w}" height="${h}" fill="url(#glow)"/>
-    </svg>
-  `);
-
-  // Compose layers
-  const rawBuf = await rawImage.png().toBuffer();
-  const captionBuf = await sharp(captionSVG).resize(w, captionHeight).png().toBuffer();
-
-  await background
+  })
     .composite([
       { input: glowSVG, top: 0, left: 0 },
       { input: captionBuf, top: 0, left: 0 },
-      {
-        input: rawBuf,
-        top: captionHeight,
-        left: screenPadding,
-      },
+      { input: rawBuf, top: captionHeight, left: screenPadding },
     ])
     .png()
     .toFile(outputPath);
@@ -171,7 +178,6 @@ async function generateScreenshot(rawPath, caption, size, outputPath) {
 async function main() {
   const rawDir = join(ROOT, "screenshots", "raw");
 
-  // Check raw dir exists
   try {
     await access(rawDir);
   } catch {
@@ -179,31 +185,13 @@ async function main() {
 Screenshot Generator for Mor Doo
 =================================
 
-Step 1: Create the raw screenshots directories:
+Step 1: Create directories:
   mkdir -p screenshots/raw/en screenshots/raw/th
 
-Step 2: Take simulator screenshots (Cmd+S in Simulator) and save them:
+Step 2: Save simulator screenshots (Cmd+S) named by slot:
+  1-pulse.png, 2-oracle.png, 3-siam-si.png, etc.
 
-  screenshots/raw/en/
-    1-pulse.png          Pulse screen (energy score visible)
-    2-oracle.png         Oracle chat (mid-conversation)
-    3-siam-si.png        Siam Si result card
-    4-lucky.png          Pulse lucky elements section
-    5-birth.png          Soul Snapshot / birth data card
-    6-oracle-thai.png    Oracle in Thai (for bilingual slot)
-    7-pulse-notif.png    Pulse with notification (or reuse 1)
-    8-life-context.png   Life context concerns grid
-    9-soul-gate.png      Soul Gate sign-in screen
-    10-pricing.png       Paywall or pricing (optional)
-
-  screenshots/raw/th/
-    (same filenames, but with the app set to Thai language)
-
-Step 3: Run this script again:
-  node scripts/generate-screenshots.mjs
-
-Output: fastlane/screenshots/en-US/ and fastlane/screenshots/th/
-Then:   fastlane ios upload_screenshots
+Step 3: Run: node scripts/generate-screenshots.mjs
 `);
     process.exit(0);
   }
@@ -217,7 +205,7 @@ Then:   fastlane ios upload_screenshots
     try {
       files = await readdir(langDir);
     } catch {
-      console.log(`No raw screenshots found in screenshots/raw/${lang}/ — skipping`);
+      console.log(`No raw screenshots in screenshots/raw/${lang}/ — skipping`);
       continue;
     }
 
@@ -230,7 +218,6 @@ Then:   fastlane ios upload_screenshots
     console.log(`\nProcessing ${lang} (${pngFiles.length} screenshots)...`);
 
     for (const file of pngFiles) {
-      // Extract slot number from filename (e.g., "1-pulse.png" → "1")
       const slotMatch = basename(file).match(/^(\d+)/);
       if (!slotMatch) {
         console.log(`  Skipping ${file} (no slot number)`);
@@ -245,8 +232,7 @@ Then:   fastlane ios upload_screenshots
 
       const rawPath = join(langDir, file);
 
-      // Generate for each device size
-      for (const [sizeKey, size] of Object.entries(SIZES)) {
+      for (const [, size] of Object.entries(SIZES)) {
         const outFile = `${slot}_${size.suffix}.png`;
         const outPath = join(outDir, outFile);
 

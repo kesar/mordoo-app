@@ -16,5 +16,5 @@ jobs:
     name: Send OTA update to production
     type: update
     params:
-      platform: ios
+      platform: ios # TODO: change to 'all' when Android is launched
       channel: production

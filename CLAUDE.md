@@ -8,6 +8,9 @@
 - **AI:** Anthropic Claude (Sonnet 4.6) for Oracle chat
 - **State:** Zustand + MMKV persistence, React Query for server state
 - **Auth:** Supabase (Phone OTP + Email; Apple/Google behind feature flag)
+- **Payments:** RevenueCat (subscriptions + webhook)
+- **Analytics:** PostHog (React Native SDK)
+- **Error Tracking:** Sentry (`@sentry/react-native`)
 - **i18n:** i18next — Thai (`th`) and English (`en`), JSON files in `src/i18n/`
 - **Styling:** Custom dark theme design system (gold + night palette)
 
@@ -25,21 +28,35 @@ src/
   hooks/                # Custom React hooks
   i18n/{en,th}/         # Translation JSON files (namespaced)
   lib/supabase.ts       # Supabase client init
-  services/             # API service functions (oracle, pulse, auth, birth-data)
+  services/             # API service functions (oracle, pulse, auth, birth-data, etc.)
   stores/               # Zustand stores (auth, onboarding, oracle, settings)
+  types/                # TypeScript type definitions
   utils/                # Storage, haptics, zustand-mmkv adapter
 shared/                 # Shared logic used by both RN app and API
   compute-reading.ts    # Numerology engine
   siam-si.ts            # 28 fortune sticks
   insight-templates.ts  # Bilingual insight text
+  zodiac.ts             # Zodiac sign logic
+  hash.ts               # Hashing utilities
   types.ts              # Shared TypeScript types
 api/                    # Next.js API backend (deployed to Vercel)
   src/app/api/
+    account/delete/     # DELETE — Account deletion
+    notifications/register/ # POST — Push notification token registration
     oracle/chat/        # POST — SSE streaming Oracle chat
+    oracle/history/     # GET — Chat history
     oracle/siam-si/     # POST — Fortune stick draw
+    oracle/today/       # GET — Today's oracle summary
     pulse/daily/        # POST — Daily reading
+    webhooks/revenuecat/ # POST — Subscription lifecycle webhook
+    zodiac/signs/       # GET — Zodiac sign data
 sql/                    # Database migration scripts
-docs/                   # Architecture docs, specs, plans
+docs/                   # Architecture & technical docs
+  marketing/            # ASO, monetization, launch, press strategy docs
+  superpowers/          # Feature plans & design specs
+fastlane/               # iOS App Store deployment automation
+screenshots/            # App Store screenshot assets
+scripts/                # Build scripts (env validation)
 ```
 
 ## Path Aliases
@@ -98,6 +115,7 @@ eas workflow:run .eas/workflows/send-updates.yml           # Trigger OTA workflo
 - All endpoints require Supabase bearer token auth
 - Oracle chat uses SSE streaming (text/event-stream)
 - API validates auth, checks quotas, and increments usage server-side
+- RevenueCat webhook handles subscription lifecycle events
 - Deployed to Vercel at `api.mordoo.app`
 
 ## Environment Variables
@@ -106,6 +124,7 @@ eas workflow:run .eas/workflows/send-updates.yml           # Trigger OTA workflo
 1. Add it to `.env.local` (and/or `api/.env.local`)
 2. Add it to EAS secrets: `eas secret:create --name <NAME> --value <VALUE>`
 3. Add it to `scripts/validate-env.js` required array (for mobile vars)
+4. Add it to `.env.example` (and/or `api/.env.example`)
 
 ### Mobile (`.env.local`)
 ```
@@ -155,6 +174,10 @@ Runs on every PR and push to `main` — 4 parallel jobs:
 ### Vercel (API)
 - Auto-deploys `api/` on push to `main`
 - Deployed at `api.mordoo.app`
+
+### Fastlane (iOS)
+- App Store submission automation in `fastlane/`
+- Metadata and screenshots managed via `fastlane/metadata/`
 
 ## Architecture Decisions
 - Guest auth was removed — sign-in is required (phone OTP or email)

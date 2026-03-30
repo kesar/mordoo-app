@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "ai.mordoo.app",
-      "buildNumber": "24",
+      "buildNumber": "28",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -69,13 +69,19 @@
               "name": "DailyPulseWidget",
               "displayName": "Daily Pulse",
               "description": "Your daily energy score and lucky elements",
-              "supportedFamilies": ["systemSmall", "systemMedium"]
+              "supportedFamilies": [
+                "systemSmall",
+                "systemMedium"
+              ]
             },
             {
               "name": "SiamSiWidget",
               "displayName": "Siam Si",
               "description": "Today's fortune stick",
-              "supportedFamilies": ["systemSmall", "accessoryRectangular"]
+              "supportedFamilies": [
+                "systemSmall",
+                "accessoryRectangular"
+              ]
             }
           ]
         }

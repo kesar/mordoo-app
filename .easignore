@@ -66,12 +66,16 @@ __tests__/
 CLAUDE.md
 skills-lock.json
 .claude/
+.agents/
 .superpowers/
 .mcp.json
 .env.example
 
 # Nanobanana output (dev/design artifacts)
 nanobanana-output/
+
+# Screenshots (App Store assets, not needed for build)
+screenshots/
 
 # Vercel config
 vercel.json

@@ -43,3 +43,9 @@ yarn-error.*
 /ios
 /android
 .vercel
+
+# AI-generated image output
+nanobanana-output/
+
+# Superpowers brainstorm sessions (ephemeral)
+.superpowers/brainstorm/
