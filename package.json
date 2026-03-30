@@ -74,9 +74,11 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
-    "sharp": "^0.34.5",
     "typescript": "~5.9.2",
     "vitest": "^3.2.4"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.34.5"
   },
   "private": true
 }
