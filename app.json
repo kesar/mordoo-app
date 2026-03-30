@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "scheme": "mordoo",
-    "runtimeVersion": "1.0.0",
+    "runtimeVersion": "1.1.0",
     "updates": {
       "url": "https://u.expo.dev/969fe2eb-8da0-4af0-be98-df44a79690a8"
     },
@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "ai.mordoo.app",
-      "buildNumber": "23",
+      "buildNumber": "24",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -60,7 +60,27 @@
           "organization": "mordoo",
           "project": "react-native"
         }
-      ]
+      ],
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "DailyPulseWidget",
+              "displayName": "Daily Pulse",
+              "description": "Your daily energy score and lucky elements",
+              "supportedFamilies": ["systemSmall", "systemMedium"]
+            },
+            {
+              "name": "SiamSiWidget",
+              "displayName": "Siam Si",
+              "description": "Today's fortune stick",
+              "supportedFamilies": ["systemSmall", "accessoryRectangular"]
+            }
+          ]
+        }
+      ],
+      "@config-plugins/react-native-siri-shortcut"
     ],
     "extra": {
       "eas": {
