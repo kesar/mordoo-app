@@ -2,3 +2,9 @@ app_identifier("ai.mordoo.app")
 
 # App Store Connect API Key authentication
 json_key_file(ENV["APP_STORE_CONNECT_API_KEY_PATH"]) if ENV["APP_STORE_CONNECT_API_KEY_PATH"]
+
+# Google Play Store
+for_platform :android do
+  package_name("ai.mordoo.app")
+  json_key_file(ENV["GOOGLE_PLAY_JSON_KEY_PATH"] || File.expand_path("~/.google-play/service-account.json"))
+end

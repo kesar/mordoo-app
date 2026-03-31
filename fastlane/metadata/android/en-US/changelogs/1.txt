@@ -1,0 +1,7 @@
+What's New in Mor Doo 1.0
+
+• Home Screen Widget — see your Daily Pulse energy score right on your home screen
+• Daily Pulse — personalized energy score, lucky color, number, and direction
+• AI Oracle — conversational AI guide blending Thai, Chinese, and Western traditions
+• Siam Si — 28 traditional Thai fortune sticks with shake-to-draw
+• Full Thai & English experience

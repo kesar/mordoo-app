@@ -1,12 +1,15 @@
 default_platform(:ios)
 
-# App Store Connect API Key
+# ─── App Store Connect API Key ───────────────────────────────
 API_KEY = app_store_connect_api_key(
   key_id: "8522GN55AR",
   issuer_id: "69a6de84-0d5e-47e3-e053-5b8c7c11a4d1",
   key_filepath: File.expand_path("~/.appstoreconnect/private_keys/AuthKey_8522GN55AR.p8"),
   in_house: false
 )
+
+# ─── Google Play Service Account Key ─────────────────────────
+GOOGLE_PLAY_JSON_KEY = ENV["GOOGLE_PLAY_JSON_KEY_PATH"] || File.expand_path("~/.google-play/service-account.json")
 
 platform :ios do
   # ─── Metadata ───────────────────────────────────────────────
@@ -188,5 +191,92 @@ platform :ios do
     else
       UI.user_error!("No age rating declaration found")
     end
+  end
+end
+
+# ═══════════════════════════════════════════════════════════════
+# ANDROID — Google Play Store (via supply)
+# ═══════════════════════════════════════════════════════════════
+platform :android do
+  # ─── Metadata ───────────────────────────────────────────────
+  desc "Upload metadata to Google Play"
+  lane :upload_metadata do
+    supply(
+      json_key: GOOGLE_PLAY_JSON_KEY,
+      package_name: "ai.mordoo.app",
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false,
+      metadata_path: "fastlane/metadata/android"
+    )
+  end
+
+  # ─── Screenshots ────────────────────────────────────────────
+  desc "Upload screenshots to Google Play"
+  lane :upload_screenshots do
+    supply(
+      json_key: GOOGLE_PLAY_JSON_KEY,
+      package_name: "ai.mordoo.app",
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      metadata_path: "fastlane/metadata/android"
+    )
+  end
+
+  # ─── Upload AAB ─────────────────────────────────────────────
+  desc "Upload AAB to Google Play internal track"
+  lane :upload_build do |options|
+    track = options[:track] || "internal"
+    aab_path = options[:aab] || lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+
+    supply(
+      json_key: GOOGLE_PLAY_JSON_KEY,
+      package_name: "ai.mordoo.app",
+      track: track,
+      aab: aab_path,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      metadata_path: "fastlane/metadata/android"
+    )
+  end
+
+  # ─── Promote Track ─────────────────────────────────────────
+  desc "Promote a release from one track to another"
+  lane :promote do |options|
+    from = options[:from] || "internal"
+    to = options[:to] || "production"
+
+    supply(
+      json_key: GOOGLE_PLAY_JSON_KEY,
+      package_name: "ai.mordoo.app",
+      track: from,
+      track_promote_to: to,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  # ─── Full Upload ────────────────────────────────────────────
+  desc "Upload everything (metadata + screenshots) to Google Play"
+  lane :deliver_all do
+    supply(
+      json_key: GOOGLE_PLAY_JSON_KEY,
+      package_name: "ai.mordoo.app",
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      metadata_path: "fastlane/metadata/android"
+    )
   end
 end
