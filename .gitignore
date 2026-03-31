@@ -24,6 +24,10 @@ expo-env.d.ts
 # Google Play
 google-play-service-account.json
 
+# Build artifacts
+build-artifacts/
+*.aab
+
 # Metro
 .metro-health-check*
 

@@ -18,7 +18,12 @@
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "android": {
+        "cache": {
+          "paths": ["~/.gradle/caches"]
+        }
+      }
     },
     "base": {
       "prebuildCommand": "node scripts/validate-env.js"
