@@ -79,24 +79,30 @@ npm run test:watch   # Watch mode
 ## Project Structure
 
 ```
-app/                    Expo Router screens (onboarding + main tabs)
+app/                    Expo Router screens
+  (onboarding)/         Auth + onboarding flow
+  (main)/               Main tabs (pulse, oracle, profile)
 src/
-  api/endpoints/        API client helpers
-  components/ui/        Design system components
+  components/
+    ui/                 Design system components
+    sharing/            Share card components (Pulse, Siam Si)
+    icons/              Custom icon components
   config/               Feature flags
   constants/            Colors, typography, tiers
   hooks/                Custom React hooks
   i18n/{en,th}/         Translation JSON files (namespaced)
   lib/                  Supabase client init
   services/             API service functions
-  stores/               Zustand stores (auth, onboarding, oracle, settings)
+  stores/               Zustand stores (auth, onboarding, oracle, settings, subscription)
   types/                TypeScript type definitions
-  utils/                Storage, haptics, zustand-mmkv adapter
+  utils/                Storage, haptics, scaling, Siri shortcuts, timezone, zustand-mmkv
+  widgets/              iOS home screen widgets (Daily Pulse, Siam Si)
 shared/                 Shared logic (numerology engine, fortune sticks, zodiac)
 api/                    Next.js API backend (Vercel)
   src/app/api/
-    account/delete/     DELETE — Account deletion
-    notifications/register/  POST — Push notification token
+    account/delete/             DELETE — Account deletion
+    account/sync-subscription/  POST — Sync subscription status
+    notifications/register/     POST — Push notification token
     oracle/chat/        POST — SSE streaming Oracle chat
     oracle/history/     GET — Chat history
     oracle/siam-si/     POST — Fortune stick draw
@@ -105,6 +111,7 @@ api/                    Next.js API backend (Vercel)
     webhooks/revenuecat/  POST — Subscription webhook
     zodiac/signs/       GET — Zodiac sign data
 sql/                    Database migration scripts
+supabase/               Supabase config and edge functions
 docs/                   Architecture & technical docs
   marketing/            ASO, monetization, launch, press strategy
   superpowers/          Feature plans & design specs

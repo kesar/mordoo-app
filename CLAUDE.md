@@ -19,19 +19,22 @@
 ```
 app/                    # Expo Router screens
   (onboarding)/         # Auth + onboarding flow (modal group)
-  (main)/               # Main app tabs (pulse, oracle)
+  (main)/               # Main app tabs (pulse, oracle, profile)
 src/
-  api/endpoints/        # API client helpers
-  components/ui/        # Design system components
+  components/
+    ui/                 # Design system components
+    sharing/            # Share card components (Pulse, Siam Si)
+    icons/              # Custom icon components
   config/features.ts    # Feature flags
   constants/            # Colors, typography, tiers
   hooks/                # Custom React hooks
   i18n/{en,th}/         # Translation JSON files (namespaced)
   lib/supabase.ts       # Supabase client init
   services/             # API service functions (oracle, pulse, auth, birth-data, etc.)
-  stores/               # Zustand stores (auth, onboarding, oracle, settings)
+  stores/               # Zustand stores (auth, onboarding, oracle, settings, subscription)
   types/                # TypeScript type definitions
-  utils/                # Storage, haptics, zustand-mmkv adapter
+  utils/                # Storage, haptics, scaling, Siri shortcuts, timezone, zustand-mmkv
+  widgets/              # iOS home screen widgets (Daily Pulse, Siam Si)
 shared/                 # Shared logic used by both RN app and API
   compute-reading.ts    # Numerology engine
   siam-si.ts            # 28 fortune sticks
@@ -41,8 +44,9 @@ shared/                 # Shared logic used by both RN app and API
   types.ts              # Shared TypeScript types
 api/                    # Next.js API backend (deployed to Vercel)
   src/app/api/
-    account/delete/     # DELETE — Account deletion
-    notifications/register/ # POST — Push notification token registration
+    account/delete/             # DELETE — Account deletion
+    account/sync-subscription/  # POST — Sync subscription status
+    notifications/register/     # POST — Push notification token registration
     oracle/chat/        # POST — SSE streaming Oracle chat
     oracle/history/     # GET — Chat history
     oracle/siam-si/     # POST — Fortune stick draw
@@ -51,6 +55,7 @@ api/                    # Next.js API backend (deployed to Vercel)
     webhooks/revenuecat/ # POST — Subscription lifecycle webhook
     zodiac/signs/       # GET — Zodiac sign data
 sql/                    # Database migration scripts
+supabase/               # Supabase config and edge functions
 docs/                   # Architecture & technical docs
   marketing/            # ASO, monetization, launch, press strategy docs
   superpowers/          # Feature plans & design specs
