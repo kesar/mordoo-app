@@ -19,8 +19,8 @@
     "production": {
       "autoIncrement": true,
       "channel": "production",
-      "env": {
-        "EAS_USE_CACHE": "1"
+      "cache": {
+        "key": "v1"
       }
     },
     "base": {
