@@ -204,11 +204,13 @@ platform :android do
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
       package_name: "ai.mordoo.app",
+      track: "internal",
+      release_status: "draft",
       skip_upload_apk: true,
       skip_upload_aab: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      skip_upload_changelogs: false,
+      skip_upload_changelogs: true,
       metadata_path: "fastlane/metadata/android"
     )
   end
@@ -219,6 +221,8 @@ platform :android do
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
       package_name: "ai.mordoo.app",
+      track: "internal",
+      release_status: "draft",
       skip_upload_apk: true,
       skip_upload_aab: true,
       skip_upload_metadata: true,
@@ -239,9 +243,10 @@ platform :android do
       json_key: GOOGLE_PLAY_JSON_KEY,
       package_name: "ai.mordoo.app",
       track: track,
+      release_status: "draft",
       aab: aab_path,
       skip_upload_metadata: true,
-      skip_upload_changelogs: false,
+      skip_upload_changelogs: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
       metadata_path: "fastlane/metadata/android"
@@ -274,6 +279,8 @@ platform :android do
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
       package_name: "ai.mordoo.app",
+      track: "internal",
+      release_status: "draft",
       skip_upload_apk: true,
       skip_upload_aab: true,
       metadata_path: "fastlane/metadata/android"

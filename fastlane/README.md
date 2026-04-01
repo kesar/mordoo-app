@@ -73,6 +73,51 @@ Set age rating for the app
 
 ----
 
+
+## Android
+
+### android upload_metadata
+
+```sh
+[bundle exec] fastlane android upload_metadata
+```
+
+Upload metadata to Google Play
+
+### android upload_screenshots
+
+```sh
+[bundle exec] fastlane android upload_screenshots
+```
+
+Upload screenshots to Google Play
+
+### android upload_build
+
+```sh
+[bundle exec] fastlane android upload_build
+```
+
+Upload AAB to Google Play internal track
+
+### android promote
+
+```sh
+[bundle exec] fastlane android promote
+```
+
+Promote a release from one track to another
+
+### android deliver_all
+
+```sh
+[bundle exec] fastlane android deliver_all
+```
+
+Upload everything (metadata + screenshots) to Google Play
+
+----
+
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
 
 More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
