@@ -18,7 +18,10 @@
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "env": {
+        "EAS_USE_CACHE": "1"
+      }
     },
     "base": {
       "prebuildCommand": "node scripts/validate-env.js"
