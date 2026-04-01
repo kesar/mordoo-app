@@ -184,6 +184,22 @@ Runs on every PR and push to `main` — 4 parallel jobs:
 - App Store submission automation in `fastlane/`
 - Metadata and screenshots managed via `fastlane/metadata/`
 
+### Fastlane (Android)
+- Google Play Store automation via `supply` in `fastlane/Fastfile` (platform :android)
+- Metadata in `fastlane/metadata/android/{en-US,th}/`
+- Screenshots in `fastlane/metadata/android/{locale}/images/{phoneScreenshots,sevenInchScreenshots,tenInchScreenshots}/`
+- Service account key: `~/.google-play/service-account.json` (or `GOOGLE_PLAY_JSON_KEY_PATH` env var)
+- **IMPORTANT — Draft app:** While the app is in draft status on Google Play (before first production release), both Fastlane and EAS Submit require `release_status: "draft"` / `releaseStatus: "draft"`. Once the app has a live production release, change these to `"completed"`:
+  - `eas.json` → `submit.production.android.releaseStatus` (currently `"draft"`)
+  - `fastlane/Fastfile` → `release_status` param in Android lanes (currently `"draft"`)
+- Lanes: `upload_metadata`, `upload_screenshots`, `upload_build`, `promote`, `deliver_all`
+
+### EAS Submit (Android)
+- Config in `eas.json` → `submit.production.android`
+- Service account key: `./google-play-service-account.json` (gitignored)
+- Track: `internal`, release status: `draft` (change to `completed` after first production release)
+- Command: `eas submit --platform android --profile production`
+
 ## Architecture Decisions
 - Guest auth was removed — sign-in is required (phone OTP or email)
 - Client-side quota tracking was removed — server handles all quota logic
