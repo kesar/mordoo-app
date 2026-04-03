@@ -32,6 +32,7 @@ import { SiamSiShareCard } from '@/src/components/sharing/SiamSiShareCard';
 import { useShareCard } from '@/src/hooks/useShareCard';
 import SiamSiWidget from '@/src/widgets/SiamSiWidget';
 import { donateSiamSiShortcut } from '@/src/utils/siri-shortcuts';
+import { useFeatureFlagStore } from '@/src/stores/featureFlagStore';
 
 const FORTUNE_COLORS: Record<string, string> = {
   excellent: colors.energy.high,
@@ -62,6 +63,8 @@ export default function SiamSiScreen() {
     performDraw,
     refreshQuota,
   } = useSiamSi();
+
+  const showFortuneLabels = useFeatureFlagStore((s) => s.fortuneLabels);
 
   const [showPaywall, setShowPaywall] = useState(false);
 
@@ -211,21 +214,23 @@ export default function SiamSiScreen() {
               {
                 opacity: revealOpacity,
                 transform: [{ scale: revealScale }],
-                borderColor: FORTUNE_COLORS[currentStick.fortune] ?? colors.gold.DEFAULT,
+                borderColor: showFortuneLabels ? (FORTUNE_COLORS[currentStick.fortune] ?? colors.gold.DEFAULT) : colors.gold.DEFAULT,
               },
             ]}
           >
             <Text style={styles.stickNumber}>#{currentStick.number}</Text>
-            <View
-              style={[
-                styles.fortuneBadge,
-                { backgroundColor: FORTUNE_COLORS[currentStick.fortune] ?? colors.gold.DEFAULT },
-              ]}
-            >
-              <Text style={styles.fortuneText}>
-                {fortuneLabels[currentStick.fortune] ?? currentStick.fortune}
-              </Text>
-            </View>
+            {showFortuneLabels && (
+              <View
+                style={[
+                  styles.fortuneBadge,
+                  { backgroundColor: FORTUNE_COLORS[currentStick.fortune] ?? colors.gold.DEFAULT },
+                ]}
+              >
+                <Text style={styles.fortuneText}>
+                  {fortuneLabels[currentStick.fortune] ?? currentStick.fortune}
+                </Text>
+              </View>
+            )}
             <Text style={styles.titleEn}>
               {i18n.language === 'th' ? currentStick.titleTh : currentStick.titleEn}
             </Text>
