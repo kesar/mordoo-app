@@ -5,7 +5,7 @@
     "unlimitedOracle": "Unlimited Oracle questions",
     "unlimitedSiamSi": "Unlimited Siam Si draws",
     "memory": "Oracle remembers your journey",
-    "tarot": "All tarot spreads unlocked"
+    "tarot": "Premium insights unlocked"
   },
   "annual": {
     "label": "Annual",
@@ -21,9 +21,9 @@
   "privacy": "Privacy",
   "notNow": "Not now",
   "quotaExceeded": {
-    "title": "You've used your daily reading",
+    "title": "You've reached today's limit",
     "body": "Unlock unlimited access or come back tomorrow.",
-    "comeBack": "Your next free reading is available tomorrow."
+    "comeBack": "Your next free session is available tomorrow."
   },
   "restoreSuccess": "Subscription restored!",
   "restoreNotFound": "No active subscription found.",

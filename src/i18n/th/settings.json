@@ -6,7 +6,7 @@
   "languageThai": "ไทย",
   "notifications": "การแจ้งเตือน",
   "notificationTime": "เวลาแจ้งเตือน",
-  "notificationTimeDescription": "คุณต้องการให้แจ้งเตือนดวงประจำวันเมื่อไหร่?",
+  "notificationTimeDescription": "คุณต้องการให้แจ้งเตือนประจำวันเมื่อไหร่?",
   "notificationsDenied": "กรุณาเปิดการแจ้งเตือนในการตั้งค่าอุปกรณ์ของคุณ",
   "account": "บัญชี",
   "signOut": "ออกจากระบบ",

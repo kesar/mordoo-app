@@ -36,8 +36,8 @@
     "timeout": "Request timed out."
   },
   "notificationPrompt": {
-    "title": "Your Daily Cosmic Reading Awaits",
-    "description": "Get your Prana Index, lucky elements, and daily insight delivered every morning.",
+    "title": "Your Daily Insight Awaits",
+    "description": "Get your personalized daily insight delivered every morning.",
     "enable": "Enable Notifications",
     "later": "Maybe Later",
     "noSpam": "We'll only notify you once daily — no spam, ever."
