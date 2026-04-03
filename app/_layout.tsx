@@ -18,6 +18,7 @@ import { useAnalytics } from '@/src/hooks/useAnalytics';
 import { PostHogProvider, posthog } from '@/src/services/analytics';
 import { incrementSession } from '@/src/services/rating';
 import { configureRevenueCat, identifyUser, checkSubscriptionStatus } from '@/src/services/purchases';
+import { syncRemoteFlags } from '@/src/services/feature-flags';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useNetworkStatus } from '@/src/hooks/useNetworkStatus';
 import { OfflineBanner } from '@/src/components/OfflineBanner';
@@ -85,6 +86,7 @@ function RootLayout() {
   useEffect(() => {
     incrementSession();
     configureRevenueCat();
+    syncRemoteFlags();
   }, []);
 
   const [fontsLoaded, fontError] = useFonts({
