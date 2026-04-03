@@ -47,6 +47,14 @@ Upload screenshots to App Store Connect
 
 Upload everything (metadata + screenshots) to App Store Connect
 
+### ios release
+
+```sh
+[bundle exec] fastlane ios release
+```
+
+Build and upload to TestFlight (no EAS needed)
+
 ### ios sync
 
 ```sh
@@ -75,6 +83,14 @@ Set age rating for the app
 
 
 ## Android
+
+### android release
+
+```sh
+[bundle exec] fastlane android release
+```
+
+Build AAB and upload to Google Play internal track (no EAS needed)
 
 ### android upload_metadata
 

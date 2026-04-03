@@ -8,8 +8,8 @@ copyright "#{Time.now.year} Mordoo"
 primary_category "LIFESTYLE"
 secondary_category "ENTERTAINMENT"
 
-# Age Rating
-app_rating_config_path "./fastlane/metadata/rating_config.json"
+# Age Rating — set manually in App Store Connect for new apps
+# app_rating_config_path "./fastlane/metadata/rating_config.json"
 
 # Auto release after approval
 automatic_release true
@@ -26,5 +26,5 @@ app_review_information({
   last_name: "R",
   phone_number: "+34622200020",
   email_address: "kesarr@gmail.com",
-  notes: "No special login required for review. The app uses phone OTP or email authentication. You can sign up with any valid phone number or email to test all features."
+  notes: "Test account: Phone +66000000 (OTP: 000000). Enter any birth date when prompted. Chat with the AI companion, then try Siam Si (shake phone or tap to draw a wisdom stick)."
 })
