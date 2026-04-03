@@ -30,8 +30,8 @@
   },
   "birthData": {
     "step": "Phase 2 of 4 — The Blueprint",
-    "title": "Your Celestial Foundation",
-    "subtitle": "This data is sacred — it defines your cosmic blueprint.",
+    "title": "Your Personal Profile",
+    "subtitle": "This data defines your personal profile.",
     "dateLabel": "Solar Alignment (Date of Birth)",
     "day": "Day",
     "month": "Month",
@@ -56,21 +56,21 @@
     "am": "AM",
     "pm": "PM",
     "cta": "CAST THE BLUEPRINT",
-    "footer": "Fate awaits your initiation"
+    "footer": "Your profile is ready"
   },
   "nameNumbers": {
     "step": "Phase 3 of 4 — The Vibration",
-    "title": "Your Cosmic Signature",
+    "title": "Your Profile Details",
     "subtitle": "Names and numbers carry vibrational frequencies that shape your destiny.",
     "fullNameLabel": "Name Vibration (Full Name)",
     "fullNamePlaceholder": "Enter your full name...",
     "phoneLabel": "Digital Signal (Phone — Optional)",
     "phonePlaceholder": "0XX-XXX-XXXX",
-    "phoneHint": "Your number carries numerological significance",
+    "phoneHint": "Your number carries personal significance",
     "carPlateLabel": "Vehicle Resonance (Car Plate — Optional)",
     "carPlatePlaceholder": "e.g. กข 1234",
     "cta": "SEAL THE VIBRATION",
-    "footer": "Your name echoes in the cosmic ledger"
+    "footer": "Your name echoes in your profile"
   },
   "lifeContext": {
     "step": "Phase 4 of 4 — The Intent",
@@ -88,19 +88,19 @@
     "whisperLabel": "Whisper to the Oracle (Optional)",
     "whisperPlaceholder": "Tell us more about what weighs on your spirit...",
     "cta": "DECLARE YOUR INTENT",
-    "footer": "The stars listen to those who seek"
+    "footer": "Your journey begins here"
   },
   "powerUps": {
     "step": "Phase 5 of 6 — The Awakening",
     "title": "UNLOCK DEEPER READINGS",
-    "subtitle": "Grant the Oracle access to enhance your cosmic readings.",
+    "subtitle": "Grant the Oracle access to enhance your deeper insights.",
     "location": {
       "title": "Sacred Coordinates",
       "description": "Your location helps calculate precise planetary positions for accurate readings."
     },
     "notifications": {
       "title": "Daily Oracle Whispers",
-      "description": "Receive your daily energy score and cosmic alerts each morning.",
+      "description": "Receive your daily insight each morning.",
       "denied": "Notifications Blocked",
       "deniedMessage": "You can enable notifications later in your device settings."
     },
@@ -128,7 +128,7 @@
     "stepLabel": "Step 6 of 6",
     "loading": {
       "stars": "Reading the stars...",
-      "blueprint": "Calculating your celestial blueprint...",
+      "blueprint": "Calculating your personal profile...",
       "cosmos": "The cosmos speaks..."
     }
   }
