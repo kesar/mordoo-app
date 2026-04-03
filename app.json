@@ -18,8 +18,8 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "ai.mordoo.app",
-      "buildNumber": "30",
+      "bundleIdentifier": "app.mordoo.oracle",
+      "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -60,7 +60,7 @@
       [
         "expo-sensors",
         {
-          "motionPermission": "Allow $(PRODUCT_NAME) to detect shake gestures for Siam Si fortune drawing"
+          "motionPermission": "Allow $(PRODUCT_NAME) to detect shake gestures for Siam Si wisdom stick drawing"
         }
       ],
       [
@@ -85,7 +85,7 @@
             {
               "name": "DailyPulseWidget",
               "displayName": "Daily Pulse",
-              "description": "Your daily energy score and lucky elements",
+              "description": "Your daily insight at a glance",
               "supportedFamilies": [
                 "systemSmall",
                 "systemMedium"
@@ -94,7 +94,7 @@
             {
               "name": "SiamSiWidget",
               "displayName": "Siam Si",
-              "description": "Today's fortune stick",
+              "description": "Today's wisdom stick",
               "supportedFamilies": [
                 "systemSmall",
                 "accessoryRectangular"
@@ -107,7 +107,24 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "969fe2eb-8da0-4af0-be98-df44a79690a8"
+        "projectId": "969fe2eb-8da0-4af0-be98-df44a79690a8",
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "ExpoWidgetsTarget",
+                  "bundleIdentifier": "app.mordoo.oracle.ExpoWidgetsTarget",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.app.mordoo.oracle"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
       },
       "router": {}
     },
