@@ -9,6 +9,7 @@ import { fonts, fontSizes } from '@/src/constants/typography';
 import { Text } from '@/src/components/ui/Text';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useSettingsStore } from '@/src/stores/settingsStore';
+import { useFeatureFlagStore } from '@/src/stores/featureFlagStore';
 import { signOut } from '@/src/services/auth';
 import { deleteAccount } from '@/src/services/account';
 import { fetchUserProfile } from '@/src/services/profile';
@@ -134,6 +135,7 @@ export default function ProfileScreen() {
   const setNotificationTime = useSettingsStore((s) => s.setNotificationTime);
   const profilePrivate = useSettingsStore((s) => s.profilePrivate);
   const toggleProfilePrivacy = useSettingsStore((s) => s.toggleProfilePrivacy);
+  const zodiacReferences = useFeatureFlagStore((s) => s.zodiacReferences);
 
   const { data: profile, isLoading, error, refetch } = useQuery({
     queryKey: ['profile', userId],
@@ -144,7 +146,7 @@ export default function ProfileScreen() {
   const { data: zodiac, isLoading: zodiacLoading } = useQuery({
     queryKey: ['zodiac-signs', userId, language],
     queryFn: () => fetchZodiacSigns(language as 'en' | 'th'),
-    enabled: !!userId && !!profile?.dateOfBirth,
+    enabled: zodiacReferences && !!userId && !!profile?.dateOfBirth,
     staleTime: Infinity,
   });
 
@@ -331,7 +333,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Zodiac Signs */}
-        {zodiac ? (
+        {zodiacReferences && (zodiac ? (
           <View style={{ gap: 0, marginBottom: 14 }}>
             <ZodiacCard
               systemLabel={t('westernZodiac')}
@@ -354,7 +356,7 @@ export default function ProfileScreen() {
             <ZodiacCardSkeleton />
             <ZodiacCardSkeleton />
           </View>
-        ) : null}
+        ) : null)}
 
         {/* Subscription */}
         {features.paywall && (
