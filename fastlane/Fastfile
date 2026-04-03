@@ -17,7 +17,7 @@ platform :ios do
   lane :download_metadata do
     deliver(
       api_key: API_KEY,
-      app_identifier: "ai.mordoo.app",
+      app_identifier: "app.mordoo.oracle",
       skip_binary_upload: true,
       skip_screenshots: true,
       run_precheck_before_submit: false,
@@ -60,6 +60,55 @@ platform :ios do
       overwrite_screenshots: true,
       precheck_include_in_app_purchases: false
     )
+  end
+
+  # ─── Build & Submit to App Store Connect ────────────────────
+  desc "Build and upload to TestFlight (no EAS needed)"
+  lane :release do
+    project_root = File.expand_path("..", __dir__)
+
+    # 1. Bump build number in app.json
+    app_json_path = File.join(project_root, "app.json")
+    app_json = JSON.parse(File.read(app_json_path))
+    current_build = app_json["expo"]["ios"]["buildNumber"].to_i
+    new_build = current_build + 1
+    app_json["expo"]["ios"]["buildNumber"] = new_build.to_s
+    File.write(app_json_path, JSON.pretty_generate(app_json) + "\n")
+    UI.success("Bumped buildNumber: #{current_build} → #{new_build}")
+
+    version = app_json["expo"]["version"]
+
+    # 2. Regenerate native project from Expo config
+    sh("cd #{project_root} && npx expo prebuild --clean --no-install")
+    sh("cd #{project_root}/ios && unset GEM_PATH GEM_HOME && /opt/homebrew/bin/pod install")
+
+    # 3. Build signed archive
+    update_code_signing_settings(
+      path: File.join(project_root, "ios", "MorDoo.xcodeproj"),
+      use_automatic_signing: true,
+      team_id: "WYQPT8K8K3"
+    )
+
+    build_app(
+      workspace: File.join(project_root, "ios", "MorDoo.xcworkspace"),
+      scheme: "MorDoo",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: File.join(project_root, "ios", "build"),
+      output_name: "MorDoo.ipa",
+      clean: true,
+      xcargs: "-allowProvisioningUpdates"
+    )
+
+    # 4. Upload to TestFlight
+    upload_to_testflight(
+      api_key: API_KEY,
+      ipa: File.join(project_root, "ios", "build", "MorDoo.ipa"),
+      skip_waiting_for_build_processing: true,
+      skip_submission: true
+    )
+
+    UI.success("✅ v#{version} (#{new_build}) uploaded to App Store Connect!")
   end
 
   # ─── Sync from ASC ─────────────────────────────────────────
@@ -198,6 +247,51 @@ end
 # ANDROID — Google Play Store (via supply)
 # ═══════════════════════════════════════════════════════════════
 platform :android do
+  # ─── Build & Upload AAB ────────────────────────────────────
+  desc "Build AAB and upload to Google Play internal track (no EAS needed)"
+  lane :release do |options|
+    track = options[:track] || "internal"
+    project_root = File.expand_path("..", __dir__)
+
+    # 1. Bump versionCode in app.json
+    app_json_path = File.join(project_root, "app.json")
+    app_json = JSON.parse(File.read(app_json_path))
+    current_code = app_json["expo"]["android"]["versionCode"].to_i
+    new_code = current_code + 1
+    app_json["expo"]["android"]["versionCode"] = new_code
+    File.write(app_json_path, JSON.pretty_generate(app_json) + "\n")
+    UI.success("Bumped versionCode: #{current_code} → #{new_code}")
+
+    version = app_json["expo"]["version"]
+
+    # 2. Regenerate native project from Expo config
+    sh("cd #{project_root} && npx expo prebuild --platform android --clean --no-install")
+
+    # 3. Build release AAB
+    gradle(
+      project_dir: File.join(project_root, "android"),
+      task: "bundle",
+      build_type: "Release"
+    )
+
+    # 4. Upload to Google Play
+    aab_path = lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+    supply(
+      json_key: GOOGLE_PLAY_JSON_KEY,
+      package_name: "ai.mordoo.app",
+      track: track,
+      release_status: "draft",
+      aab: aab_path,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      metadata_path: "fastlane/metadata/android"
+    )
+
+    UI.success("✅ v#{version} (#{new_code}) uploaded to Google Play (#{track})!")
+  end
+
   # ─── Metadata ───────────────────────────────────────────────
   desc "Upload metadata to Google Play"
   lane :upload_metadata do

@@ -1,7 +1,6 @@
-app_identifier("ai.mordoo.app")
-
-# App Store Connect API Key authentication
-json_key_file(ENV["APP_STORE_CONNECT_API_KEY_PATH"]) if ENV["APP_STORE_CONNECT_API_KEY_PATH"]
+app_identifier("app.mordoo.oracle")
+apple_id("kesarr@gmail.com")
+team_id("WYQPT8K8K3")
 
 # Google Play Store
 for_platform :android do
