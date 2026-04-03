@@ -23,11 +23,13 @@ import { CheckIcon } from '@/src/components/icons/TarotIcons';
 import { useTranslation } from 'react-i18next';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
 import { analytics } from '@/src/services/analytics';
+import { useFeatureFlagStore } from '@/src/stores/featureFlagStore';
 
 export default function PowerUps() {
   const { t } = useTranslation('onboarding');
   const setStep = useOnboardingStore((s) => s.setStep);
   const completeOnboarding = useOnboardingStore((s) => s.completeOnboarding);
+  const dailyPulse = useFeatureFlagStore((s) => s.dailyPulse);
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [notifToggle, setNotifToggle] = useState(false);
   const language = useSettingsStore((s) => s.language);
@@ -38,7 +40,7 @@ export default function PowerUps() {
     analytics.track('onboarding_completed');
     setStep(6);
     completeOnboarding();
-    router.replace('/(main)/pulse');
+    router.replace(dailyPulse ? '/(main)/pulse' : '/(main)/home');
   };
 
   return (

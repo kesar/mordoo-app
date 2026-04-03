@@ -19,6 +19,7 @@ import { GoldButton } from '@/src/components/ui/GoldButton';
 import { TopAppBar } from '@/src/components/ui/TopAppBar';
 import { useOnboardingStore, Concern } from '@/src/stores/onboardingStore';
 import { analytics } from '@/src/services/analytics';
+import { useFeatureFlagStore } from '@/src/stores/featureFlagStore';
 
 const CONCERNS: { concern: Concern; image: number }[] = [
   { concern: 'love', image: require('@/assets/images/tarot/concern-love.webp') },
@@ -35,6 +36,8 @@ export default function LifeContext() {
   const setUrgencyContext = useOnboardingStore((s) => s.setUrgencyContext);
   const setStep = useOnboardingStore((s) => s.setStep);
   const completeOnboarding = useOnboardingStore((s) => s.completeOnboarding);
+
+  const dailyPulse = useFeatureFlagStore((s) => s.dailyPulse);
 
   const [selectedConcerns, setSelectedConcerns] = useState<Concern[]>([]);
   const [urgency, setUrgency] = useState('');
@@ -53,7 +56,7 @@ export default function LifeContext() {
     analytics.track('onboarding_completed');
     setStep(5);
     completeOnboarding();
-    router.replace('/(main)/pulse');
+    router.replace(dailyPulse ? '/(main)/pulse' : '/(main)/home');
   };
 
   return (
