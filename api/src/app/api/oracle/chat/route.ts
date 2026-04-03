@@ -19,6 +19,9 @@ import {
   summarizeConversation,
 } from '../../../../lib/conversation';
 
+// Toggle after App Store approval — re-enables zodiac references in Oracle responses
+const ENABLE_ZODIAC_REFERENCES = false;
+
 function buildSystemPrompt(
   birthData?: { dateOfBirth: string; fullName?: string; concerns: string[] },
   lang?: string,
@@ -31,17 +34,22 @@ function buildSystemPrompt(
     const month = date.getMonth() + 1;
     const day = date.getDate();
 
-    const zodiac = getZodiacSign(month, day);
-    const element = getElement(month);
-    const chineseZodiac = getChineseZodiac(date.getFullYear());
-
     context = `
 The seeker's birth data:
 - Date of birth: ${birthData.dateOfBirth}
-- Name: ${birthData.fullName || 'Unknown'}
+- Name: ${birthData.fullName || 'Unknown'}`;
+
+    if (ENABLE_ZODIAC_REFERENCES) {
+      const zodiac = getZodiacSign(month, day);
+      const element = getElement(month);
+      const chineseZodiac = getChineseZodiac(date.getFullYear());
+      context += `
 - Western zodiac: ${zodiac}
 - Element: ${element}
-- Chinese zodiac: ${chineseZodiac}
+- Chinese zodiac: ${chineseZodiac}`;
+    }
+
+    context += `
 - Life concerns: ${birthData.concerns.join(', ') || 'general guidance'}
 `;
   }
@@ -51,12 +59,21 @@ The seeker's birth data:
     summaryContext = `\nPrevious sessions with this seeker:\n${summaries.map((s) => `- ${s.date}: ${s.summary}`).join('\n')}\n`;
   }
 
-  return `You are Mor Doo (หมอดู), a mystical Thai astrologer who blends Thai, Chinese, and Western astrology into deeply personal readings. You speak with ancient wisdom but in accessible modern language.
+  const persona = ENABLE_ZODIAC_REFERENCES
+    ? `You are Mor Doo (หมอดู), a mystical Thai astrologer who blends Thai, Chinese, and Western astrology into deeply personal readings. You speak with ancient wisdom but in accessible modern language.
 
 Your personality:
 - Warm, mysterious, and insightful
 - You reference specific astrological positions relevant to the seeker's question
-- You blend Thai astrology (วันเกิด), Chinese zodiac, and Western zodiac naturally
+- You blend Thai astrology (วันเกิด), Chinese zodiac, and Western zodiac naturally`
+    : `You are Mor Doo (หมอดู), a wise Thai counselor and AI companion for self-reflection. You speak with warmth, insight, and clarity rooted in Thai wisdom traditions.
+
+Your personality:
+- Warm, perceptive, and thoughtful
+- You offer practical guidance grounded in the seeker's personal context
+- You draw on Thai cultural wisdom and universal human insight`;
+
+  return `${persona}
 - Keep responses very short: 2-4 sentences maximum. Be direct, specific, and meaningful — no filler, no preamble
 - Use mystical but clear language — no generic fortune cookie responses
 - Never use emojis — use words and markdown formatting (bold, italic) instead
