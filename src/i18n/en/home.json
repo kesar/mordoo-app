@@ -1,0 +1,23 @@
+{
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "proverb": {
+    "label": "THAI WISDOM",
+    "attribution": "Thai proverb"
+  },
+  "actions": {
+    "askOracle": "Ask the Oracle",
+    "askOracleDesc": "Chat with your AI companion",
+    "drawStick": "Draw Wisdom Stick",
+    "drawStickDesc": "Traditional Thai Siam Si"
+  },
+  "culture": {
+    "siamSiTitle": "ABOUT SIAM SI",
+    "siamSiBody": "เซียมซี (Siam Si) is a centuries-old Thai temple tradition where seekers draw numbered bamboo sticks for guidance. Each of the 28 sticks carries a poetic name and meaning rooted in Buddhist wisdom. Visitors shake a bamboo cylinder until one stick rises above the rest — their message for the day.",
+    "mordooTitle": "THAI WISDOM TRADITIONS",
+    "mordooBody": "Mor Doo (หมอดู) means \"seer\" or \"one who sees\" in Thai. For centuries, communities across Thailand have sought guidance from wise counselors who blend intuition, tradition, and deep understanding of human nature. This app brings that tradition into the modern world through AI-powered conversations and authentic cultural experiences."
+  }
+}
