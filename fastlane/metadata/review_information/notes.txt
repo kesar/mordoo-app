@@ -1,34 +1,18 @@
-Dear App Review Team,
+Mor Doo is an AI self-reflection companion that brings Thai cultural traditions to a modern conversational experience.
 
-Thank you for taking the time to review Mor Doo. We understand this category receives many submissions, and we appreciate the opportunity to explain what makes our app genuinely different from existing astrology apps on the App Store.
+WHAT MAKES THIS APP UNIQUE:
+- AI-powered conversations (not pre-written content) — each response is generated uniquely for the user's question and context
+- Siam Si (เซียมซี) digital experience — a traditional Thai temple practice of drawing bamboo wisdom sticks, presented authentically with bilingual poetic content
+- Natively bilingual Thai/English — designed for the Thai diaspora and Thai culture enthusiasts
 
-WHAT MOR DOO IS NOT:
-Mor Doo is not a generic Western horoscope app. It does not generate sun-sign daily horoscopes, does not use template-based readings, and does not duplicate the content found in apps like Co-Star, The Pattern, or Sanctuary.
+TEST ACCOUNT:
+Phone: +66000000 (OTP: 000000)
 
-WHAT MAKES MOR DOO UNIQUE:
+HOW TO TEST:
+1. Sign in with the test phone number above
+2. Enter any birth date when prompted
+3. Chat with the AI companion — ask any life question
+4. Navigate to Siam Si tab — shake phone or tap to draw a wisdom stick
+5. Check the home screen widget after first use
 
-1. SIAM SI (เซียมซี) — A Thai Cultural Tradition with No App Store Representation
-Siam Si is a centuries-old Thai Buddhist temple practice where seekers shake a bamboo cylinder to draw numbered fortune sticks. Each of our 28 sticks has an authentic Thai name and meaning (e.g., "มังกรทะยาน / Rising Dragon", "ช้างราชพาหนะ / Royal Elephant"). Users physically shake their phone to simulate the temple experience. We searched the App Store extensively — no existing app offers a quality digital Siam Si experience with AI interpretation.
-
-2. AI-POWERED CONVERSATIONAL ORACLE (Not Template-Based)
-Our Oracle uses Claude AI to conduct genuine two-way conversations. It is not a horoscope generator — it engages with the user's specific life questions, blends three distinct astrological traditions (Thai, Chinese, Western), and maintains conversation memory across sessions. This is fundamentally different from pre-written daily horoscope text.
-
-3. THAI NUMEROLOGY ENGINE
-Our numerology computation system (life path numbers, name vibrations, Prana Index energy scoring) is based on Thai numerological methods — a distinct system from Western astrology. It computes personalized daily readings from exact birth data, not generic zodiac categories.
-
-4. UNDERSERVED CULTURAL MARKET
-Mor Doo is fully bilingual (Thai/English) with native Thai text throughout. It serves the Thai-speaking community (70M+ in Thailand, 6M+ diaspora) with culturally authentic spiritual practices that have no quality digital representation on the App Store.
-
-5. DEEP iOS PLATFORM INTEGRATION
-This version adds:
-- Home screen widgets (Daily Pulse energy score + Siam Si fortune stick) via WidgetKit
-- Lock screen widgets
-- Siri Shortcuts for quick access to readings
-These demonstrate genuine investment in the iOS platform beyond what template or web-wrapper apps provide.
-
-DEMO ACCOUNT:
-You can use the app with any valid phone number or email. The onboarding asks for birth date and name to compute numerology — any data works for testing.
-
-We believe Mor Doo serves a genuinely underrepresented cultural community with traditions and technology not found in any existing App Store app. We welcome a phone call to demonstrate these features live if that would be helpful.
-
-Thank you for your consideration.
+The AI companion uses Claude by Anthropic to generate personalized responses. All conversations are unique and contextual.
