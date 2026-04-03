@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { colors } from '@/src/constants/colors';
 import { fonts } from '@/src/constants/typography';
 import { lightHaptic } from '@/src/utils/haptics';
+import { useFeatureFlagStore } from '@/src/stores/featureFlagStore';
 import type { BottomTabBarButtonProps } from '@react-navigation/bottom-tabs';
 
 export default function MainLayout() {
   const { t } = useTranslation();
+  const dailyPulse = useFeatureFlagStore((s) => s.dailyPulse);
 
   return (
     <Tabs
@@ -42,16 +44,34 @@ export default function MainLayout() {
         tabBarButton: (props: BottomTabBarButtonProps) => <TabButton {...props} />,
       }}
     >
-      <Tabs.Screen
-        name="pulse"
-        listeners={{ tabPress: () => lightHaptic() }}
-        options={{
-          title: t('tabs.pulse'),
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon name="pulse" color={color} focused={focused} />
-          ),
-        }}
-      />
+      {dailyPulse ? (
+        <Tabs.Screen
+          name="pulse"
+          listeners={{ tabPress: () => lightHaptic() }}
+          options={{
+            title: t('tabs.pulse'),
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon name="pulse" color={color} focused={focused} />
+            ),
+          }}
+        />
+      ) : (
+        <Tabs.Screen
+          name="home"
+          listeners={{ tabPress: () => lightHaptic() }}
+          options={{
+            title: t('tabs.home'),
+            tabBarIcon: ({ color, focused }) => (
+              <TabIcon name="home" color={color} focused={focused} />
+            ),
+          }}
+        />
+      )}
+      {dailyPulse ? (
+        <Tabs.Screen name="home" options={{ href: null }} />
+      ) : (
+        <Tabs.Screen name="pulse" options={{ href: null }} />
+      )}
       <Tabs.Screen
         name="oracle"
         listeners={{ tabPress: () => lightHaptic() }}
@@ -97,7 +117,7 @@ function TabButton({ children, accessibilityState, onPress, style }: BottomTabBa
 function TabIcon({ name, color }: { name: string; color: string; focused: boolean }) {
   const size = 22;
   const icon =
-    name === 'pulse' ? (
+    name === 'pulse' || name === 'home' ? (
       <StarIcon size={size} color={color} />
     ) : name === 'oracle' ? (
       <OracleHeartIcon size={size} color={color} />

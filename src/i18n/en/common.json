@@ -1,6 +1,7 @@
 {
   "appName": "Mor Doo",
   "tabs": {
+    "home": "Home",
     "pulse": "The Pulse",
     "oracle": "The Oracle",
     "profile": "Profile"
