@@ -4,9 +4,9 @@ import { Platform } from 'react-native';
 export function donatePulseShortcut() {
   if (Platform.OS !== 'ios') return;
   donateShortcut({
-    activityType: 'ai.mordoo.app.dailyPulse',
-    title: 'View Daily Reading',
-    suggestedInvocationPhrase: 'Show my daily reading',
+    activityType: 'app.mordoo.oracle.dailyInsight',
+    title: 'View Daily Insight',
+    suggestedInvocationPhrase: 'Show my daily insight',
     isEligibleForSearch: true,
     isEligibleForPrediction: true,
   });
@@ -15,9 +15,9 @@ export function donatePulseShortcut() {
 export function donateSiamSiShortcut() {
   if (Platform.OS !== 'ios') return;
   donateShortcut({
-    activityType: 'ai.mordoo.app.siamSi',
-    title: 'Draw Fortune Stick',
-    suggestedInvocationPhrase: 'Draw a fortune stick',
+    activityType: 'app.mordoo.oracle.siamSi',
+    title: 'Draw Wisdom Stick',
+    suggestedInvocationPhrase: 'Draw a wisdom stick',
     isEligibleForSearch: true,
     isEligibleForPrediction: true,
   });
@@ -26,7 +26,7 @@ export function donateSiamSiShortcut() {
 export function donateOracleShortcut() {
   if (Platform.OS !== 'ios') return;
   donateShortcut({
-    activityType: 'ai.mordoo.app.askOracle',
+    activityType: 'app.mordoo.oracle.askOracle',
     title: 'Ask Mor Doo',
     suggestedInvocationPhrase: 'Ask Mor Doo',
     isEligibleForSearch: true,
