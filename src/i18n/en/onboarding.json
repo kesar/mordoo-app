@@ -123,13 +123,13 @@
     "luckyNumber": "Number",
     "luckyDirection": "East",
     "dailyRitual": "Daily Ritual",
-    "dailyRitualText": "Today: wear gold to amplify your Sun in Leo. Avoid signing contracts after 3pm.",
+    "dailyRitualText": "Today: wear gold to amplify your energy. Avoid signing contracts after 3pm.",
     "enterRealms": "Enter the Realms",
     "stepLabel": "Step 6 of 6",
     "loading": {
-      "stars": "Reading the stars...",
+      "stars": "Preparing your reading...",
       "blueprint": "Calculating your personal profile...",
-      "cosmos": "The cosmos speaks..."
+      "cosmos": "Ancient wisdom speaks..."
     }
   }
 }

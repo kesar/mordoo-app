@@ -18,6 +18,7 @@ import { NotificationPrompt } from '@/src/components/NotificationPrompt';
 import { useSettingsStore } from '@/src/stores/settingsStore';
 import { incrementPulseView } from '@/src/services/rating';
 import { features } from '@/src/config/features';
+import { useFeatureFlagStore } from '@/src/stores/featureFlagStore';
 import { analytics } from '@/src/services/analytics';
 import {
   SparkleIcon,
@@ -108,6 +109,7 @@ function TwinklingStar({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 
 export default function PulseScreen() {
   const { t, i18n } = useTranslation('pulse');
+  const zodiacRefs = useFeatureFlagStore((s) => s.zodiacReferences);
   const { data: pulse, isLoading, error, refetch } = useDailyPulse();
   const { viewShotRef, shareCard, isSharing } = useShareCard();
   const { ratingPromptVisible, showRatingPrompt, closeRatingPrompt } = useRatingPrompt();
@@ -231,8 +233,8 @@ export default function PulseScreen() {
             <View style={styles.loadingRingPlaceholder}>
               <ActivityIndicator color={colors.gold.DEFAULT} size="large" />
             </View>
-            <Text style={styles.loadingText}>{t('loading.title')}</Text>
-            <Text style={styles.loadingSubText}>{t('loading.subtitle')}</Text>
+            <Text style={styles.loadingText}>{t(zodiacRefs ? 'loading.titleAstro' : 'loading.title')}</Text>
+            <Text style={styles.loadingSubText}>{t(zodiacRefs ? 'loading.subtitleAstro' : 'loading.subtitle')}</Text>
           </View>
         ) : error && !pulse ? (
           <View style={styles.errorContainer}>
@@ -291,7 +293,7 @@ export default function PulseScreen() {
                 style={({ pressed }) => [styles.shareBtn, pressed && { opacity: 0.7 }]}
                 onPress={() => {
                   analytics.track('share_tapped', { content_type: 'pulse' });
-                  shareCard(t('share.message', { score: pulse.energyScore }), 'pulse');
+                  shareCard(t(zodiacRefs ? 'share.messageAstro' : 'share.message', { score: pulse.energyScore }), 'pulse');
                 }}
                 disabled={isSharing}
               >

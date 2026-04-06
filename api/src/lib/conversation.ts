@@ -169,7 +169,7 @@ export async function summarizeConversation(
       messages: [
         {
           role: 'user',
-          content: `Summarize this conversation between a user and Mor Doo (an astrology advisor). Focus on:
+          content: `Summarize this conversation between a user and Mor Doo (a Thai wisdom counselor). Focus on:
 - The user's main concerns and questions
 - Key advice or predictions given
 - The user's emotional state and reactions

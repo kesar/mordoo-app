@@ -33,6 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { analytics } from '@/src/services/analytics';
 import { Paywall } from '@/src/components/Paywall';
 import { features } from '@/src/config/features';
+import { useFeatureFlagStore } from '@/src/stores/featureFlagStore';
 import { onSubscriptionChange } from '@/src/services/purchases';
 import { donateOracleShortcut } from '@/src/utils/siri-shortcuts';
 
@@ -139,13 +140,15 @@ const markdownStyles = {
 
 function AiMessageBubble({ message, isThinking }: { message: ChatMessage; isThinking?: boolean }) {
   const { t } = useTranslation('oracle');
+  const zodiacRefs = useFeatureFlagStore((s) => s.zodiacReferences);
   const time = new Date(message.timestamp).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
   });
 
   const [phrase] = useState(() => {
-    const phrases = t('chat.thinking', { returnObjects: true }) as string[];
+    const key = zodiacRefs ? 'chat.thinkingAstro' : 'chat.thinking';
+    const phrases = t(key, { returnObjects: true }) as string[];
     return phrases[Math.floor(Math.random() * phrases.length)];
   });
 
@@ -237,6 +240,7 @@ function DateDivider({ date }: { date: string }) {
 
 export default function OracleScreen() {
   const { t } = useTranslation('oracle');
+  const zodiacRefs = useFeatureFlagStore((s) => s.zodiacReferences);
   const [mode, setMode] = useState<'mordoo' | 'strategist'>('mordoo');
   const [input, setInput] = useState('');
   const [quotaExceeded, setQuotaExceeded] = useState(false);
@@ -368,9 +372,9 @@ export default function OracleScreen() {
   const welcomeMessage = useMemo<ChatMessage>(() => ({
     id: 'welcome',
     role: 'assistant',
-    content: t('chat.welcomeMessage'),
+    content: t(zodiacRefs ? 'chat.welcomeMessageAstro' : 'chat.welcomeMessage'),
     timestamp: new Date().toISOString(),
-  }), [t]);
+  }), [t, zodiacRefs]);
 
   const loadMoreHistory = useCallback(() => {
     if (isLoadingHistory || !hasMoreHistory) return;
@@ -523,7 +527,7 @@ export default function OracleScreen() {
         } else {
           analytics.track('oracle_response_error', { error: error.message });
           appendToLastMessage(
-            t('chat.errorDisrupted'),
+            t(zodiacRefs ? 'chat.errorDisruptedAstro' : 'chat.errorDisrupted'),
           );
         }
       },
@@ -572,7 +576,7 @@ export default function OracleScreen() {
           <BambooIcon size={18} />
         </Pressable>
       </View>
-      <Text style={styles.disclaimer}>{t('disclaimer')}</Text>
+      <Text style={styles.disclaimer}>{t(zodiacRefs ? 'disclaimerAstro' : 'disclaimer')}</Text>
 
       <KeyboardAvoidingView
         style={styles.flex}
@@ -615,7 +619,7 @@ export default function OracleScreen() {
                   style={styles.textInput}
                   value={input}
                   onChangeText={setInput}
-                  placeholder={t('chat.placeholder')}
+                  placeholder={t(zodiacRefs ? 'chat.placeholderAstro' : 'chat.placeholder')}
                   placeholderTextColor="rgba(228,225,240,0.35)"
                   onSubmitEditing={sendMessage}
                   returnKeyType="send"

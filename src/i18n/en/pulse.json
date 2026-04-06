@@ -4,10 +4,13 @@
   "pranaIndex": "PRANA INDEX",
   "energyScore": "Energy Score",
   "pranaLabel": "Prana Index",
-  "summary": "Today's Cosmic Summary",
+  "summary": "Today's Summary",
+  "summaryAstro": "Today's Cosmic Summary",
   "loading": {
-    "title": "Reading the stars...",
-    "subtitle": "Aligning your cosmic energies"
+    "title": "Preparing your reading...",
+    "titleAstro": "Reading the stars...",
+    "subtitle": "Tuning into your personal energy",
+    "subtitleAstro": "Aligning your cosmic energies"
   },
   "error": {
     "title": "Could not read your pulse today"
@@ -25,7 +28,8 @@
     "direction": "LUCKY DIRECTION"
   },
   "cosmicNews": {
-    "title": "Cosmic News",
+    "title": "Daily Insights",
+    "titleAstro": "Cosmic News",
     "seeAll": "See all",
     "tags": {
       "transit": "Transit",
@@ -40,6 +44,7 @@
   },
   "share": {
     "button": "Share",
-    "message": "My cosmic energy is {{score}} today! Check yours on Mordoo."
+    "message": "My energy score is {{score}} today! Check yours on Mordoo.",
+    "messageAstro": "My cosmic energy is {{score}} today! Check yours on Mordoo."
   }
 }
