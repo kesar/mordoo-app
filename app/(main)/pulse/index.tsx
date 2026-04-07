@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Redirect } from 'expo-router';
 import { Animated, View, ScrollView, StyleSheet, ActivityIndicator, Easing, Pressable } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import { PulseShareCard } from '@/src/components/sharing/PulseShareCard';
@@ -109,6 +110,7 @@ function TwinklingStar({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 
 export default function PulseScreen() {
   const { t, i18n } = useTranslation('pulse');
+  const dailyPulseEnabled = useFeatureFlagStore((s) => s.dailyPulse);
   const zodiacRefs = useFeatureFlagStore((s) => s.zodiacReferences);
   const { data: pulse, isLoading, error, refetch } = useDailyPulse();
   const { viewShotRef, shareCard, isSharing } = useShareCard();
@@ -186,6 +188,10 @@ export default function PulseScreen() {
     month: 'short',
     year: 'numeric',
   }).toUpperCase();
+
+  if (!dailyPulseEnabled) {
+    return <Redirect href="/(main)/home" />;
+  }
 
   return (
     <SafeAreaView style={styles.scrollView} edges={['top']}>
