@@ -10,7 +10,7 @@ const FLAGS = {
   oracleChat: true,
 };
 
-const VERSION = 2;
+const VERSION = 3;
 
 export async function GET() {
   return NextResponse.json(
