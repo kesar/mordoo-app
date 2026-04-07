@@ -183,6 +183,11 @@ Runs on every PR and push to `main` — 4 parallel jobs:
 ### Fastlane (iOS)
 - App Store submission automation in `fastlane/`
 - Metadata and screenshots managed via `fastlane/metadata/`
+- **IMPORTANT — Sentry source maps:** the build script tries to upload source maps to Sentry and will fail with `Auth token is required` unless `SENTRY_AUTH_TOKEN` is set. Until that token is configured locally, run release builds with `SENTRY_DISABLE_AUTO_UPLOAD=true` to skip the upload step:
+  ```bash
+  SENTRY_DISABLE_AUTO_UPLOAD=true fastlane ios release
+  ```
+- Fastlane is installed globally (no Gemfile) — invoke as `fastlane`, not `bundle exec fastlane`.
 
 ### Fastlane (Android)
 - Google Play Store automation via `supply` in `fastlane/Fastfile` (platform :android)
