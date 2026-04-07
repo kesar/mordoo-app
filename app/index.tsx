@@ -3,12 +3,14 @@ import { Redirect } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { useAuthStore } from '@/src/stores/authStore';
 import { useOnboardingStore } from '@/src/stores/onboardingStore';
+import { useFeatureFlagStore } from '@/src/stores/featureFlagStore';
 import { fetchExistingBirthData } from '@/src/services/birth-data';
 import { colors } from '@/src/constants/colors';
 
 export default function Index() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const onboardingComplete = useOnboardingStore((s) => s.isComplete);
+  const dailyPulse = useFeatureFlagStore((s) => s.dailyPulse);
   const [checking, setChecking] = useState(false);
   const [resolved, setResolved] = useState(false);
 
@@ -59,5 +61,5 @@ export default function Index() {
   }
 
   if (!onboardingComplete) return <Redirect href="/(onboarding)/soul-gate" />;
-  return <Redirect href="/(main)/pulse" />;
+  return <Redirect href={dailyPulse ? '/(main)/pulse' : '/(main)/home'} />;
 }

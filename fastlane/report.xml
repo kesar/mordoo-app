@@ -5,17 +5,37 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000194">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000208">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: app_store_connect_api_key" time="0.001754">
+      <testcase classname="fastlane.lanes" name="1: app_store_connect_api_key" time="0.00182">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="2: deliver" time="13.917568">
+      <testcase classname="fastlane.lanes" name="2: cd /Users/kesar/projects/mordoo-app &amp;&amp; npx expo prebuild --clean --no-install" time="2.588003">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: cd /Users/kesar/projects/mordoo-app/ios &amp;&amp; unset GEM_PATH GEM_HOME &amp;&amp; /opt/homebrew/bin/pod install" time="36.203052">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: update_code_signing_settings" time="0.040157">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="5: build_app" time="259.172399">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="6: upload_to_testflight" time="101.09166">
         
       </testcase>
     
