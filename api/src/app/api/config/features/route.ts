@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 // Toggle these after App Store approval
 const FLAGS = {
-  dailyPulse: true,
+  dailyPulse: false,
   zodiacReferences: false,
   fortuneLabels: false,
   luckyElements: false,
