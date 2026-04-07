@@ -14,7 +14,7 @@ export const features = {
   paywall: true,
 
   // Remote-toggled flags (synced from /api/config/features)
-  dailyPulse: false,
+  dailyPulse: true,
   zodiacReferences: false,
   fortuneLabels: false,
   luckyElements: false,

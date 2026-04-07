@@ -25,7 +25,7 @@
       }
     },
     "android": {
-      "package": "ai.mordoo.app",
+      "package": "app.mordoo.oracle",
       "adaptiveIcon": {
         "backgroundColor": "#0a0a14",
         "foregroundImage": "./assets/android-icon-foreground.png",

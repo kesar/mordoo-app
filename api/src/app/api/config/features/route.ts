@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 // Toggle these after App Store approval
 const FLAGS = {
-  dailyPulse: false,
+  dailyPulse: true,
   zodiacReferences: false,
   fortuneLabels: false,
   luckyElements: false,
@@ -10,7 +10,7 @@ const FLAGS = {
   oracleChat: true,
 };
 
-const VERSION = 1;
+const VERSION = 2;
 
 export async function GET() {
   return NextResponse.json(

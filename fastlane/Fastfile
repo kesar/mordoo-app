@@ -123,7 +123,7 @@ platform :ios do
       key: API_KEY[:key]
     })
 
-    app = Spaceship::ConnectAPI::App.find("ai.mordoo.app")
+    app = Spaceship::ConnectAPI::App.find("app.mordoo.oracle")
     UI.user_error!("App not found!") unless app
 
     # Get version (edit or live)
@@ -183,7 +183,7 @@ platform :ios do
       key: API_KEY[:key]
     })
 
-    app = Spaceship::ConnectAPI::App.find("ai.mordoo.app")
+    app = Spaceship::ConnectAPI::App.find("app.mordoo.oracle")
     version = app.get_edit_app_store_version
     UI.user_error!("No editable version found!") unless version
 
@@ -207,7 +207,7 @@ platform :ios do
       key: API_KEY[:key]
     })
 
-    app = Spaceship::ConnectAPI::App.find("ai.mordoo.app")
+    app = Spaceship::ConnectAPI::App.find("app.mordoo.oracle")
     app_info = app.fetch_latest_app_info
     age_rating = app_info.fetch_age_rating_declaration
 
@@ -278,7 +278,7 @@ platform :android do
     aab_path = lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
-      package_name: "ai.mordoo.app",
+      package_name: "app.mordoo.oracle",
       track: track,
       release_status: "draft",
       aab: aab_path,
@@ -297,7 +297,7 @@ platform :android do
   lane :upload_metadata do
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
-      package_name: "ai.mordoo.app",
+      package_name: "app.mordoo.oracle",
       track: "internal",
       release_status: "draft",
       skip_upload_apk: true,
@@ -314,7 +314,7 @@ platform :android do
   lane :upload_screenshots do
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
-      package_name: "ai.mordoo.app",
+      package_name: "app.mordoo.oracle",
       track: "internal",
       release_status: "draft",
       skip_upload_apk: true,
@@ -335,7 +335,7 @@ platform :android do
 
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
-      package_name: "ai.mordoo.app",
+      package_name: "app.mordoo.oracle",
       track: track,
       release_status: "draft",
       aab: aab_path,
@@ -355,7 +355,7 @@ platform :android do
 
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
-      package_name: "ai.mordoo.app",
+      package_name: "app.mordoo.oracle",
       track: from,
       track_promote_to: to,
       skip_upload_apk: true,
@@ -372,7 +372,7 @@ platform :android do
   lane :deliver_all do
     supply(
       json_key: GOOGLE_PLAY_JSON_KEY,
-      package_name: "ai.mordoo.app",
+      package_name: "app.mordoo.oracle",
       track: "internal",
       release_status: "draft",
       skip_upload_apk: true,
